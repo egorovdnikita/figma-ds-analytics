@@ -2,7 +2,7 @@
   "name": "figma-ds-analytics",
   "version": "0.0.0",
   "private": true,
-  "description": "Figma Design System Auditor",
+  "description": "Плагин Figma для анализа использования компонентов и токенов дизайн-системы",
   "license": "MIT",
   "type": "module",
   "engines": {

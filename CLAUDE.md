@@ -1,4 +1,4 @@
-# Figma Design System Auditor — паспорт проекта
+# figma-ds-analytics — паспорт проекта
 
 ## Что это
 

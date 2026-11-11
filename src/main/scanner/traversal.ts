@@ -22,6 +22,8 @@ export interface VisitContext {
   readonly pageId: string;
   /** Нода внутри инстанса — включая сам инстанс. */
   readonly insideInstance: boolean;
+  /** Инстанс без родительского инстанса в обходе. */
+  readonly topLevelInstance: boolean;
   /** Нода внутри определения компонента — включая сам компонент. */
   readonly insideComponent: boolean;
 }
@@ -131,7 +133,12 @@ export async function traverse(
       const insideComponent =
         entry.insideComponent || node.type === 'COMPONENT' || node.type === 'COMPONENT_SET';
 
-      visit(node, { pageId: page.id, insideInstance, insideComponent });
+      visit(node, {
+        pageId: page.id,
+        insideInstance,
+        insideComponent,
+        topLevelInstance: node.type === 'INSTANCE' && !entry.insideInstance,
+      });
       nodesVisited++;
       sinceLastYield++;
 

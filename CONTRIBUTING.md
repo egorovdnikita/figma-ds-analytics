@@ -14,7 +14,7 @@ npm run dev        # watch-сборка plugin sandbox
 
 1. `npm run build` — манифест ссылается на `dist/`, без сборки импорт не заработает.
 2. Figma → **Plugins → Development → Import plugin from manifest…** → выбрать `manifest.json` из корня репозитория.
-3. Запуск: **Plugins → Development → Design System Auditor**.
+3. Запуск: **Plugins → Development → figma-ds-analytics**.
 
 При разработке держать `npm run dev` (watch-сборка sandbox). UI пересобирается только через `npm run build:ui`. После пересборки плагин перезапустить — Figma не следит за файлами.
 

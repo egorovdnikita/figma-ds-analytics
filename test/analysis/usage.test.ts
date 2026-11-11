@@ -8,6 +8,16 @@ function resolveAll(id: string) {
 }
 
 describe('обратный индекс токенов', () => {
+  it('один токен на нескольких свойствах слоя считается один раз', () => {
+    const index = new VariableUsageIndex();
+    index.add('V:1', place('a'));
+    index.add('V:1', place('a'));
+    index.add('V:1', place('b'));
+    const [usage] = index.describe(resolveAll, 10);
+    expect(usage?.nodes).toBe(2);
+    expect(usage?.places.map((item) => item.nodeId)).toEqual(['a', 'b']);
+  });
+
   it('считает ноды и страницы, где токен встретился', () => {
     const index = new VariableUsageIndex();
     index.add('V:1', place('a', 'p:1'));

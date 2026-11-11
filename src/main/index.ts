@@ -138,7 +138,7 @@ async function scan(scope: ScanScope): Promise<void> {
       // Мастер резолвим только для инстансов верхнего уровня: вложенные
       // делят его с родителем, и тысячи лишних async-вызовов растянули бы
       // прогон на минуты.
-      if (node.type === 'INSTANCE' && !context.insideInstance) {
+      if (node.type === 'INSTANCE' && context.topLevelInstance) {
         topLevelInstances.push({ node, pageId: context.pageId });
       }
     },
@@ -155,16 +155,17 @@ async function scan(scope: ScanScope): Promise<void> {
 
   const masterRefs: (MasterRef | null)[] = [];
   for (const { node, pageId } of topLevelInstances) {
+    const place: Place = { nodeId: node.id, pageId, name: node.name };
+    const unknown: MasterRef = { key: node.id, name: node.name, remote: null, place };
     try {
       const master = await node.getMainComponentAsync();
       if (master === null) {
-        masterRefs.push(null);
+        masterRefs.push(unknown);
         continue;
       }
-      const place: Place = { nodeId: node.id, pageId, name: node.name };
       masterRefs.push({ key: master.key, name: master.name, remote: master.remote, place });
     } catch {
-      masterRefs.push(null);
+      masterRefs.push(unknown);
     }
   }
 

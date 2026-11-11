@@ -37,6 +37,9 @@ export class VariableUsageIndex {
   readonly #byNode = new Map<string, string[]>();
 
   add(variableId: string, place: Place): void {
+    const onNode = this.#byNode.get(place.nodeId);
+    if (onNode?.includes(variableId) === true) return;
+
     const entry = this.#byId.get(variableId);
     if (entry === undefined) {
       this.#byId.set(variableId, { nodes: 1, places: [place], pages: new Set([place.pageId]) });
@@ -46,7 +49,6 @@ export class VariableUsageIndex {
       if (entry.places.length < PLACES_PER_VARIABLE) entry.places.push(place);
     }
 
-    const onNode = this.#byNode.get(place.nodeId);
     if (onNode === undefined) this.#byNode.set(place.nodeId, [variableId]);
     else onNode.push(variableId);
   }

@@ -1,6 +1,6 @@
-# DS Analytics
+# figma-ds-analytics
 
-Плагин Figma для дизайнеров и мейнтейнеров дизайн-систем: показывает, насколько файл живёт на дизайн-системе, и ведёт к слою с проблемой.
+Плагин Figma для анализа использования компонентов и токенов дизайн-системы, просмотра тренда и перехода к слоям.
 
 <a href="https://github.com/egorovdnikita/figma-ds-analytics"><img src="docs/assets/figma-ds-analytics-demo.webp" width="100%" alt="Демо плагина на вымышленном файле «Магазин цветов — макеты» в тёмной теме: выбор охвата «весь файл» и запуск проверки с прогрессом по шести страницам; сводка с вердиктом «Дизайн-система используется наполовину», кольцами 76% компонентов из библиотеки и 83% слоёв на токенах, трендом и блоком «С чего начать»; переход по пункту «Компоненты мимо библиотеки» в отфильтрованный список, карточка компонента Banner / Sale с местами и кнопкой «перейти»; вкладка «Токены» с числом слоёв на каждый токен и карточка color/text/primary — 3 412 слоёв на 6 страницах; возврат к сводке и стартовому экрану."></a>
 
@@ -25,7 +25,7 @@ npm ci
 npm run build
 ```
 
-Затем в Figma: **Plugins → Development → Import plugin from manifest…** → выбери `manifest.json` из корня репозитория. Запуск: **Plugins → Development → Design System Auditor**.
+Затем в Figma: **Plugins → Development → Import plugin from manifest…** → выбери `manifest.json` из корня репозитория. Запуск: **Plugins → Development → figma-ds-analytics**.
 
 Проверка как в CI — `npm run verify` (typecheck, lint, format, тесты, сборка). Только тесты — `npm test`.
 

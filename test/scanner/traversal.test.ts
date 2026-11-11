@@ -2,6 +2,7 @@ import { describe, expect, it, beforeEach, vi } from 'vitest';
 import { traverse, type ScanTarget } from '../../src/main/scanner/traversal';
 import {
   document,
+  instance,
   frame,
   manyRectangles,
   page,
@@ -26,6 +27,17 @@ function countingYield() {
 
 describe('traverse', () => {
   beforeEach(resetIds);
+
+  it('включает верхний инстанс в отчёт, исключая вложенные', async () => {
+    const nested = instance({ name: 'nested' });
+    const outer = tree(instance({ name: 'outer' }), [nested]);
+    const target: ScanTarget = { kind: 'page', page: page({ children: [outer] }) };
+    const seen: string[] = [];
+    await traverse(target, (node, context) => {
+      if (node.type === 'INSTANCE' && context.topLevelInstance) seen.push(node.name);
+    });
+    expect(seen).toEqual(['outer']);
+  });
 
   it('обходит вложенное дерево целиком', async () => {
     const leaf = rectangle({ name: 'leaf' });

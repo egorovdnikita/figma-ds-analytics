@@ -24,7 +24,7 @@ import type { VariableResolver } from '../scanner/variables';
 export interface MasterRef {
   readonly key: string;
   readonly name: string;
-  readonly remote: boolean;
+  readonly remote: boolean | null;
   /** Копия, через которую этот мастер встретился — чтобы к ней перейти. */
   readonly place: Place;
 }
@@ -56,7 +56,7 @@ export async function buildAdoption(
   library: LibraryGateway,
 ): Promise<Adoption> {
   const masters = countMasters(input.masterRefs);
-  const unknown = input.masterRefs.filter((ref) => ref === null).length;
+  const unknown = input.masterRefs.filter((ref) => ref === null || ref.remote === null).length;
 
   const { collections, libraries, available } = await describeVariableSources(
     input.resolver,
@@ -90,7 +90,7 @@ function countMasters(refs: readonly (MasterRef | null)[]): MasterUsage[] {
 
   for (const ref of refs) {
     if (ref === null) continue;
-    const origin: MasterOrigin = ref.remote ? 'library' : 'local';
+    const origin: MasterOrigin = ref.remote === null ? 'unknown' : ref.remote ? 'library' : 'local';
     const existing = byKey.get(ref.key);
     if (existing === undefined) {
       byKey.set(ref.key, { name: ref.name, origin, instances: 1, places: [ref.place] });
