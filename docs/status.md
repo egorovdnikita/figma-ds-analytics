@@ -8,7 +8,7 @@ Pre-alpha. Правил ещё нет, но отчёт adoption уже рабо�
 
 Не написание кода, а **валидация сигнала правил на боевых файлах**: [протокол](validation/protocol.md), [таблица результатов](validation/results.md). При сигнале < 70% правило не идёт в продукт. Пока таблица не заполнена, правила в `src/main/rules/` не пишутся.
 
-Инструмент для замера — ветка [`spike/signal-probe`](https://github.com/egorovdnikita/ds-analytics/tree/spike/signal-probe). В `main` она не мержится: оттуда переносятся цифры, а не код.
+Инструмент для замера — ветка [`spike/signal-probe`](https://github.com/egorovdnikita/figma-ds-analytics/tree/spike/signal-probe). В `main` она не мержится: оттуда переносятся цифры, а не код.
 
 ## Расхождения с Figma API
 

@@ -4,7 +4,7 @@
 клики показаны кольцами в измеренных центрах кнопок, камера плавная,
 первый и последний кадры совпадают.
 
-    python scripts/promo/compose.py ПАПКА docs/assets/ds-analytics-demo.webp [--keys-only]
+    python scripts/promo/compose.py ПАПКА docs/assets/figma-ds-analytics-demo.webp [--keys-only]
 """
 import argparse
 import json

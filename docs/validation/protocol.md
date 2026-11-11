@@ -34,7 +34,7 @@
 
 Судить вручную по всему файлу невозможно и не нужно. Нужен **одноразовый пробник**: сборка плагина, которая только находит и перечисляет, без фиксов и без UI-полировки.
 
-> **Пробник собран 2026-08-23** — ветка [`spike/signal-probe`](https://github.com/egorovdnikita/ds-analytics/tree/spike/signal-probe), инструкция в `PROBE.md` на той же ветке. Прогнать и заполнить [results.md](results.md).
+> **Пробник собран 2026-08-23** — ветка [`spike/signal-probe`](https://github.com/egorovdnikita/figma-ds-analytics/tree/spike/signal-probe), инструкция в `PROBE.md` на той же ветке. Прогнать и заполнить [results.md](results.md).
 
 Правила пробника:
 

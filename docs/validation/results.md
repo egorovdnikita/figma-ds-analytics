@@ -1,6 +1,6 @@
 # Результаты валидации сигнала
 
-Заполняется по [протоколу](protocol.md). Замеры делает [пробник](https://github.com/egorovdnikita/ds-analytics/tree/spike/signal-probe), вердикты — дизайнер.
+Заполняется по [протоколу](protocol.md). Замеры делает [пробник](https://github.com/egorovdnikita/figma-ds-analytics/tree/spike/signal-probe), вердикты — дизайнер.
 
 **Статус: три замера на двух профилях, судейство не начиналось. Правила не пишутся.**
 

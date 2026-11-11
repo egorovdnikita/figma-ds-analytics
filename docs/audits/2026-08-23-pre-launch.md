@@ -1,4 +1,4 @@
-# Pre-launch аудит — ds-analytics
+# Pre-launch аудит — figma-ds-analytics
 
 Дата аудита: 2026-08-23 · Обновлён: 2026-08-23 (закрыт блок C)
 
