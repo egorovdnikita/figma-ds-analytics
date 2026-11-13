@@ -127,7 +127,7 @@ export function verdict(adoption: Adoption): { text: string; tone: 'good' | 'war
     return { text: 'Файл держится на дизайн-системе', tone: 'good' };
   }
   if (fromLibrary >= 0.5) {
-    return { text: 'Дизайн-система используется наполовину', tone: 'warn' };
+    return { text: 'Часть копий собрана мимо библиотеки', tone: 'warn' };
   }
   return { text: 'Большая часть собрана мимо дизайн-системы', tone: 'warn' };
 }

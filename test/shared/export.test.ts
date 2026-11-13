@@ -54,7 +54,7 @@ describe('отчёт в Markdown', () => {
     const text = toMarkdown(report(), at);
 
     expect(text).toContain('# Дизайн-система в файле «Главная»');
-    expect(text).toContain('Дизайн-система используется наполовину.');
+    expect(text).toContain('Часть копий собрана мимо библиотеки.');
     expect(text).toContain('охват «весь файл»');
   });
 
