@@ -226,16 +226,90 @@ function trendDelta(adoption: Adoption, trend: Trend): number | null {
   );
 }
 
+/**
+ * Столбики тренда от нуля, последний — индиго. Если замеров меньше `slots`,
+ * свободные места рисуются пунктиром: видно, что здесь появится.
+ */
+function Bars({
+  series,
+  slots = series.length,
+}: {
+  series: number[];
+  slots?: number;
+}): JSX.Element {
+  const step = 400 / Math.max(slots, 1);
+  const width = Math.min(36, step * 0.6);
+  return (
+    <svg
+      className="my-3 block w-full overflow-visible"
+      viewBox="0 0 400 112"
+      role="img"
+      aria-label={`Покрытие компонентами из библиотеки: ${series.map((v) => `${Math.round(v)}%`).join(', ')}`}
+    >
+      {Array.from({ length: Math.max(slots, series.length) }, (_, i) => {
+        const value = series[i];
+        const x = step * (i + 0.5) - width / 2;
+        if (value === undefined)
+          return (
+            <rect
+              key={i}
+              x={x + 0.75}
+              y={56.75}
+              width={width - 1.5}
+              height={40.5}
+              style={{ rx: 'var(--rounding-4)' }}
+              fill="none"
+              stroke="var(--surface-base-border-default)"
+              strokeWidth="1.5"
+              strokeDasharray="4 4"
+            />
+          );
+        const height = Math.max(1, value * 0.84);
+        return (
+          <g key={i}>
+            <rect
+              x={x}
+              y={98 - height}
+              width={width}
+              height={height}
+              style={{ rx: 'var(--rounding-4)' }}
+              fill={
+                i === series.length - 1 ? 'var(--accent-fill-solid)' : 'var(--accent-fill-soft)'
+              }
+            />
+            {series.length <= 10 && (
+              <text
+                x={x + width / 2}
+                y={90 - height}
+                textAnchor="middle"
+                fill="var(--surface-base-content-muted)"
+                className="text-caption-l"
+              >
+                {Math.round(value)}%
+              </text>
+            )}
+          </g>
+        );
+      })}
+    </svg>
+  );
+}
+
 function TrendCard({ adoption, trend }: { adoption: Adoption; trend: Trend }): JSX.Element {
   const delta = trendDelta(adoption, trend);
 
   if (trend.previous === null || delta === null) {
+    const now =
+      adoption.instancesCounted === 0
+        ? 0
+        : (adoption.fromLibrary / adoption.instancesCounted) * 100;
     return (
       <Section title="тренд">
-        <Card plain className="list-surface py-4">
-          <p className="text-body-l font-medium">Первый замер сохранён</p>
-          <p className="mt-1 text-body-m text-ink-soft">
-            Сравнение появится после следующей проверки.
+        <Card plain className="trend-panel list-surface">
+          <p className="pt-2 text-body-l font-medium">Первый замер сохранён</p>
+          <Bars series={[now]} slots={6} />
+          <p className="pb-2 text-caption-l text-ink-soft">
+            Сравнение появится после проверки в другой день
           </p>
         </Card>
       </Section>
@@ -256,50 +330,11 @@ function TrendCard({ adoption, trend }: { adoption: Adoption; trend: Trend }): J
           <p className="text-body-m text-ink-soft">К прошлому замеру</p>
           <Delta points={delta} since={shortDate(trend.previous.at)} />
         </div>
-        <div className="mt-3 flex items-baseline justify-between">
-          <span className="text-body-l font-medium tabular-nums">
-            {Math.round(series[0] ?? 0)}% → {Math.round(series[series.length - 1] ?? 0)}%
-          </span>
-          <span className="text-caption-l text-ink-soft">За период</span>
-        </div>
-        <svg
-          className="my-3 block w-full overflow-visible"
-          viewBox="0 0 400 112"
-          role="img"
-          aria-label={`Покрытие компонентами из библиотеки: ${series.map((v) => `${Math.round(v)}%`).join(', ')}`}
-        >
-          {series.map((value, i) => {
-            const step = 400 / Math.max(series.length, 1);
-            const width = Math.min(36, step * 0.6);
-            const x = step * (i + 0.5);
-            const height = Math.max(1, value * 0.84);
-            return (
-              <g key={trend.points[i]?.at ?? i}>
-                <rect
-                  x={x - width / 2}
-                  y={98 - height}
-                  width={width}
-                  height={height}
-                  style={{ rx: 'var(--rounding-4)' }}
-                  fill={
-                    i === series.length - 1 ? 'var(--accent-fill-solid)' : 'var(--accent-fill-soft)'
-                  }
-                />
-                {series.length <= 10 && (
-                  <text
-                    x={x}
-                    y={90 - height}
-                    textAnchor="middle"
-                    fill="var(--surface-base-content-muted)"
-                    className="text-caption-l"
-                  >
-                    {Math.round(value)}%
-                  </text>
-                )}
-              </g>
-            );
-          })}
-        </svg>
+        <p className="mt-3 text-body-l font-medium tabular-nums">
+          <span className="mr-2 text-body-m font-normal text-ink-soft">За период</span>
+          {Math.round(series[0] ?? 0)}% → {Math.round(series[series.length - 1] ?? 0)}%
+        </p>
+        <Bars series={series} />
         <div className="flex justify-between text-caption-l text-ink-soft">
           <span>{first ? shortDate(first.at) : ''}</span>
           <span>{last ? shortDate(last.at) : ''}</span>
