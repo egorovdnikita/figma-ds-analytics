@@ -11,7 +11,8 @@
  */
 const FIXED_MODES = {
   'data-accent': 'deep',
-  'data-radius': 'low',
+  // Скругления крупные, как у веба HireHi: карточка 24, поле 16, чипс 12.
+  'data-radius': 'medium',
   'data-font': 'inter',
   // Панель плагина — всегда десктоп: ширина iframe 480px не телефон, и
   // мобильная плотность только съела бы место.
