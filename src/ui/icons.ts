@@ -1,20 +1,20 @@
 /**
  * Иконки плагина — единственный список.
  *
- * Иконки приходят из дизайн-системы Box UI (набор Solar, стиль linear), но
- * не целиком: один стиль весит 640 KB, а бюджет всего UI-бандла — 500 KB.
- * Скрипт `npm run sync:box-ui` читает этот список и вырезает из Box UI
- * геометрию ровно этих иконок. Новая иконка = строка здесь + пересинхронизация.
+ * Иконки приходят из дизайн-системы Box UI (набор Solar), но не целиком:
+ * один стиль весит 640 KB, а бюджет всего UI-бандла — 500 KB. Скрипт
+ * `npm run sync:box-ui` читает эти списки и вырезает из Box UI геометрию
+ * ровно этих иконок. Новая иконка = строка здесь + пересинхронизация.
+ *
+ * Стиль по умолчанию — `bold`. Стрелки и поиск — `linear`: залитая
+ * стрелка или лупа читается как кнопка-пятно, а не как направление.
  */
-export const ICON_NAMES = [
-  'magnifer',
-  'refresh',
+export const BOLD_ICONS = [
   'copy',
   'close-circle',
   'danger-triangle',
   'check-circle',
   'info-circle',
-  'alt-arrow-right',
   'widget',
   'palette',
   'graph-up',
@@ -26,5 +26,9 @@ export const ICON_NAMES = [
   'link-broken',
   'clipboard',
 ] as const;
+
+export const LINEAR_ICONS = ['magnifer', 'alt-arrow-right', 'refresh'] as const;
+
+export const ICON_NAMES = [...BOLD_ICONS, ...LINEAR_ICONS] as const;
 
 export type IconName = (typeof ICON_NAMES)[number];

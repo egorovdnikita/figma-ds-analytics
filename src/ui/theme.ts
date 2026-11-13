@@ -20,7 +20,7 @@ const FIXED_MODES = {
   'data-status': 'positive',
   'data-appearance': 'solid',
   'data-state': 'default',
-  'data-icon-style': 'linear',
+  'data-icon-style': 'bold',
 } as const;
 
 export type Theme = 'light' | 'dark';
