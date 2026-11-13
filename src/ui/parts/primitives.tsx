@@ -306,60 +306,56 @@ export interface Segment {
   readonly status?: StatusKind;
 }
 
-/** Полоса долей: части одного целого, подписи читаются без легенды-угадайки. */
+/**
+ * Доли строками, как «Allocation» в Copilot: название, число и процент,
+ * под ними тонкая линия своей длины. Каждую часть читают отдельно, без
+ * сверки цвета с легендой.
+ */
 export function StackedBar({ segments }: { segments: readonly Segment[] }): JSX.Element {
   const total = segments.reduce((sum, s) => sum + s.value, 0);
   if (total === 0) return <p className="text-caption-l text-ink-faint">Нет данных</p>;
 
   return (
-    <div>
-      <div className="flex h-3 w-full gap-0.5 overflow-hidden rounded-pill bg-canvas">
-        {segments.map((segment) =>
-          segment.value === 0 ? null : (
-            <div
-              key={segment.label}
-              className={segment.className}
-              {...(segment.status === undefined ? {} : statusAttrs(segment.status))}
-              style={{ width: `${(segment.value / total) * 100}%` }}
-            />
-          ),
-        )}
-      </div>
-      <ul className="mt-3 flex flex-col">
-        {segments.map((segment) => {
-          const body = (
-            <>
-              <span
-                className={`h-2.5 w-2.5 shrink-0 rounded-pill ${segment.className}`}
-                {...(segment.status === undefined ? {} : statusAttrs(segment.status))}
-              />
-              <span className="min-w-0 flex-1 truncate text-left text-ink-soft">
-                {segment.label}
+    <ul className="flex flex-col gap-1">
+      {segments.map((segment) => {
+        const share = (segment.value / total) * 100;
+        const body = (
+          <>
+            <span className="flex items-baseline gap-2">
+              <span className="min-w-0 flex-1 truncate text-left">{segment.label}</span>
+              <span className="shrink-0 font-semibold tabular-nums">
+                {segment.value.toLocaleString('ru')}
               </span>
-              <span className="shrink-0 font-medium">{segment.value.toLocaleString('ru')}</span>
-              <span className="w-9 shrink-0 text-right text-caption-l text-ink-faint">
+              <span className="w-9 shrink-0 text-right text-caption-l tabular-nums text-ink-faint">
                 {pct(segment.value, total)}
               </span>
-            </>
-          );
+            </span>
+            <span className="mt-1.5 block h-1 w-full">
+              <span
+                className={`block h-full rounded-pill ${segment.className}`}
+                {...(segment.status === undefined ? {} : statusAttrs(segment.status))}
+                style={{ width: `${segment.value === 0 ? 0 : Math.max(share, 1)}%` }}
+              />
+            </span>
+          </>
+        );
 
-          return (
-            <li key={segment.label}>
-              {segment.onClick === undefined || segment.value === 0 ? (
-                <div className="flex items-center gap-2 py-1 text-body-m">{body}</div>
-              ) : (
-                <button
-                  className="-mx-1.5 flex w-[calc(100%+12px)] items-center gap-2 rounded-xs px-1.5 py-1 text-body-m hover:bg-hover"
-                  onClick={segment.onClick}
-                >
-                  {body}
-                </button>
-              )}
-            </li>
-          );
-        })}
-      </ul>
-    </div>
+        return (
+          <li key={segment.label}>
+            {segment.onClick === undefined || segment.value === 0 ? (
+              <div className="py-1.5 text-body-m">{body}</div>
+            ) : (
+              <button
+                className="-mx-1.5 block w-[calc(100%+12px)] rounded-xs px-1.5 py-1.5 text-body-m hover:bg-hover"
+                onClick={segment.onClick}
+              >
+                {body}
+              </button>
+            )}
+          </li>
+        );
+      })}
+    </ul>
   );
 }
 
