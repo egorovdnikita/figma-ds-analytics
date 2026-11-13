@@ -18,7 +18,6 @@ export const BOLD_ICONS = [
   'widget',
   'palette',
   'graph-up',
-  'library',
   'map-point',
   'lightbulb',
   'stop-circle',
@@ -27,6 +26,9 @@ export const BOLD_ICONS = [
   'clipboard',
   'sun',
   'moon',
+  'cursor-square',
+  'document',
+  'folder',
 ] as const;
 
 export const LINEAR_ICONS = [

@@ -233,6 +233,58 @@ export function ThemeButton({
   );
 }
 
+/**
+ * Карточка-вариант с радиокнопкой, как выбор цели в онбординге Snapchat
+ * и Cal AI: иконка в подложке, название, пояснение, отметка справа.
+ */
+export function ChoiceCard({
+  icon,
+  title,
+  hint,
+  selected,
+  disabled = false,
+  onSelect,
+}: {
+  icon: IconName;
+  title: string;
+  hint: string;
+  selected: boolean;
+  disabled?: boolean;
+  onSelect: () => void;
+}): JSX.Element {
+  return (
+    <button
+      role="radio"
+      aria-checked={selected}
+      disabled={disabled}
+      className={`flex w-full items-center gap-3 rounded-md bg-surface p-3 text-left ${
+        selected ? 'ring-2 ring-accent' : 'hover:bg-hover'
+      }`}
+      onClick={onSelect}
+    >
+      <span
+        className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-sm ${
+          selected ? 'bg-accent-soft text-accent-ink' : 'bg-canvas text-ink-soft'
+        }`}
+      >
+        <Icon name={icon} size="2xs" />
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="block text-body-m font-medium">{title}</span>
+        <span className="mt-0.5 block text-caption-l text-ink-soft">{hint}</span>
+      </span>
+      <span
+        aria-hidden
+        className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-pill border-2 ${
+          selected ? 'border-accent' : 'border-line-strong'
+        }`}
+      >
+        {selected && <span className="h-2.5 w-2.5 rounded-pill bg-accent" />}
+      </span>
+    </button>
+  );
+}
+
 /** Пустое состояние: что случилось и что с этим делать. */
 export function Empty({ title, hint }: { title: string; hint?: string }): JSX.Element {
   return (

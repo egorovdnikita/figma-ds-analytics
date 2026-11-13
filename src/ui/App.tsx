@@ -10,10 +10,10 @@ import type { MainMessage, UiMessage } from '../shared/messages';
 import { oppositeTheme, type Theme } from '../shared/theme';
 import type { ScanScope } from '../shared/types';
 import type { IconName } from './icons';
-import { Icon } from './parts/icon';
 import {
   Button,
   Chip,
+  ChoiceCard,
   Pill,
   Progress,
   Segmented,
@@ -36,10 +36,10 @@ const TAB_ICONS: Readonly<Record<Tab, IconName>> = {
   Токены: 'palette',
 };
 
-const SCOPES: readonly { value: ScanScope; label: string }[] = [
-  { value: 'selection', label: 'выделение' },
-  { value: 'page', label: 'страница' },
-  { value: 'file', label: 'весь файл' },
+const SCOPES: readonly { value: ScanScope; label: string; hint: string; icon: IconName }[] = [
+  { value: 'selection', label: 'выделение', hint: 'Только выделенные слои', icon: 'cursor-square' },
+  { value: 'page', label: 'страница', hint: 'Текущая страница целиком', icon: 'document' },
+  { value: 'file', label: 'весь файл', hint: 'Все страницы по очереди — дольше', icon: 'folder' },
 ];
 
 interface Progressing {
@@ -227,18 +227,17 @@ function Start({
   theme: Theme;
   onToggleTheme: () => void;
 }): JSX.Element {
+  // Устроен как шаг онбординга (Snapchat, Cal AI): вопрос слева сверху,
+  // варианты карточками, главное действие прижато к низу во всю ширину.
   return (
-    <div className="relative flex h-screen flex-col items-center justify-center bg-canvas px-6 text-center">
+    <div className="relative flex h-screen flex-col bg-canvas">
       <div className="absolute right-2 top-2">
         <ThemeButton theme={theme} onToggle={onToggleTheme} />
       </div>
-      <div className="flex w-full max-w-xs flex-col items-center">
-        <span className="mb-4 flex h-14 w-14 items-center justify-center rounded-pill bg-accent-soft text-accent-ink">
-          <Icon name="library" size="s" />
-        </span>
-        {/* Перенос не зашит: кегль приходит из токена h4 и меняется вместе с
-            ним, а ручной <br> был подогнан под одну конкретную ширину. */}
-        <h1 className="text-balance text-h4 font-semibold">
+
+      <div className="min-h-0 flex-1 overflow-y-auto px-4 pt-10">
+        {fileName !== null && <p className="truncate pr-8 text-body-m text-ink-soft">{fileName}</p>}
+        <h1 className="mt-1 text-balance text-h4 font-semibold">
           проверим, как файл живёт на дизайн-системе
         </h1>
         <p className="mt-2 text-body-m leading-relaxed text-ink-soft">
@@ -246,33 +245,24 @@ function Start({
           цвета.
         </p>
 
-        <div className="mt-6 flex justify-center gap-1">
+        <div role="radiogroup" aria-label="Что проверить" className="mt-6 flex flex-col gap-1">
           {SCOPES.map((item) => (
-            <Chip
+            <ChoiceCard
               key={item.value}
-              active={scope === item.value}
+              icon={item.icon}
+              title={item.label}
+              hint={item.hint}
+              selected={scope === item.value}
               disabled={running}
-              onClick={() => setScope(item.value)}
-            >
-              {item.label}
-            </Chip>
+              onSelect={() => setScope(item.value)}
+            />
           ))}
         </div>
+      </div>
 
-        <div className="mt-4 flex justify-center">
-          {running ? (
-            <Button variant="raised" size="lg" onClick={onCancel} icon="stop-circle">
-              Остановить
-            </Button>
-          ) : (
-            <Button size="lg" onClick={onStart} icon="play">
-              Проверить
-            </Button>
-          )}
-        </div>
-
-        <div className="mt-5 min-h-16 w-full">
-          {running && progress !== null && (
+      <div className="shrink-0 px-4 pb-4 pt-3">
+        {running && progress !== null && (
+          <div className="mb-4">
             <Progress
               done={progress.pagesTotal > 1 ? progress.pagesDone : progress.nodes}
               total={progress.pagesTotal > 1 ? progress.pagesTotal : Math.max(progress.nodes, 1)}
@@ -283,16 +273,24 @@ function Start({
                   }
                 : {})}
             />
-          )}
-          {error !== null && (
-            <p className="text-caption-l leading-snug text-status-ink" {...statusAttrs('negative')}>
-              {error}
-            </p>
-          )}
-        </div>
-
-        {fileName !== null && !running && (
-          <p className="mt-6 truncate text-caption-l text-ink-faint">{fileName}</p>
+          </div>
+        )}
+        {error !== null && (
+          <p
+            className="mb-3 text-center text-caption-l leading-snug text-status-ink"
+            {...statusAttrs('negative')}
+          >
+            {error}
+          </p>
+        )}
+        {running ? (
+          <Button variant="raised" size="lg" onClick={onCancel} icon="stop-circle" wide>
+            Остановить
+          </Button>
+        ) : (
+          <Button size="lg" onClick={onStart} icon="play" wide>
+            Проверить
+          </Button>
         )}
       </div>
     </div>

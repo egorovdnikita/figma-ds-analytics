@@ -142,7 +142,7 @@ hold(1.0);
 // Охват «весь файл» и запуск.
 cam(300, 1.75);
 hold(0.6);
-await click(page.getByRole('button', { name: 'весь файл' }), 'Охват: весь файл', { fade: 0.08 });
+await click(page.getByRole('radio', { name: /весь файл/ }), 'Охват: весь файл', { fade: 0.08 });
 await click(page.getByRole('button', { name: 'Проверить' }), 'Проверить', {
   fade: 0.08,
   lead: 0.55,
