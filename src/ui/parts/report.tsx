@@ -14,6 +14,7 @@ import {
   BarCell,
   Button,
   Card,
+  Chip,
   CopyButton,
   Delta,
   Empty,
@@ -319,6 +320,15 @@ export function ComponentsScreen({
     );
   }, [adoption.masters, filter, query]);
 
+  const countByOrigin = useMemo(() => {
+    const counts: Record<MasterFilter, number> = { all: 0, library: 0, local: 0, unknown: 0 };
+    for (const master of adoption.masters) {
+      counts.all += 1;
+      counts[master.origin] += 1;
+    }
+    return counts;
+  }, [adoption.masters]);
+
   if (adoption.masters.length === 0) {
     return <Empty title="Копий компонентов нет" hint="В этом охвате не нашлось ни одной." />;
   }
@@ -338,15 +348,22 @@ export function ComponentsScreen({
             setLimit(PAGE_SIZE);
           }}
         />
-        <div className="overflow-x-auto">
-          <Segmented
-            options={MASTER_FILTERS}
-            value={filter}
-            onChange={(value) => {
-              setFilter(value);
-              setLimit(PAGE_SIZE);
-            }}
-          />
+        {/* Ряд чипсов на полотне, как категории у HireHi; счётчик — сколько
+            компонентов попадёт в список, до клика. */}
+        <div className="-mx-1 flex gap-1 overflow-x-auto px-1">
+          {MASTER_FILTERS.map((option) => (
+            <Chip
+              key={option.value}
+              active={filter === option.value}
+              count={countByOrigin[option.value]}
+              onClick={() => {
+                setFilter(option.value);
+                setLimit(PAGE_SIZE);
+              }}
+            >
+              {option.label}
+            </Chip>
+          ))}
         </div>
 
         {visible.length === 0 ? (
