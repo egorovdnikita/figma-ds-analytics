@@ -230,14 +230,14 @@ export function Section({
   children: ReactNode;
 }): JSX.Element {
   return (
-    <section className="mt-5">
+    <section className="mt-8">
       {onOpen === undefined ? (
-        <h2 className="mb-2 text-body-l font-semibold">
+        <h2 className="mb-4 text-h5 font-semibold tracking-tight">
           {title.charAt(0).toUpperCase() + title.slice(1)}
         </h2>
       ) : (
         <button
-          className="mb-2 flex items-center gap-1 text-body-l font-semibold hover:text-accent-ink"
+          className="mb-4 flex items-center gap-1 text-h5 font-semibold tracking-tight hover:text-accent-ink"
           onClick={onOpen}
         >
           {title.charAt(0).toUpperCase() + title.slice(1)}
