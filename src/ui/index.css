@@ -225,3 +225,10 @@
 .scope-preview-mark-muted {
   background: var(--surface-base-content-subtle);
 }
+
+[data-theme='dark'] .scope-preview {
+  background: var(--surface-base-fill-layer-subtle);
+}
+[data-theme='dark'] .scope-preview-line {
+  background: var(--surface-base-border-strong);
+}
