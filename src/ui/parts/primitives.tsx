@@ -235,7 +235,7 @@ export function Kpi({
   hint?: string;
 }): JSX.Element {
   return (
-    <div className="rounded-card bg-surface p-3">
+    <div className="rounded-card bg-surface p-4">
       {/* Подпись над крупным числом, как «зарплата» в карточке вакансии HireHi. */}
       <div className="text-body-m text-ink-soft">{label}</div>
       <div className="mt-1 text-h4 font-semibold leading-none">{value}</div>
