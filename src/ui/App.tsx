@@ -10,15 +10,7 @@ import type { MainMessage, UiMessage } from '../shared/messages';
 import { oppositeTheme, type Theme } from '../shared/theme';
 import type { ScanScope } from '../shared/types';
 import type { IconName } from './icons';
-import {
-  Button,
-  Chip,
-  Pill,
-  Progress,
-  statusAttrs,
-  ThemeButton,
-  type Tint,
-} from './parts/primitives';
+import { Button, Progress, statusAttrs, ThemeButton, type Tint } from './parts/primitives';
 import { Icon } from './parts/icon';
 import { ComponentsScreen, SummaryScreen, TokensScreen, type MasterFilter } from './parts/report';
 import { chooseTheme, currentTheme } from './theme';
@@ -161,53 +153,52 @@ export function App(): JSX.Element {
 
   return (
     <div className="relative flex h-screen flex-col bg-panel text-ink">
-      <header className="shrink-0 border-b border-line-subtle px-6 pb-3 pt-5">
-        <div className="flex items-center gap-2">
-          <p className="flex min-w-0 flex-1 items-center gap-1.5 text-caption-l text-ink-soft">
-            <span data-tint="violet" className="tint-ink">
-              <Icon name="widget" />
-            </span>
-            <span>{report.scope}</span>
-            <span aria-hidden>/</span>
-            <span className="tabular-nums">{report.nodesVisited.toLocaleString('ru')} слоёв</span>
-            {report.cancelled && <Pill tone="warn">остановлено</Pill>}
-          </p>
-          <button
-            className="-my-2 flex h-10 shrink-0 items-center gap-1.5 rounded-sm bg-panel-card px-3 text-body-m font-medium hover:bg-hover"
-            onClick={() => {
-              setReport(null);
-              setProgress(null);
-              setError(null);
-            }}
-          >
-            <Icon name="refresh" />
-            Повторить
-          </button>
-          <div className="-my-2 -mr-2">
+      <header className="shrink-0 border-b border-line-subtle px-6 pb-4 pt-5">
+        <h1 className="truncate text-h4 font-semibold tracking-tight" title={report.fileName}>
+          {report.fileName}
+        </h1>
+        <div className="mt-3 flex items-center justify-between gap-6">
+          <div className="min-w-0 text-caption-l">
+            <p className="truncate font-medium text-ink-soft">{report.scope}</p>
+            <p className="mt-0.5 truncate tabular-nums text-ink-faint">
+              {report.nodesVisited.toLocaleString('ru')} слоёв
+              {report.cancelled ? ' · остановлено' : ''}
+            </p>
+          </div>
+          <div className="flex shrink-0 items-center gap-2">
+            <button
+              className="flex h-10 items-center gap-1.5 rounded-sm bg-panel-card px-3 text-body-m font-medium hover:bg-hover"
+              onClick={() => {
+                setReport(null);
+                setProgress(null);
+                setError(null);
+              }}
+            >
+              <Icon name="refresh" />
+              Повторить
+            </button>
             <ThemeButton theme={theme} onToggle={toggleTheme} />
           </div>
         </div>
-
-        {/* Имя файла — отдельной строкой во всю ширину: рядом с кнопкой на
-            480px оно схлопывалось в «Дизайн…». */}
-        <h1 className="mt-2 truncate text-h4 font-semibold tracking-tight">{report.fileName}</h1>
-
-        <nav aria-label="Разделы отчёта" className="-mx-1 mt-4 flex gap-1 overflow-x-auto px-1">
+        <nav aria-label="Разделы отчёта" className="mt-4 flex rounded-md bg-panel-card p-1">
           {TABS.map((name) => {
             const count = countFor(name, report);
             return (
-              <Chip
+              <button
                 key={name}
-                active={tab === name}
-                icon={TAB_ICONS[name]}
-                {...(count === null ? {} : { count })}
+                aria-pressed={tab === name}
+                className={`flex h-10 min-w-0 flex-1 items-center justify-center gap-1 rounded-sm px-2 text-body-m transition-colors ${tab === name ? 'segment-selected font-medium' : 'text-ink-soft hover:bg-hover'}`}
                 onClick={() => {
                   if (name === 'Компоненты') setComponentFilter('all');
                   setTab(name);
                 }}
               >
-                {name}
-              </Chip>
+                <Icon name={TAB_ICONS[name]} size="min" />
+                <span>{name}</span>
+                {count !== null && (
+                  <span className="text-caption-l tabular-nums text-ink-faint">{count}</span>
+                )}
+              </button>
             );
           })}
         </nav>
