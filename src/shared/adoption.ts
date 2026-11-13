@@ -35,6 +35,9 @@ export interface LibrarySource {
   readonly variables: number;
 }
 
+/** Источник коллекции, чья библиотека файлу больше не подключена. */
+export const DISCONNECTED_LIBRARY = 'Библиотека не подключена';
+
 export interface CollectionUsage {
   readonly name: string;
   /** Имя библиотеки или «Локальная». */

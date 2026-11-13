@@ -19,6 +19,7 @@ import type {
   Place,
   VariableUsage,
 } from '../../shared/adoption';
+import { DISCONNECTED_LIBRARY } from '../../shared/adoption';
 import type { VariableResolver } from '../scanner/variables';
 
 export interface MasterRef {
@@ -135,7 +136,7 @@ async function describeVariableSources(
     source: collection.isLocal
       ? 'Локальная'
       : available
-        ? (libraryByKey.get(collection.key) ?? 'Библиотека не подключена')
+        ? (libraryByKey.get(collection.key) ?? DISCONNECTED_LIBRARY)
         : 'Источник неизвестен',
     variables: collection.variables,
     isLocal: collection.isLocal,

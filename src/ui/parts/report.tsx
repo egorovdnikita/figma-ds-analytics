@@ -3,7 +3,14 @@
  * Тексты бытовые: «токен», «копия», «библиотека», без терминов из кода.
  */
 import { useMemo, useState } from 'react';
-import type { Adoption, MasterUsage, ScanReport, VariableUsage } from '../../shared/adoption';
+import {
+  DISCONNECTED_LIBRARY,
+  type Adoption,
+  type CollectionUsage,
+  type MasterUsage,
+  type ScanReport,
+  type VariableUsage,
+} from '../../shared/adoption';
 import { buildAdvice, verdict } from '../../shared/advice';
 import { toMarkdown } from '../../shared/export';
 import { plural, withCount } from '../../shared/plural';
@@ -534,11 +541,7 @@ function CollectionsTable({ adoption }: { adoption: Adoption }): JSX.Element {
               key={`${collection.name}-${collection.source}`}
               leading={<Monogram name={collection.name} />}
               title={collection.name}
-              subtitle={
-                <span className={collection.isLocal ? 'text-ink-faint' : 'text-accent-ink'}>
-                  {collection.source}
-                </span>
-              }
+              subtitle={<SourceText collection={collection} />}
               value={collection.variables.toLocaleString('ru')}
               valueHint={plural(collection.variables, 'токен', 'токена', 'токенов')}
             />
@@ -644,6 +647,22 @@ function TokenMark(): JSX.Element {
       className="flex h-10 w-10 shrink-0 items-center justify-center rounded-pill bg-canvas text-ink-soft"
     >
       <Icon name="palette" size="2xs" />
+    </span>
+  );
+}
+
+/** Источник коллекции: отключённая библиотека — предупреждение, а не норма. */
+function SourceText({ collection }: { collection: CollectionUsage }): JSX.Element {
+  if (collection.source === DISCONNECTED_LIBRARY) {
+    return (
+      <span className="text-status-ink" {...statusAttrs('warning')}>
+        {collection.source}
+      </span>
+    );
+  }
+  return (
+    <span className={collection.isLocal ? 'text-ink-faint' : 'text-accent-ink'}>
+      {collection.source}
     </span>
   );
 }

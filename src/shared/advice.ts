@@ -8,7 +8,7 @@
  * Чистая функция без DOM и без `figma.*` — поэтому её можно проверить
  * тестами, а не глазами.
  */
-import type { Adoption } from './adoption';
+import { DISCONNECTED_LIBRARY, type Adoption } from './adoption';
 import { withCount } from './plural';
 
 export type AdviceTarget =
@@ -81,7 +81,7 @@ export function buildAdvice(adoption: Adoption): readonly Advice[] {
 
   // Токены из отключённой библиотеки — тихая зависимость от чужой системы.
   const orphanCollections = adoption.collections.filter(
-    (collection) => !collection.isLocal && collection.source === 'Библиотека не подключена',
+    (collection) => !collection.isLocal && collection.source === DISCONNECTED_LIBRARY,
   );
   if (orphanCollections.length > 0) {
     const variables = orphanCollections.reduce((sum, item) => sum + item.variables, 0);
