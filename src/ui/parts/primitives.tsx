@@ -124,7 +124,7 @@ export function Chip({
     <button
       disabled={disabled}
       aria-pressed={active}
-      className={`flex min-h-11 shrink-0 items-center gap-1.5 rounded-sm px-3 py-2 text-body-m transition-colors ${
+      className={`flex min-h-10 shrink-0 items-center gap-1.5 rounded-pill px-3 py-2 text-body-m transition-colors ${
         active ? 'bg-panel-card font-medium text-ink' : 'text-ink-soft hover:bg-hover'
       }`}
       onClick={onClick}

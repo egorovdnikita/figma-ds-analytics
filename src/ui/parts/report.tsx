@@ -73,7 +73,6 @@ export function SummaryScreen({
         </div>
       )}
       <section className="coverage-hero text-center">
-        <h2 className="text-body-l font-medium">Компоненты из библиотеки</h2>
         <div
           className="coverage-gauge relative mx-auto mt-3 w-[240px]"
           role="meter"
@@ -113,7 +112,7 @@ export function SummaryScreen({
             {pct(adoption.fromLibrary, instances)}
           </p>
         </div>
-        <p className="mt-2 text-body-m text-ink-soft">
+        <p className="mt-2 text-body-m text-ink">
           {adoption.fromLibrary.toLocaleString('ru')} из {instances.toLocaleString('ru')} копий
         </p>
         <p className="mt-1 text-body-m text-ink-soft">{state.text}</p>
