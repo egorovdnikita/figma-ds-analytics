@@ -128,7 +128,7 @@ export function App(): JSX.Element {
         </p>
 
         <div className="mt-1 flex items-center gap-3">
-          <h1 className="min-w-0 flex-1 truncate text-body-l font-medium">{report.fileName}</h1>
+          <h1 className="min-w-0 flex-1 truncate text-h4 font-semibold">{report.fileName}</h1>
           <Button onClick={start} icon="refresh">
             Ещё раз
           </Button>
