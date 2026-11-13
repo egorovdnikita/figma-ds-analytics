@@ -631,16 +631,16 @@ export function AdviceRow({
         <Icon name="danger-triangle" />
       </span>
       <span className="min-w-0 flex-1">
-        <span className="flex items-baseline gap-2">
-          <span className="truncate text-body-m font-medium">{title}</span>
-          <span
-            className="shrink-0 text-caption-l tabular-nums text-status-ink"
-            {...statusAttrs('warning')}
-          >
-            {value}
-          </span>
-        </span>
+        <span className="block truncate text-body-m font-medium">{title}</span>
         <span className="mt-0.5 block text-caption-l leading-snug text-ink-faint">{hint}</span>
+      </span>
+      {/* Число — бейджем справа, как изменения в Bevel: столбец чисел
+          читается сверху вниз, а заголовок не рвётся на середине. */}
+      <span
+        className="shrink-0 self-center rounded-xs bg-status-soft px-1.5 py-0.5 text-caption-l font-medium tabular-nums text-status-ink"
+        {...statusAttrs('warning')}
+      >
+        {value}
       </span>
       {onClick !== undefined && (
         <span className="shrink-0 self-center text-accent-ink">
