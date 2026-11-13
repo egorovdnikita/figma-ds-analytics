@@ -228,7 +228,7 @@ function Start({
 
         <div className="mt-4 flex justify-center">
           {running ? (
-            <Button variant="quiet" size="lg" onClick={onCancel} icon="stop-circle">
+            <Button variant="raised" size="lg" onClick={onCancel} icon="stop-circle">
               Остановить
             </Button>
           ) : (

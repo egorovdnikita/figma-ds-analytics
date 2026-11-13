@@ -388,7 +388,8 @@ export function Button({
 }: {
   children: ReactNode;
   onClick: () => void;
-  variant?: 'accent' | 'quiet';
+  /** `quiet` — серая на белой карточке, `raised` — белая на сером полотне. */
+  variant?: 'accent' | 'quiet' | 'raised';
   /** `sm` — кнопка внутри тулбара, по высоте пункта переключателя. */
   size?: 'sm' | 'md' | 'lg';
   icon?: IconName;
@@ -397,10 +398,11 @@ export function Button({
 }): JSX.Element {
   // Наведение — токены interaction Box UI, а не фильтр яркости: так кнопка
   // ведёт себя одинаково в светлой и тёмной теме.
-  const look =
-    variant === 'accent'
-      ? 'bg-accent text-accent-on hover:bg-accent-hover'
-      : 'bg-canvas text-ink hover:bg-hover';
+  const look = {
+    accent: 'bg-accent text-accent-on hover:bg-accent-hover',
+    quiet: 'bg-canvas text-ink hover:bg-hover',
+    raised: 'bg-surface text-ink hover:bg-hover',
+  }[variant];
   const dims = {
     sm: 'h-8 shrink-0 gap-1.5 rounded-sm px-2.5 text-body-m',
     // Как кнопки у HireHi: высота 36 и 44, скругление 12 и 16, отступ 16.
