@@ -50,62 +50,6 @@ export function Card({
 }
 
 /**
- * Кольцо с числом в центре.
- *
- * Для одной доли кольцо читается быстрее полосы: глаз хватает заполнение
- * целиком, а не сравнивает длину с невидимым эталоном.
- */
-export function Ring({
-  value,
-  total,
-  caption,
-  tone = 'accent',
-}: {
-  value: number;
-  total: number;
-  caption: string;
-  tone?: 'accent' | 'warn';
-}): JSX.Element {
-  const share = total === 0 ? 0 : value / total;
-  const radius = 34;
-  const circumference = 2 * Math.PI * radius;
-  const stroke = tone === 'accent' ? 'var(--accent-fill-solid)' : 'var(--status-fill-solid)';
-
-  return (
-    <div className="flex flex-col items-center">
-      <svg
-        viewBox="0 0 80 80"
-        className="h-[84px] w-[84px] -rotate-90"
-        {...(tone === 'warn' ? statusAttrs('warning') : {})}
-      >
-        <circle
-          cx="40"
-          cy="40"
-          r={radius}
-          fill="none"
-          stroke="var(--surface-base-fill-page)"
-          strokeWidth="9"
-        />
-        <circle
-          cx="40"
-          cy="40"
-          r={radius}
-          fill="none"
-          stroke={stroke}
-          strokeWidth="9"
-          strokeLinecap="round"
-          strokeDasharray={`${circumference * share} ${circumference}`}
-        />
-      </svg>
-      <div className="-mt-[54px] text-h5 font-semibold tabular-nums">{pct(value, total)}</div>
-      <div className="mt-[26px] text-center text-caption-l leading-tight text-ink-soft">
-        {caption}
-      </div>
-    </div>
-  );
-}
-
-/**
  * Столбец внутри ячейки таблицы.
  *
  * Даёт сравнение строк между собой без отдельной диаграммы: длина

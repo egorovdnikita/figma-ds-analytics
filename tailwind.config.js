@@ -63,6 +63,7 @@ export default {
         'body-l': ['var(--type-body-l-font-size)', 'var(--type-body-l-line-height)'],
         h5: ['var(--type-h5-font-size)', 'var(--type-h5-line-height)'],
         h4: ['var(--type-h4-font-size)', 'var(--type-h4-line-height)'],
+        h2: ['var(--type-h2-font-size)', 'var(--type-h2-line-height)'],
       },
       fontWeight: {
         medium: 'var(--type-font-weight-medium)',

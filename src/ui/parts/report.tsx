@@ -26,7 +26,6 @@ import {
   pct,
   Pill,
   Places,
-  Ring,
   Row,
   SearchInput,
   Sparkline,
@@ -54,28 +53,55 @@ export function SummaryScreen({
 
   const state = verdict(adoption);
   const advice = buildAdvice(adoption);
+  const delta = trendDelta(adoption, trend);
 
   return (
     <div className="flex flex-col gap-1">
-      {/* Вердикт фразой, а под ним кольца. Цифры без вывода заставляют
-          читателя гадать, хорошо это или плохо. */}
-      <Card>
+      {/* Одна крупная цифра с бейджем изменения, как баланс в Phantom, и
+          вывод фразой под ней, как в Lifesum: цифра без вывода заставляет
+          гадать, хорошо это или плохо. */}
+      <section className="px-1 pb-4 pt-2">
+        <p className="text-body-m text-ink-soft">компоненты из библиотеки</p>
+        <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1">
+          <span className="text-h2 font-semibold tabular-nums">
+            {pct(adoption.fromLibrary, instances)}
+          </span>
+          {delta !== null && trend.previous !== null && (
+            <Delta points={delta} since={shortDate(trend.previous.at)} />
+          )}
+        </div>
         <p
-          className={`text-center text-body-l font-medium ${
+          className={`mt-2 text-body-m font-medium ${
             state.tone === 'good' ? 'text-accent-ink' : 'text-ink'
           }`}
         >
           {state.text}
         </p>
-        <div className="mt-3 flex items-start justify-around">
-          <Ring
-            value={adoption.fromLibrary}
-            total={instances}
-            caption="компонентов из библиотеки"
-          />
-          <Ring value={onTokens} total={tokenNodes} caption="слоёв на токенах" />
-        </div>
-      </Card>
+      </section>
+
+      {/* Ключевые цифры плитками два в ряд, как в Google Health. */}
+      <div className="grid grid-cols-2 gap-1">
+        <Kpi
+          label="слои на токенах"
+          value={pct(onTokens, tokenNodes)}
+          hint={`${onTokens.toLocaleString('ru')} из ${tokenNodes.toLocaleString('ru')}`}
+        />
+        <Kpi
+          label="компонентов"
+          value={adoption.mastersTotal.toLocaleString('ru')}
+          hint={`${adoption.local.toLocaleString('ru')} копий мимо библиотеки`}
+        />
+        <Kpi
+          label="копий"
+          value={instances.toLocaleString('ru')}
+          hint={`${adoption.fromLibrary.toLocaleString('ru')} из библиотеки`}
+        />
+        <Kpi
+          label="коллекций токенов"
+          value={adoption.collections.length.toLocaleString('ru')}
+          hint={`${onTokens.toLocaleString('ru')} привязок`}
+        />
+      </div>
 
       <TrendCard adoption={adoption} trend={trend} />
 
@@ -114,19 +140,6 @@ export function SummaryScreen({
           })}
         </Card>
       )}
-
-      <div className="grid grid-cols-2 gap-1">
-        <Kpi
-          label="компонентов"
-          value={adoption.mastersTotal.toLocaleString('ru')}
-          hint={`${instances.toLocaleString('ru')} копий`}
-        />
-        <Kpi
-          label="коллекций токенов"
-          value={adoption.collections.length.toLocaleString('ru')}
-          hint={`${(adoption.nodesOnLibraryVariable + adoption.nodesOnLocalVariable).toLocaleString('ru')} привязок`}
-        />
-      </div>
 
       <Card
         title="откуда компоненты"
@@ -240,14 +253,17 @@ export function SummaryScreen({
  * не тренд, и притворяться, что она о чём-то говорит, не надо — карточка
  * тогда честно объясняет, что сравнивать не с чем.
  */
-function TrendCard({ adoption, trend }: { adoption: Adoption; trend: Trend }): JSX.Element {
-  const instances = adoption.instancesCounted;
-  const delta = deltaPoints(
-    { part: adoption.fromLibrary, total: instances },
+function trendDelta(adoption: Adoption, trend: Trend): number | null {
+  return deltaPoints(
+    { part: adoption.fromLibrary, total: adoption.instancesCounted },
     trend.previous === null
       ? null
       : { part: trend.previous.fromLibrary, total: trend.previous.instances },
   );
+}
+
+function TrendCard({ adoption, trend }: { adoption: Adoption; trend: Trend }): JSX.Element {
+  const delta = trendDelta(adoption, trend);
 
   if (trend.previous === null || delta === null) {
     return (
