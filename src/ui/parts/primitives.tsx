@@ -354,7 +354,7 @@ export function Row({
   );
 }
 
-/** Пилюля-метка: нейтральная, зелёная или предупреждающая. */
+/** Метка-тег, как теги карточки у HireHi: нейтральная, акцентная или предупреждающая. */
 export function Pill({
   children,
   tone = 'plain',
@@ -369,7 +369,7 @@ export function Pill({
   };
   return (
     <span
-      className={`inline-block rounded-pill px-2 py-0.5 text-caption-l ${tones[tone]}`}
+      className={`inline-block rounded-xs px-2 py-1 text-caption-l ${tones[tone]}`}
       {...(tone === 'warn' ? statusAttrs('warning') : {})}
     >
       {children}
