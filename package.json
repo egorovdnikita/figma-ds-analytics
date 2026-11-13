@@ -10,7 +10,7 @@
   },
   "scripts": {
     "build": "npm run build:ui && npm run build:main && npm run size-check",
-    "build:ui": "vite build",
+    "build:ui": "vite build && node scripts/prune-css-vars.mjs",
     "build:main": "node scripts/build-main.mjs",
     "dev": "node scripts/build-main.mjs --watch",
     "typecheck": "tsc -p tsconfig.main.json && tsc -p tsconfig.ui.json && tsc -p tsconfig.test.json",

@@ -11,6 +11,7 @@
     "src/shared/**/*.ts",
     "*.config.ts",
     "*.mjs",
+    "scripts/*.d.mts",
     "src/ui/icons.ts",
     "src/ui/vendor/box-ui/icons.json"
   ]
