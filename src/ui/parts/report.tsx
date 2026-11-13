@@ -25,7 +25,6 @@ import {
   Delta,
   Empty,
   Facts,
-  Kpi,
   ListRow,
   Modal,
   Note,
@@ -38,7 +37,6 @@ import {
   StackedBar,
   statusAttrs,
   TintIcon,
-  type Tint,
 } from './primitives';
 
 /* ---------- 1. Сводка ---------- */
@@ -68,11 +66,11 @@ export function SummaryScreen({
       {/* Одна крупная цифра с бейджем изменения, как баланс в Phantom, и
           вывод фразой под ней, как в Lifesum: цифра без вывода заставляет
           гадать, хорошо это или плохо. */}
-      <section className="relative px-1 pb-4 pt-1">
-        <div className="absolute right-1 top-1">
+      <section className="relative pb-4 pt-1">
+        <div className="absolute right-0 top-1">
           <TintIcon name="graph-up" tint="green" />
         </div>
-        <p className="pr-12 text-body-m text-ink-soft">компоненты из библиотеки</p>
+        <p className="pr-12 text-body-l text-ink-soft">компоненты из библиотеки</p>
         <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1">
           <span className="summary-value font-semibold tabular-nums">
             {pct(adoption.fromLibrary, instances)}
@@ -81,7 +79,7 @@ export function SummaryScreen({
             <Delta points={delta} since={shortDate(trend.previous.at)} />
           )}
         </div>
-        <p className="mt-2 flex items-center gap-2 text-body-m text-ink-soft">
+        <p className="mt-2 flex items-center gap-2 text-body-l text-ink-soft">
           <span
             data-tint={state.tone === 'good' ? 'green' : 'orange'}
             className="tint-dot h-1.5 w-1.5 shrink-0 rounded-pill"
@@ -91,41 +89,36 @@ export function SummaryScreen({
         </p>
       </section>
 
-      {/* Ключевые цифры плитками два в ряд, как в Google Health. */}
-      <div className="grid grid-cols-2 gap-2">
-        <Kpi
-          icon="palette"
-          tint="blue"
-          label="слои на токенах"
+      <ul className="list-surface">
+        <ListRow
+          leading={<TintIcon name="palette" tint="blue" />}
+          title="Слои на токенах"
           value={pct(onTokens, tokenNodes)}
-          hint={`${onTokens.toLocaleString('ru')} из ${tokenNodes.toLocaleString('ru')}`}
+          onClick={() => onGoTo('Токены')}
         />
-        <Kpi
-          icon="widget"
-          tint="violet"
-          label="компонентов"
+        <ListRow
+          leading={<TintIcon name="widget" tint="violet" />}
+          title="Компоненты"
           value={adoption.mastersTotal.toLocaleString('ru')}
-          hint={`${adoption.local.toLocaleString('ru')} копий мимо библиотеки`}
+          onClick={() => onGoTo('Компоненты')}
         />
-        <Kpi
-          icon="copy"
-          tint="orange"
-          label="копий"
+        <ListRow
+          leading={<TintIcon name="copy" tint="orange" />}
+          title="Копии"
           value={instances.toLocaleString('ru')}
-          hint={`${adoption.fromLibrary.toLocaleString('ru')} из библиотеки`}
+          onClick={() => onGoTo('Компоненты')}
         />
-        <Kpi
-          icon="folder"
-          tint="pink"
-          label="коллекций токенов"
+        <ListRow
+          leading={<TintIcon name="folder" tint="pink" />}
+          title="Коллекции токенов"
           value={adoption.collections.length.toLocaleString('ru')}
-          hint={`${onTokens.toLocaleString('ru')} привязок`}
+          onClick={() => onGoTo('Токены')}
         />
-      </div>
+      </ul>
 
       {advice.length > 0 && (
         <Section title="с чего начать">
-          <Card>
+          <Card plain className="list-surface">
             {advice.map((item) => {
               // Через локальную константу: внутри замыкания TypeScript не
               // удерживает сужение по `item.target.kind`.
@@ -154,7 +147,7 @@ export function SummaryScreen({
       <TrendCard adoption={adoption} trend={trend} />
 
       <Section title="откуда компоненты" onOpen={() => onGoTo('Компоненты')}>
-        <Card>
+        <Card plain>
           <StackedBar
             segments={[
               {
@@ -190,7 +183,7 @@ export function SummaryScreen({
       </Section>
 
       <Section title="откуда токены" onOpen={() => onGoTo('Токены')}>
-        <Card>
+        <Card plain>
           <StackedBar
             segments={[
               {
@@ -216,12 +209,12 @@ export function SummaryScreen({
 
       {adoption.librarySourcesAvailable && adoption.libraries.length > 0 && (
         <Section title="библиотеки">
-          <Card className="py-1">
-            <ul>
+          <Card plain>
+            <ul className="list-surface">
               {adoption.libraries.map((library) => (
                 <ListRow
                   key={library.libraryName}
-                  leading={<Monogram name={library.libraryName} tint="green" />}
+                  leading={<TintIcon name="folder" tint="green" />}
                   title={library.libraryName}
                   value={library.variables.toLocaleString('ru')}
                   valueHint={plural(library.variables, 'токен', 'токена', 'токенов')}
@@ -394,13 +387,13 @@ export function ComponentsScreen({
         {visible.length === 0 ? (
           <Empty title="Ничего не нашлось" hint="Попробуйте другое название или снимите фильтр." />
         ) : (
-          <Card className="py-1">
-            <ul>
+          <Card plain>
+            <ul className="list-surface">
               {visible.slice(0, limit).map((master) => (
                 <ListRow
                   key={master.key}
                   onClick={() => setSelected(master)}
-                  leading={<Monogram name={master.name} />}
+                  leading={<TintIcon name="widget" tint="violet" />}
                   title={master.name}
                   subtitle={<OriginText origin={master.origin} />}
                   value={master.instances.toLocaleString('ru')}
@@ -421,7 +414,7 @@ export function ComponentsScreen({
       </div>
 
       {selected !== null && (
-        <Modal title={selected.name} onClose={() => setSelected(null)}>
+        <Modal title={selected.name} caption="Компонент" onClose={() => setSelected(null)}>
           <Facts
             items={[
               { label: 'источник', value: <OriginPill origin={selected.origin} /> },
@@ -443,7 +436,7 @@ export function ComponentsScreen({
           </div>
 
           {/* Раздел отделён линией во всю ширину, как «описание» у HireHi. */}
-          <div className="-mx-4 mt-4 border-t border-line-subtle" />
+          <div className="mt-5 border-t-2 border-dotted border-line-subtle" />
           <h4 className="mb-1 mt-3 text-caption-l text-ink-soft">
             где посмотреть{' '}
             {selected.instances > selected.places.length && (
@@ -505,7 +498,7 @@ export function TokensScreen({
       </div>
 
       {selected !== null && (
-        <Modal title={selected.name} onClose={() => setSelected(null)}>
+        <Modal title={selected.name} caption="Токен" onClose={() => setSelected(null)}>
           <Facts
             items={[
               { label: 'коллекция', value: selected.collectionName || '—' },
@@ -524,7 +517,7 @@ export function TokensScreen({
           </div>
 
           {/* Раздел отделён линией во всю ширину, как «описание» у HireHi. */}
-          <div className="-mx-4 mt-4 border-t border-line-subtle" />
+          <div className="mt-5 border-t-2 border-dotted border-line-subtle" />
           <h4 className="mb-1 mt-3 text-caption-l text-ink-soft">
             где посмотреть{' '}
             {selected.nodes > selected.places.length && (
@@ -547,12 +540,12 @@ function CollectionsTable({ adoption }: { adoption: Adoption }): JSX.Element {
 
   return (
     <>
-      <Card className="py-1">
-        <ul>
+      <Card plain>
+        <ul className="list-surface">
           {adoption.collections.map((collection) => (
             <ListRow
               key={`${collection.name}-${collection.source}`}
-              leading={<Monogram name={collection.name} tint="pink" />}
+              leading={<TintIcon name="palette" tint="pink" />}
               title={collection.name}
               subtitle={<SourceText collection={collection} />}
               value={collection.variables.toLocaleString('ru')}
@@ -604,8 +597,8 @@ function VariablesTable({
       {visible.length === 0 ? (
         <Empty title="Ничего не нашлось" hint="Попробуйте другое название." />
       ) : (
-        <Card className="py-1">
-          <ul>
+        <Card plain>
+          <ul className="list-surface">
             {visible.map((item) => (
               <ListRow
                 key={item.id}
@@ -635,25 +628,7 @@ function VariablesTable({
 
 /* ---------- мелочи ---------- */
 
-/**
- * Знак компонента — круг 24 с первой буквой, как логотип компании в
- * карточке вакансии HireHi. Глазу проще держать строку длинного списка.
- */
-function Monogram({ name, tint = 'violet' }: { name: string; tint?: Tint }): JSX.Element {
-  const letter = /[\p{L}\p{N}]/u.exec(name)?.[0]?.toUpperCase() ?? '·';
-  return (
-    <span
-      aria-hidden
-      data-tint={tint}
-      className="tint-badge flex h-10 w-10 shrink-0 items-center justify-center rounded-sm text-body-l font-semibold"
-    >
-      {letter}
-    </span>
-  );
-}
-
-/** Источник подписью под именем: цвет говорит раньше слов. */
-/** Знак токена: палитра в подложке того же размера, что знак компонента. */
+/** Цветной знак токена без подложки. */
 function TokenMark(): JSX.Element {
   return <TintIcon name="palette" tint="blue" />;
 }
@@ -668,7 +643,10 @@ function SourceText({ collection }: { collection: CollectionUsage }): JSX.Elemen
     );
   }
   return (
-    <span data-tint="green" className={collection.isLocal ? 'text-ink-faint' : 'tint-ink'}>
+    <span className="inline-flex items-center gap-1.5 text-ink-faint">
+      {!collection.isLocal && (
+        <span data-tint="green" className="tint-dot h-1 w-1 shrink-0 rounded-pill" aria-hidden />
+      )}
       {collection.source}
     </span>
   );
@@ -677,7 +655,8 @@ function SourceText({ collection }: { collection: CollectionUsage }): JSX.Elemen
 function OriginText({ origin }: { origin: MasterUsage['origin'] }): JSX.Element {
   if (origin === 'library')
     return (
-      <span data-tint="green" className="tint-ink">
+      <span className="inline-flex items-center gap-1.5 text-ink-faint">
+        <span data-tint="green" className="tint-dot h-1 w-1 shrink-0 rounded-pill" aria-hidden />
         из библиотеки
       </span>
     );

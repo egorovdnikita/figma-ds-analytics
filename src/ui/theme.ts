@@ -12,7 +12,7 @@
 import { resolveTheme, type Theme } from '../shared/theme';
 
 const FIXED_MODES = {
-  'data-accent': 'monochrome',
+  'data-accent': 'deep',
   // Крупные нейтральные поверхности; отдельные детали получают свои оттенки.
   'data-radius': 'medium',
   'data-font': 'inter',

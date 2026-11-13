@@ -21,7 +21,7 @@ export function TintIcon({
   return (
     <span
       data-tint={tint}
-      className={`tint-badge flex shrink-0 items-center justify-center rounded-sm ${small ? 'h-8 w-8' : 'h-10 w-10'}`}
+      className={`tint-ink flex shrink-0 items-center justify-center ${small ? 'h-6 w-6' : 'h-8 w-8'}`}
     >
       <Icon name={name} size={small ? 'min' : '2xs'} />
     </span>
@@ -51,14 +51,16 @@ export function Card({
   action,
   children,
   className = '',
+  plain = false,
 }: {
   title?: string;
   action?: ReactNode;
   children: ReactNode;
   className?: string;
+  plain?: boolean;
 }): JSX.Element {
   return (
-    <section className={`rounded-card bg-panel-card p-4 ${className}`}>
+    <section className={`${plain ? '' : 'rounded-card bg-panel-card p-4'} ${className}`}>
       {title !== undefined && (
         <header className="mb-3 flex items-baseline gap-2">
           <h2 className="min-w-0 flex-1 text-body-l font-medium">{title}</h2>
@@ -71,8 +73,7 @@ export function Card({
 }
 
 /**
- * Сегментированный переключатель — компактнее набора кнопок. Форма как у
- * переключателя вида у HireHi: серая подложка 12, пункт внутри 8.
+ * Сегменты: внешнее скругление 16, внутреннее 12; выбранный пункт белый.
  */
 export function Segmented<T extends string>({
   options,
@@ -84,13 +85,13 @@ export function Segmented<T extends string>({
   onChange: (value: T) => void;
 }): JSX.Element {
   return (
-    <div className="inline-flex rounded-pill bg-panel-card p-1">
+    <div className="inline-flex rounded-md bg-panel-card p-1">
       {options.map((option) => (
         <button
           key={option.value}
           aria-pressed={value === option.value}
-          className={`rounded-pill px-3 py-1.5 text-caption-l transition-colors ${
-            value === option.value ? 'bg-accent font-medium text-accent-on' : 'text-ink-soft'
+          className={`h-10 rounded-sm px-3 text-caption-l transition-colors ${
+            value === option.value ? 'segment-selected font-medium' : 'text-ink-soft'
           }`}
           onClick={() => onChange(option.value)}
         >
@@ -102,9 +103,7 @@ export function Segmented<T extends string>({
 }
 
 /**
- * Чипс-фильтр, как ряд категорий у веба HireHi: выбранный залит акцентом,
- * остальные без фона и проявляются только при наведении. Счётчик рядом
- * показывает, сколько там, до перехода.
+ * Нейтральный фильтр со счётчиком элементов до перехода.
  */
 export function Chip({
   children,
@@ -125,17 +124,15 @@ export function Chip({
     <button
       disabled={disabled}
       aria-pressed={active}
-      className={`flex shrink-0 items-center gap-1.5 rounded-pill px-3 py-2 text-body-m transition-colors ${
-        active ? 'bg-accent text-accent-on' : 'text-ink hover:bg-hover'
+      className={`flex min-h-11 shrink-0 items-center gap-1.5 rounded-sm px-3 py-2 text-body-m transition-colors ${
+        active ? 'bg-panel-card font-medium text-ink' : 'text-ink-soft hover:bg-hover'
       }`}
       onClick={onClick}
     >
       {icon !== undefined && <Icon name={icon} />}
       {children}
       {count !== undefined && (
-        <span
-          className={`text-caption-l tabular-nums ${active ? 'text-accent-on-muted' : 'text-ink-faint'}`}
-        >
+        <span className="text-caption-l tabular-nums text-ink-faint">
           {count.toLocaleString('ru')}
         </span>
       )}
@@ -159,7 +156,7 @@ export function ThemeButton({
     <button
       title={title}
       aria-label={title}
-      className="flex h-8 w-8 shrink-0 items-center justify-center rounded-pill bg-panel-card text-ink-soft hover:bg-hover hover:text-ink"
+      className="flex h-10 w-10 shrink-0 items-center justify-center rounded-sm bg-panel-card text-ink-soft hover:bg-hover hover:text-ink"
       onClick={onToggle}
     >
       <Icon name={theme === 'light' ? 'moon' : 'sun'} />
@@ -235,12 +232,12 @@ export function Section({
   return (
     <section className="mt-5">
       {onOpen === undefined ? (
-        <h2 className="mb-2 px-1 text-body-l font-semibold">
+        <h2 className="mb-2 text-body-l font-semibold">
           {title.charAt(0).toUpperCase() + title.slice(1)}
         </h2>
       ) : (
         <button
-          className="mb-2 flex items-center gap-1 px-1 text-body-l font-semibold hover:text-accent-ink"
+          className="mb-2 flex items-center gap-1 text-body-l font-semibold hover:text-accent-ink"
           onClick={onOpen}
         >
           {title.charAt(0).toUpperCase() + title.slice(1)}
@@ -275,13 +272,13 @@ export function ListRow({
     <>
       {leading}
       <span className="min-w-0 flex-1">
-        <span className="block truncate text-body-m font-medium">{title}</span>
+        <span className="block truncate text-body-l font-medium">{title}</span>
         {subtitle !== undefined && (
           <span className="mt-0.5 block truncate text-caption-l">{subtitle}</span>
         )}
       </span>
       <span className="shrink-0 text-right">
-        <span className="block text-body-m font-semibold tabular-nums">{value}</span>
+        <span className="block text-body-l font-medium tabular-nums text-ink-faint">{value}</span>
         {valueHint !== undefined && (
           <span className="mt-0.5 block text-caption-l tabular-nums text-ink-faint">
             {valueHint}
@@ -290,9 +287,9 @@ export function ListRow({
       </span>
     </>
   );
-  const className = 'flex items-center gap-3 py-3 text-left';
+  const className = 'flex min-h-[72px] items-center gap-3 py-3 text-left';
   return (
-    <li className="border-t border-line-subtle first:border-0">
+    <li>
       {onClick === undefined ? (
         <div className={`${className} w-full`}>{body}</div>
       ) : (
@@ -310,7 +307,7 @@ export function ListRow({
 /** Пустое состояние: что случилось и что с этим делать. */
 export function Empty({ title, hint }: { title: string; hint?: string }): JSX.Element {
   return (
-    <div className="flex flex-col items-center rounded-card bg-surface px-4 py-10 text-center">
+    <div className="flex flex-col items-center px-4 py-10 text-center">
       <span data-tint="blue" className="tint-ink mb-2">
         <Icon name="info-circle" size="xs" />
       </span>
@@ -338,7 +335,7 @@ export function Kpi({
   tint?: Tint;
 }): JSX.Element {
   return (
-    <div className="rounded-card bg-panel-card p-4">
+    <div className="min-w-0 pb-4 pt-2">
       <div className="flex items-center gap-2">
         {icon !== undefined && <TintIcon name={icon} tint={tint} small />}
         <div className="text-caption-l text-ink-soft">{label}</div>
@@ -369,26 +366,18 @@ export function StackedBar({ segments }: { segments: readonly Segment[] }): JSX.
   if (total === 0) return <p className="text-caption-l text-ink-faint">Нет данных</p>;
 
   return (
-    <ul className="flex flex-col gap-1">
+    <ul className="list-surface flex flex-col">
       {segments.map((segment) => {
-        const share = (segment.value / total) * 100;
         const body = (
           <>
             <span className="flex items-baseline gap-2">
               <span className="min-w-0 flex-1 truncate text-left">{segment.label}</span>
-              <span className="shrink-0 font-semibold tabular-nums">
+              <span className="shrink-0 font-medium tabular-nums text-ink-faint">
                 {segment.value.toLocaleString('ru')}
               </span>
               <span className="w-9 shrink-0 text-right text-caption-l tabular-nums text-ink-faint">
                 {pct(segment.value, total)}
               </span>
-            </span>
-            <span className="mt-1.5 block h-1 w-full">
-              <span
-                className={`block h-full rounded-pill ${segment.className}`}
-                {...(segment.status === undefined ? {} : statusAttrs(segment.status))}
-                style={{ width: `${segment.value === 0 ? 0 : Math.max(share, 1)}%` }}
-              />
             </span>
           </>
         );
@@ -396,10 +385,10 @@ export function StackedBar({ segments }: { segments: readonly Segment[] }): JSX.
         return (
           <li key={segment.label}>
             {segment.onClick === undefined || segment.value === 0 ? (
-              <div className="py-1.5 text-body-m">{body}</div>
+              <div className="flex min-h-[72px] flex-col justify-center text-body-l">{body}</div>
             ) : (
               <button
-                className="-mx-1.5 block w-[calc(100%+12px)] rounded-xs px-1.5 py-1.5 text-body-m hover:bg-hover"
+                className="-mx-1.5 flex min-h-[72px] w-[calc(100%+12px)] flex-col justify-center rounded-sm px-1.5 text-body-l hover:bg-hover"
                 onClick={segment.onClick}
               >
                 {body}
@@ -454,7 +443,7 @@ export function Button({
   /** `sm` — кнопка внутри тулбара, по высоте пункта переключателя. */
   size?: 'sm' | 'md' | 'lg';
   icon?: IconName;
-  /** Во всю ширину, как кнопки в боковой панели вакансии HireHi. */
+  /** Во всю ширину контейнера. */
   wide?: boolean;
 }): JSX.Element {
   // Наведение — токены interaction Box UI, а не фильтр яркости: так кнопка
@@ -465,10 +454,9 @@ export function Button({
     raised: 'bg-surface text-ink hover:bg-hover',
   }[variant];
   const dims = {
-    sm: 'h-8 shrink-0 gap-1.5 rounded-pill px-3 text-body-m',
-    // Как кнопки у HireHi: высота 36 и 44, скругление 12 и 16, отступ 16.
-    md: 'h-10 gap-1.5 rounded-pill px-4 text-body-m',
-    lg: 'h-12 gap-2 rounded-pill px-5 text-body-l',
+    sm: 'h-12 shrink-0 gap-1.5 rounded-sm px-3 text-body-m',
+    md: 'h-12 gap-1.5 rounded-sm px-4 text-body-m',
+    lg: 'h-14 gap-2 rounded-md px-5 text-body-l',
   }[size];
   return (
     <button
@@ -483,10 +471,12 @@ export function Button({
 
 export function Modal({
   title,
+  caption,
   onClose,
   children,
 }: {
   title: string;
+  caption?: string;
   onClose: () => void;
   children: ReactNode;
 }): JSX.Element {
@@ -504,24 +494,32 @@ export function Modal({
     // Нижний лист, как детали в мобильных приложениях (Cal AI, Bevel):
     // палец и взгляд уже внизу списка, а сверху остаётся видно, откуда пришли.
     <div
-      className="absolute inset-0 z-10 flex flex-col justify-end bg-overlay pt-12"
+      className="absolute inset-0 z-10 flex flex-col justify-end bg-overlay px-2 pb-2 pt-12"
       onClick={onClose}
     >
       <div
         role="dialog"
         aria-label={title}
-        className="flex max-h-full w-full flex-col rounded-t-card bg-surface ring-1 ring-line"
+        className="flex max-h-full w-full flex-col rounded-card bg-surface ring-1 ring-line"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Ручка — знак листа, как в iOS: сверху по центру, 36 × 4. */}
         <span aria-hidden className="mx-auto mt-2 h-1 w-9 shrink-0 rounded-pill bg-line-strong" />
-        <header className="flex items-center gap-2 px-4 pb-4 pt-2">
-          <h3 className="min-w-0 flex-1 truncate text-h5 font-semibold">{title}</h3>
-          <button className="shrink-0 px-1 text-ink-faint hover:text-ink" onClick={onClose}>
+        <header className="flex items-center gap-2 px-6 pb-4 pt-4">
+          <div className="min-w-0 flex-1">
+            {caption !== undefined && <p className="text-caption-l text-ink-faint">{caption}</p>}
+            <h3 className="truncate text-h5 font-semibold">{title}</h3>
+          </div>
+          <button
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-sm bg-panel-card text-ink-faint hover:bg-hover hover:text-ink"
+            onClick={onClose}
+          >
             <Icon name="close-circle" size="2xs" title="Закрыть" />
           </button>
         </header>
-        <div className="min-h-0 flex-1 overflow-y-auto px-4 pb-4 text-body-m">{children}</div>
+        <div className="panel-scroll modal-scroll min-h-0 flex-1 overflow-y-auto overflow-x-hidden text-body-m">
+          <div className="scroll-content pb-4">{children}</div>
+        </div>
       </div>
     </div>
   );
@@ -539,11 +537,13 @@ export function Facts({
 }): JSX.Element {
   const columns = items.length >= 3 ? 'grid-cols-3' : 'grid-cols-2';
   return (
-    <dl className={`grid gap-1 ${columns}`}>
+    <dl className={`grid gap-1 border-y-2 border-dotted border-line-subtle py-3 ${columns}`}>
       {items.map((item) => (
-        <div key={item.label} className="min-w-0 rounded-md bg-canvas p-3">
-          <dt className="text-caption-l text-ink-soft">{item.label}</dt>
-          <dd className="mt-1 truncate text-h5 font-semibold tabular-nums">{item.value}</dd>
+        <div key={item.label} className="flex min-w-0 flex-col items-center px-1 text-center">
+          <dt className="order-2 mt-1 text-caption-l text-ink-faint">{item.label}</dt>
+          <dd className="order-1 max-w-full truncate text-h5 font-semibold tabular-nums">
+            {item.value}
+          </dd>
         </div>
       ))}
     </dl>
@@ -560,7 +560,7 @@ export function Note({ children }: { children: ReactNode }): JSX.Element {
  */
 export function Aside({ children }: { children: ReactNode }): JSX.Element {
   return (
-    <p className="mt-2 flex gap-2 px-1 text-caption-l leading-relaxed text-ink-faint">
+    <p className="mt-2 flex gap-2 text-caption-l leading-relaxed text-ink-faint">
       <span className="mt-px shrink-0">
         <Icon name="info-circle" />
       </span>
@@ -627,15 +627,16 @@ export function Places({
   }
 
   return (
-    <ul className="flex flex-col">
+    <ul className="list-surface flex flex-col">
       {places.map((place) => (
         <li key={place.nodeId}>
           <button
-            className="flex w-full items-center gap-2 border-t border-line-subtle py-2 text-left first:border-0 hover:bg-hover"
+            className="flex min-h-16 w-full items-center gap-3 rounded-sm py-3 text-left hover:bg-hover"
             onClick={() => onReveal(place.nodeId, place.pageId)}
           >
+            <TintIcon name="map-point" tint="blue" />
             <span className="min-w-0 flex-1">
-              <span className="block truncate text-body-m">{place.name}</span>
+              <span className="block truncate text-body-l font-medium">{place.name}</span>
               {place.detail !== undefined && place.detail !== '' && (
                 <span className="mt-0.5 block truncate text-caption-l text-ink-faint">
                   {place.detail}
@@ -644,9 +645,8 @@ export function Places({
             </span>
             <span
               data-tint="blue"
-              className="tint-ink flex shrink-0 items-center gap-1 text-caption-l"
+              className="flex shrink-0 items-center text-caption-l text-ink-faint"
             >
-              <Icon name="map-point" />
               перейти
             </span>
           </button>
@@ -675,11 +675,14 @@ export function AdviceRow({
 }): JSX.Element {
   const body = (
     <>
-      <span className="mt-px shrink-0 text-status-ink" {...statusAttrs('warning')}>
+      <span
+        className="flex h-8 w-8 shrink-0 items-center justify-center text-status-ink"
+        {...statusAttrs('warning')}
+      >
         <Icon name="danger-triangle" />
       </span>
       <span className="min-w-0 flex-1">
-        <span className="block truncate text-body-m font-medium">{title}</span>
+        <span className="block text-body-l font-medium">{title}</span>
         <span className="mt-0.5 block text-caption-l leading-snug text-ink-faint">{hint}</span>
       </span>
       {/* Число — бейджем справа, как изменения в Bevel: столбец чисел
@@ -698,7 +701,7 @@ export function AdviceRow({
     </>
   );
 
-  const className = 'flex w-full gap-2 border-t border-line-subtle py-2.5 text-left first:border-0';
+  const className = 'flex min-h-[72px] w-full items-center gap-3 py-3 text-left';
   return onClick === undefined ? (
     <div className={className}>{body}</div>
   ) : (
@@ -836,7 +839,7 @@ export function SearchInput({
   placeholder: string;
 }): JSX.Element {
   return (
-    <label className="flex h-11 items-center gap-2 rounded-pill bg-panel-card px-3.5 text-ink-faint">
+    <label className="flex h-12 items-center gap-2 rounded-md bg-panel-card pl-3.5 pr-1 text-ink-faint">
       <Icon name="magnifer" />
       <input
         className="min-w-0 flex-1 bg-transparent text-body-m text-ink outline-none placeholder:text-ink-faint"
@@ -845,7 +848,10 @@ export function SearchInput({
         onChange={(e) => onChange(e.target.value)}
       />
       {value !== '' && (
-        <button className="shrink-0 hover:text-ink" onClick={() => onChange('')}>
+        <button
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-sm hover:bg-hover hover:text-ink"
+          onClick={() => onChange('')}
+        >
           <Icon name="close-circle" title="Очистить" />
         </button>
       )}

@@ -10,9 +10,19 @@
 
 /* Родной холст Lottie: визуал и анимации Cat из Agent Pulse. */
 .pulse-mascot {
-  width: 208px;
-  height: 184px;
+  --mascot-frame-size: 200px;
+  position: relative;
+  width: var(--mascot-frame-size);
+  height: 128px;
   flex: none;
+}
+.pulse-mascot > svg {
+  position: absolute;
+  width: var(--mascot-frame-size) !important;
+  height: var(--mascot-frame-size) !important;
+  left: 0;
+  /* Центр тела в исходном клипе — 111,5 из 200, как в Agent Pulse. */
+  top: calc(50% - var(--mascot-frame-size) * 0.5575);
 }
 
 /* Малые цветные детали берут палитру Box UI, поверхности остаются нейтральными. */
@@ -36,27 +46,18 @@
 }
 [data-tint='violet'] {
   --tint-ink: var(--detail-violet);
-  --tint-soft: var(--color-violet-alpha-8);
 }
 [data-tint='blue'] {
   --tint-ink: var(--detail-blue);
-  --tint-soft: var(--color-blue-alpha-8);
 }
 [data-tint='orange'] {
   --tint-ink: var(--detail-orange);
-  --tint-soft: var(--color-orange-alpha-8);
 }
 [data-tint='green'] {
   --tint-ink: var(--detail-green);
-  --tint-soft: var(--color-green-alpha-8);
 }
 [data-tint='pink'] {
   --tint-ink: var(--detail-pink);
-  --tint-soft: var(--color-pink-alpha-8);
-}
-.tint-badge {
-  color: var(--tint-ink);
-  background: var(--tint-soft);
 }
 .tint-ink {
   color: var(--tint-ink);
@@ -70,6 +71,37 @@
   justify-content: center;
   padding-bottom: var(--spacing-16);
 }
+.panel-scroll {
+  --panel-inset: var(--spacing-24);
+  --panel-frame-inset: 0px;
+}
+.modal-scroll {
+  --panel-frame-inset: var(--spacing-8);
+}
+/* Ширина от viewport, а не от clientWidth скроллера. Полоса занимает
+   часть правого поля, не сдвигает содержимое и не меняет его ширину. */
+.scroll-content {
+  width: calc(100vw - var(--panel-inset) * 2 - var(--panel-frame-inset) * 2);
+  margin-left: var(--panel-inset);
+}
+.segment-selected {
+  background: var(--system-color-white-base);
+  color: var(--system-color-black-base);
+}
+.start-screen[data-compact='true'] .pulse-mascot {
+  --mascot-frame-size: 160px;
+  height: 96px;
+}
+.start-screen[data-compact='true'] .start-title {
+  font-size: var(--type-h4-font-size);
+  line-height: var(--type-h4-line-height);
+}
+.start-screen[data-compact='true'] .scope-choice {
+  height: 80px;
+}
+.start-screen[data-compact='true'] .start-scopes {
+  margin-top: var(--spacing-16);
+}
 .start-title {
   font-size: var(--type-h3-font-size);
   line-height: var(--type-h3-line-height);
@@ -81,16 +113,19 @@
 }
 
 @media (max-height: 600px) {
-  .start-content {
-    display: block;
-    padding-top: var(--spacing-16);
-  }
   .start-hero .pulse-mascot {
-    height: 120px;
+    --mascot-frame-size: 160px;
+    height: 96px;
   }
 }
 
 @layer base {
+  html,
+  body,
+  #root {
+    height: 100%;
+    overflow: hidden;
+  }
   body {
     @apply bg-canvas font-sans text-body-m text-ink;
   }
@@ -140,4 +175,53 @@
       animation-duration: 0.01ms !important;
     }
   }
+}
+
+/* Общий контейнер списка: приём Joi, без разделителей между строками. */
+.list-surface {
+  border: 1px solid var(--surface-base-border-subtle);
+  border-radius: var(--rounding-32);
+  background: var(--panel-fill);
+  padding: var(--spacing-12) var(--spacing-20);
+}
+
+/* Миниатюра: две строки без вложенных рамок и отдельных карточек. */
+.scope-preview-layout {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-8);
+  width: 64px;
+}
+.scope-preview-row {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-8);
+  height: 12px;
+}
+.scope-preview-row > .tint-ink {
+  width: 12px;
+  height: 12px;
+}
+.scope-preview-row svg {
+  width: 12px;
+  height: 12px;
+}
+.scope-preview-line {
+  width: 40px;
+  height: 6px;
+  border-radius: var(--rounding-4);
+  background: var(--surface-base-border-default);
+}
+.scope-preview-row:nth-child(2) .scope-preview-line {
+  width: 24px;
+}
+
+.scope-preview-mark {
+  width: 8px;
+  height: 8px;
+  flex: none;
+  border-radius: var(--rounding-2);
+}
+.scope-preview-mark-muted {
+  background: var(--surface-base-content-subtle);
 }

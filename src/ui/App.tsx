@@ -18,7 +18,6 @@ import {
   Segmented,
   statusAttrs,
   ThemeButton,
-  TintIcon,
   type Tint,
 } from './parts/primitives';
 import { Icon } from './parts/icon';
@@ -163,7 +162,7 @@ export function App(): JSX.Element {
 
   return (
     <div className="relative flex h-screen flex-col bg-panel text-ink">
-      <header className="shrink-0 border-b border-line-subtle px-5 pb-3 pt-5">
+      <header className="shrink-0 border-b border-line-subtle px-6 pb-3 pt-5">
         <div className="flex items-center gap-2">
           <p className="flex min-w-0 flex-1 items-center gap-1.5 text-caption-l text-ink-soft">
             <span data-tint="violet" className="tint-ink">
@@ -184,17 +183,7 @@ export function App(): JSX.Element {
             480px оно схлопывалось в «Дизайн…». */}
         <h1 className="mt-2 truncate text-h4 font-semibold tracking-tight">{report.fileName}</h1>
 
-        {/* Охват слева, повторная проверка справа; главные действия нейтральные. */}
-        <div className="mt-4 flex items-center gap-3">
-          <div className="min-w-0 flex-1">
-            <Segmented options={SCOPES} value={scope} onChange={setScope} />
-          </div>
-          <Button size="sm" onClick={start} icon="refresh">
-            Ещё раз
-          </Button>
-        </div>
-
-        <nav aria-label="Разделы отчёта" className="-mx-1 mt-3 flex gap-1 overflow-x-auto px-1">
+        <nav aria-label="Разделы отчёта" className="-mx-1 mt-4 flex gap-1 overflow-x-auto px-1">
           {TABS.map((name) => {
             const count = countFor(name, report);
             return (
@@ -215,18 +204,28 @@ export function App(): JSX.Element {
         </nav>
       </header>
 
-      <main className="min-h-0 flex-1 overflow-y-auto px-5 pb-5 pt-4">
-        <Content
-          tab={tab}
-          report={report}
-          componentFilter={componentFilter}
-          onGoTo={(next, filter) => {
-            if (filter !== undefined) setComponentFilter(filter);
-            setTab(next);
-          }}
-          onReveal={reveal}
-        />
+      <main className="panel-scroll min-h-0 flex-1 overflow-y-auto overflow-x-hidden">
+        <div className="scroll-content pb-5 pt-4">
+          <Content
+            tab={tab}
+            report={report}
+            componentFilter={componentFilter}
+            onGoTo={(next, filter) => {
+              if (filter !== undefined) setComponentFilter(filter);
+              setTab(next);
+            }}
+            onReveal={reveal}
+          />
+        </div>
       </main>
+      <footer className="flex shrink-0 items-center gap-3 border-t border-line-subtle px-6 py-3">
+        <div className="min-w-0 flex-1">
+          <Segmented options={SCOPES} value={scope} onChange={setScope} />
+        </div>
+        <Button size="sm" onClick={start} icon="refresh">
+          Ещё раз
+        </Button>
+      </footer>
     </div>
   );
 }
@@ -256,8 +255,11 @@ function Start({
   onToggleTheme: () => void;
 }): JSX.Element {
   return (
-    <div className="relative flex h-screen flex-col bg-panel text-ink">
-      <header className="flex shrink-0 items-center gap-2 px-5 pt-4">
+    <div
+      className="start-screen relative flex h-screen flex-col overflow-hidden bg-panel text-ink"
+      data-compact={running || error !== null}
+    >
+      <header className="flex shrink-0 items-center gap-2 px-6 pt-4">
         <span data-tint="violet" className="tint-ink">
           <Icon name="widget" />
         </span>
@@ -267,21 +269,24 @@ function Start({
         <ThemeButton theme={theme} onToggle={onToggleTheme} />
       </header>
 
-      <div className="start-content min-h-0 flex-1 overflow-y-auto px-6">
-        <div className="start-hero flex flex-col items-center text-center">
+      <div className="start-content min-h-0 flex-1 px-6">
+        <div className="start-hero flex shrink-0 flex-col items-center text-center">
           <Mascot />
           <h1 className="start-title text-balance font-semibold tracking-tight">
             Как файл живёт
             <br />
             на дизайн-системе
           </h1>
-          <p className="mt-3 max-w-[340px] text-body-m leading-relaxed text-ink-soft">
-            Сколько компонентов берётся из библиотеки, сколько сделано мимо неё и на чём держатся
-            цвета.
+          <p className="start-description mt-3 max-w-[360px] text-body-l leading-relaxed text-ink-soft">
+            Компоненты из библиотеки, локальные копии и покрытие токенами — в одном отчёте.
           </p>
         </div>
 
-        <div role="radiogroup" aria-label="Что проверить" className="mt-8 grid grid-cols-3 gap-2">
+        <div
+          role="radiogroup"
+          aria-label="Что проверить"
+          className="start-scopes mt-6 grid shrink-0 grid-cols-3 gap-2"
+        >
           {SCOPES.map((item) => (
             <button
               key={item.value}
@@ -290,10 +295,24 @@ function Start({
               title={item.hint}
               disabled={running}
               onClick={() => setScope(item.value)}
-              className={`scope-choice relative flex flex-col items-center gap-2 rounded-md border px-2 py-3 text-body-m transition-colors ${scope === item.value ? 'border-ink bg-panel-card font-medium' : 'border-line-subtle hover:bg-panel-card'} disabled:opacity-50`}
+              className={`scope-choice flex h-32 flex-col overflow-hidden rounded-lg border-2 text-body-m transition-colors ${scope === item.value ? 'border-accent bg-accent text-accent-on' : 'border-transparent bg-panel-card text-ink hover:border-line'} disabled:opacity-50`}
             >
-              <TintIcon name={item.icon} tint={item.tint} small />
-              {item.label}
+              <span
+                aria-hidden="true"
+                className={`scope-preview scope-preview-${item.value} flex min-h-0 flex-1 items-center justify-center rounded-md bg-surface`}
+              >
+                <span className="scope-preview-layout">
+                  <span className="scope-preview-row">
+                    <span data-tint={item.tint} className="tint-dot scope-preview-mark" />
+                    <span className="scope-preview-line" />
+                  </span>
+                  <span className="scope-preview-row text-ink-faint">
+                    <span className="scope-preview-mark scope-preview-mark-muted" />
+                    <span className="scope-preview-line" />
+                  </span>
+                </span>
+              </span>
+              <span className="flex h-8 shrink-0 items-center justify-center">{item.label}</span>
             </button>
           ))}
         </div>

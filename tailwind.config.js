@@ -52,6 +52,7 @@ export default {
         xs: 'var(--rounding-xs)',
         sm: 'var(--rounding-s)',
         md: 'var(--rounding-m)',
+        lg: 'var(--rounding-l)',
         card: 'var(--rounding-xl)',
         pill: 'var(--rounding-base-full)',
       },
