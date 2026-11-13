@@ -103,20 +103,6 @@ export function SummaryScreen({
         />
       </div>
 
-      <TrendCard adoption={adoption} trend={trend} />
-
-      <Section title="забрать с собой">
-        <Card>
-          <Note>
-            Отчёт в Markdown: вердикт, главные цифры, приоритеты и история. Вставляется в документ
-            или сообщение как есть.
-          </Note>
-          <div className="mt-3">
-            <CopyButton text={toMarkdown(report, new Date())} label="Скопировать отчёт" wide />
-          </div>
-        </Card>
-      </Section>
-
       {advice.length > 0 && (
         <Section title="с чего начать">
           <Card>
@@ -144,6 +130,8 @@ export function SummaryScreen({
           </Card>
         </Section>
       )}
+
+      <TrendCard adoption={adoption} trend={trend} />
 
       <Section title="откуда компоненты" onOpen={() => onGoTo('Компоненты')}>
         <Card>
@@ -234,6 +222,18 @@ export function SummaryScreen({
           </Card>
         </Section>
       )}
+
+      <Section title="забрать с собой">
+        <Card>
+          <Note>
+            Отчёт в Markdown: вердикт, главные цифры, приоритеты и история. Вставляется в документ
+            или сообщение как есть.
+          </Note>
+          <div className="mt-3">
+            <CopyButton text={toMarkdown(report, new Date())} label="Скопировать отчёт" wide />
+          </div>
+        </Card>
+      </Section>
     </div>
   );
 }
