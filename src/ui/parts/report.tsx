@@ -33,7 +33,6 @@ import {
   Places,
   SearchInput,
   Section,
-  Sparkline,
   StackedBar,
   statusAttrs,
   TintIcon,
@@ -284,25 +283,71 @@ function TrendCard({ adoption, trend }: { adoption: Adoption; trend: Trend }): J
     point.instances === 0 ? 0 : (point.fromLibrary / point.instances) * 100,
   );
 
+  const low = Math.max(0, Math.floor(Math.min(...series) / 10) * 10 - 5);
+  const high = Math.min(100, Math.ceil(Math.max(...series) / 10) * 10 + 5);
+  const points = series
+    .map(
+      (value, i) =>
+        `${8 + (i / Math.max(series.length - 1, 1)) * 384},${88 - ((value - low) / Math.max(high - low, 1)) * 72}`,
+    )
+    .join(' ');
+  const first = trend.points[0];
+  const last = trend.points[trend.points.length - 1];
+
   return (
     <Section title="тренд">
-      <Card>
-        <div className="flex items-center gap-3">
-          <div className="min-w-0 flex-1">
-            <p className="text-body-m">Компоненты из библиотеки</p>
-            <p className="mt-1">
-              <Delta points={delta} since={shortDate(trend.previous.at)} />
+      <Card plain className="trend-panel list-surface">
+        <div className="flex items-start justify-between gap-3 pt-3">
+          <div>
+            <p className="text-body-l text-ink-soft">Компоненты из библиотеки</p>
+            <p className="mt-2 text-h2 font-semibold tracking-tight tabular-nums">
+              {pct(adoption.fromLibrary, adoption.instancesCounted)}
             </p>
           </div>
-          <Sparkline values={series} />
+          <TintIcon name="graph-up" tint="violet" />
         </div>
-        <div className="mt-3">
-          <Note>
-            {withCount(trend.points.length, 'замер', 'замера', 'замеров')} по охвату «
-            {trend.points[0]?.scope ?? ''}». Один снимок в день: повторный прогон заменяет
-            сегодняшний.
-          </Note>
+        <div className="mt-2">
+          <Delta points={delta} since={shortDate(trend.previous.at)} />
         </div>
+        <svg
+          className="my-3 block w-full overflow-visible"
+          viewBox="0 0 400 104"
+          role="img"
+          aria-label={`Покрытие компонентами из библиотеки: ${series.map((v) => `${Math.round(v)}%`).join(', ')}`}
+        >
+          <defs>
+            <linearGradient id="trend-area" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="var(--detail-violet)" stopOpacity=".16" />
+              <stop offset="100%" stopColor="var(--detail-violet)" stopOpacity="0" />
+            </linearGradient>
+          </defs>
+          <path d="M8 96H392" stroke="var(--surface-base-border-subtle)" fill="none" />
+          <polygon points={`8,96 ${points} 392,96`} fill="url(#trend-area)" />
+          <polyline
+            points={points}
+            stroke="var(--detail-violet)"
+            strokeWidth="2.5"
+            fill="none"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+          {series.map((value, i) => (
+            <circle
+              key={i}
+              cx={8 + (i / Math.max(series.length - 1, 1)) * 384}
+              cy={88 - ((value - low) / Math.max(high - low, 1)) * 72}
+              r={i === series.length - 1 ? 4 : 2}
+              fill="var(--detail-violet)"
+            />
+          ))}
+        </svg>
+        <div className="flex justify-between text-caption-l text-ink-faint">
+          <span>{first ? shortDate(first.at) : ''}</span>
+          <span>{last ? shortDate(last.at) : ''}</span>
+        </div>
+        <p className="mt-4 pb-2 text-caption-l text-ink-soft">
+          {withCount(trend.points.length, 'замер', 'замера', 'замеров')} · один снимок в день
+        </p>
       </Card>
     </Section>
   );
