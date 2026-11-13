@@ -119,19 +119,19 @@ export function App(): JSX.Element {
       <header className="shrink-0 px-4 pt-4">
         {/* Три строки, а не одна: на 480px имя файла, переключатель охвата и
             кнопка в один ряд не помещаются — имя схлопывалось в «Дизайн…». */}
-        <div className="flex items-center gap-3">
+        {/* Крошки над заголовком, как у веба HireHi: что проверено и сколько. */}
+        <p className="flex items-center gap-1.5 text-body-m text-ink-soft">
+          <span>{report.scope}</span>
+          <span aria-hidden>/</span>
+          <span className="tabular-nums">{report.nodesVisited.toLocaleString('ru')} слоёв</span>
+          {report.cancelled && <Pill tone="warn">остановлено</Pill>}
+        </p>
+
+        <div className="mt-1 flex items-center gap-3">
           <h1 className="min-w-0 flex-1 truncate text-body-l font-medium">{report.fileName}</h1>
           <Button onClick={start} icon="refresh">
             Ещё раз
           </Button>
-        </div>
-
-        <div className="mt-2 flex items-center gap-2">
-          <Pill>{report.scope}</Pill>
-          <span className="text-caption-l tabular-nums text-ink-faint">
-            {report.nodesVisited.toLocaleString('ru')} слоёв
-          </span>
-          {report.cancelled && <Pill tone="warn">остановлено</Pill>}
         </div>
 
         <div className="mt-2.5">
