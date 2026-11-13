@@ -136,7 +136,10 @@ export function BarCell({
   );
 }
 
-/** Сегментированный переключатель — компактнее набора кнопок. */
+/**
+ * Сегментированный переключатель — компактнее набора кнопок. Форма как у
+ * переключателя вида у HireHi: серая подложка 12, пункт внутри 8.
+ */
 export function Segmented<T extends string>({
   options,
   value,
@@ -147,11 +150,11 @@ export function Segmented<T extends string>({
   onChange: (value: T) => void;
 }): JSX.Element {
   return (
-    <div className="inline-flex rounded-pill bg-canvas p-0.5">
+    <div className="inline-flex rounded-sm bg-canvas p-0.5">
       {options.map((option) => (
         <button
           key={option.value}
-          className={`rounded-pill px-2.5 py-1 text-caption-l ${
+          className={`rounded-xs px-2.5 py-1 text-caption-l ${
             value === option.value ? 'bg-surface font-medium' : 'text-ink-soft'
           }`}
           onClick={() => onChange(option.value)}
