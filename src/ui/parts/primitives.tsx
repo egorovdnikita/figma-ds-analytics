@@ -486,6 +486,21 @@ export function Note({ children }: { children: ReactNode }): JSX.Element {
   return <p className="text-caption-l leading-relaxed text-ink-faint">{children}</p>;
 }
 
+/**
+ * Пояснение под карточкой, на полотне — как предупреждение под панелью
+ * вакансии HireHi: иконка слева, мелкий серый текст.
+ */
+export function Aside({ children }: { children: ReactNode }): JSX.Element {
+  return (
+    <p className="mt-2 flex gap-2 px-1 text-caption-l leading-relaxed text-ink-faint">
+      <span className="mt-px shrink-0">
+        <Icon name="info-circle" />
+      </span>
+      <span className="min-w-0">{children}</span>
+    </p>
+  );
+}
+
 export function pct(part: number, total: number): string {
   if (total === 0) return '—';
   const value = (part / total) * 100;

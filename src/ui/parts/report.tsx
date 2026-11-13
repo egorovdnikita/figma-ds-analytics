@@ -11,6 +11,7 @@ import { deltaPoints, shortDate, type Trend } from '../../shared/snapshot';
 import { Icon } from './icon';
 import {
   AdviceRow,
+  Aside,
   BarCell,
   Button,
   Card,
@@ -551,9 +552,9 @@ function CollectionsTable({ adoption }: { adoption: Adoption }): JSX.Element {
           ))}
         </Table>
       </Card>
-      <Note>
+      <Aside>
         «Библиотека не подключена» значит, что токен используется, а его источник файлу недоступен.
-      </Note>
+      </Aside>
     </>
   );
 }
@@ -618,9 +619,9 @@ function VariablesTable({
         </Card>
       )}
 
-      <Note>
+      <Aside>
         Число слоёв — цена изменения: столько мест сломается, если токен удалить или переименовать.
-      </Note>
+      </Aside>
     </>
   );
 }
