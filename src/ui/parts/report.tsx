@@ -78,7 +78,7 @@ export function SummaryScreen({
 
       <TrendCard adoption={adoption} trend={trend} />
 
-      <Card title="Забрать с собой">
+      <Card title="забрать с собой">
         <Note>
           Отчёт в Markdown: вердикт, главные цифры, приоритеты и история. Вставляется в документ или
           сообщение как есть.
@@ -89,7 +89,7 @@ export function SummaryScreen({
       </Card>
 
       {advice.length > 0 && (
-        <Card title="С чего начать">
+        <Card title="с чего начать">
           {advice.map((item) => {
             // Через локальную константу: внутри замыкания TypeScript не
             // удерживает сужение по `item.target.kind`.
@@ -128,7 +128,7 @@ export function SummaryScreen({
       </div>
 
       <Card
-        title="Откуда компоненты"
+        title="откуда компоненты"
         action={
           <button
             className="flex items-center gap-0.5 text-caption-l text-accent-ink"
@@ -172,7 +172,7 @@ export function SummaryScreen({
       </Card>
 
       <Card
-        title="Откуда токены"
+        title="откуда токены"
         action={
           <button
             className="flex items-center gap-0.5 text-caption-l text-accent-ink"
@@ -205,7 +205,7 @@ export function SummaryScreen({
       </Card>
 
       {adoption.librarySourcesAvailable && adoption.libraries.length > 0 && (
-        <Card title="Библиотеки">
+        <Card title="библиотеки">
           <Table head={['Название', 'Токенов']}>
             {adoption.libraries.map((library) => (
               <Row
@@ -224,7 +224,7 @@ export function SummaryScreen({
       )}
 
       {!adoption.librarySourcesAvailable && (
-        <Card title="Библиотеки">
+        <Card title="библиотеки">
           <Note>Не удалось прочитать — это не значит, что библиотек нет.</Note>
         </Card>
       )}
@@ -250,7 +250,7 @@ function TrendCard({ adoption, trend }: { adoption: Adoption; trend: Trend }): J
 
   if (trend.previous === null || delta === null) {
     return (
-      <Card title="Тренд">
+      <Card title="тренд">
         <Note>
           Это первый замер по этому охвату. Прогоните ещё раз через несколько дней — появится
           сравнение.
@@ -264,7 +264,7 @@ function TrendCard({ adoption, trend }: { adoption: Adoption; trend: Trend }): J
   );
 
   return (
-    <Card title="Тренд">
+    <Card title="тренд">
       <div className="flex items-center gap-3">
         <div className="min-w-0 flex-1">
           <p className="text-body-m">Компоненты из библиотеки</p>
