@@ -1,7 +1,10 @@
-import { writeFileSync } from 'node:fs';
+import { readFileSync, writeFileSync } from 'node:fs';
 import { REPORT } from './promo/demo-data.mjs';
+const favicon = encodeURIComponent(
+  readFileSync(new URL('../docs/assets/plugin-icon.svg', import.meta.url), 'utf8'),
+);
 const page = `<!doctype html><html lang="ru"><meta charset="utf-8"><title>Дизайн-система — предпросмотр</title>
-<style>body{margin:0;background:#e8e8ea;color:#171717;font:14px system-ui;padding:24px}header{max-width:992px;margin:0 auto 24px;display:flex;align-items:center;gap:16px}h1{font-size:16px;margin:0}select{padding:8px 12px;border-radius:8px;border:1px solid #ccc;background:white}small{margin-left:auto;color:#666}.panels{display:flex;gap:32px;justify-content:center}iframe{border:0;border-radius:24px;width:480px;height:640px;display:block;box-shadow:0 12px 40px #0001}h2{font-size:12px;font-weight:500;margin:0 0 12px;color:#555}</style>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,${favicon}"><style>body{margin:0;background:#e8e8ea;color:#171717;font:14px system-ui;padding:24px}header{max-width:992px;margin:0 auto 24px;display:flex;align-items:center;gap:16px}h1{font-size:16px;margin:0}select{padding:8px 12px;border-radius:8px;border:1px solid #ccc;background:white}small{margin-left:auto;color:#666}.panels{display:flex;gap:32px;justify-content:center}iframe{border:0;border-radius:24px;width:480px;height:640px;display:block;box-shadow:0 12px 40px #0001}h2{font-size:12px;font-weight:500;margin:0 0 12px;color:#555}</style>
 <header><h1>Дизайн-система</h1><select aria-label="Экран"><option value="start">Старт</option><option value="summary">Сводка</option><option value="components">Компоненты</option><option value="collections">Коллекции</option><option value="tokens">Токены</option><option value="component-detail">Детали компонента</option><option value="token-detail">Детали токена</option><option value="progress">Проверка</option><option value="empty">Пустой результат</option><option value="error">Ошибка</option></select><small>Предпросмотр · вымышленные данные</small></header>
 <div class="panels"><section><h2>Светлая тема</h2><iframe title="Светлая тема" data-theme="light" src="/index.html?v=${Date.now()}"></iframe></section><section><h2>Тёмная тема</h2><iframe title="Тёмная тема" data-theme="dark" src="/index.html?v=${Date.now()}"></iframe></section></div>
 <script>
