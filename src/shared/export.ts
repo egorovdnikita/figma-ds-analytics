@@ -9,6 +9,7 @@
  */
 import type { ScanReport } from './adoption';
 import { buildAdvice, verdict } from './advice';
+import { plural, withCount } from './plural';
 import { deltaPoints, shortDate } from './snapshot';
 
 function pct(part: number, total: number): string {
@@ -40,7 +41,7 @@ export function toMarkdown(report: ScanReport, at: Date): string {
   lines.push(`${verdict(adoption).text}.`);
   lines.push('');
   lines.push(
-    `Замер ${shortDate(at.toISOString())}, охват «${report.scope}», ${num(report.nodesVisited)} слоёв.`,
+    `Замер ${shortDate(at.toISOString())}, охват «${report.scope}», ${withCount(report.nodesVisited, 'слой', 'слоя', 'слоёв')}.`,
   );
   if (report.cancelled) {
     lines.push('');
@@ -53,7 +54,7 @@ export function toMarkdown(report: ScanReport, at: Date): string {
   lines.push('| Показатель | Значение |');
   lines.push('| --- | --- |');
   lines.push(
-    `| Компонентов из библиотеки | ${pct(adoption.fromLibrary, instances)} · ${num(adoption.fromLibrary)} из ${num(instances)} копий |`,
+    `| Компонентов из библиотеки | ${pct(adoption.fromLibrary, instances)} · ${num(adoption.fromLibrary)} из ${num(instances)} ${plural(instances, 'копии', 'копий', 'копий')} |`,
   );
   lines.push(`| Слоёв на токенах | ${pct(onTokens, fills)} · ${num(onTokens)} из ${num(fills)} |`);
   lines.push(`| Разных компонентов | ${num(adoption.mastersTotal)} |`);

@@ -66,6 +66,16 @@ describe('отчёт в Markdown', () => {
     expect(plain(text)).toContain('60% · 60 из 100 копий');
   });
 
+  it('склоняет слои и копии по числу', () => {
+    // «из 3 641 копий» и «35 241 слоёв» — машинный русский в отчёте для руководства.
+    const text = plain(
+      toMarkdown({ ...report({ instancesCounted: 3641 }), nodesVisited: 35241 }, at),
+    );
+
+    expect(text).toContain('35 241 слой.');
+    expect(text).toContain('из 3 641 копии');
+  });
+
   it('показывает изменение к прошлому замеру', () => {
     const text = toMarkdown(report({}, undefined), at);
     expect(text).not.toContain('Изменение с');
