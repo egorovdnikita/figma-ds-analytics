@@ -260,7 +260,7 @@ function Bars({
               height={40.5}
               style={{ rx: 'var(--rounding-4)' }}
               fill="none"
-              stroke="var(--surface-base-border-default)"
+              stroke="var(--surface-base-border-strong)"
               strokeWidth="1.5"
               strokeDasharray="4 4"
             />
