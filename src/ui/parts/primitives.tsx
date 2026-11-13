@@ -125,14 +125,14 @@ export function Chip({
       disabled={disabled}
       aria-pressed={active}
       className={`flex min-h-10 shrink-0 items-center gap-1.5 rounded-pill px-3 py-2 text-body-m transition-colors ${
-        active ? 'bg-panel-card font-medium text-ink' : 'text-ink-soft hover:bg-hover'
+        active ? 'pill-selected bg-panel-card font-medium text-ink' : 'text-ink-soft hover:bg-hover'
       }`}
       onClick={onClick}
     >
       {icon !== undefined && <Icon name={icon} />}
       {children}
       {count !== undefined && (
-        <span className="text-caption-l tabular-nums text-ink-soft">
+        <span className="pill-count text-caption-l tabular-nums text-ink-soft">
           {count.toLocaleString('ru')}
         </span>
       )}

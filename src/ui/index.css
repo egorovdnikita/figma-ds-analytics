@@ -88,6 +88,16 @@
   background: var(--system-color-white-base);
   color: var(--system-color-black-base);
 }
+/* Выбранная капсула лежит на полотне, а не в подложке сегмента: в светлой
+   теме белая на белом пропала бы, поэтому там она серая. В тёмной серая
+   на чёрном почти не видна (1,2:1) — там она белая, как выбранный сегмент. */
+[data-theme='dark'] .pill-selected {
+  background: var(--surface-achromatic-light-fill-solid);
+  color: var(--surface-achromatic-light-content-strong);
+}
+[data-theme='dark'] .pill-selected .pill-count {
+  color: var(--surface-achromatic-light-content-muted);
+}
 .start-screen[data-compact='true'] .pulse-mascot {
   --mascot-frame-size: 160px;
   height: 96px;
