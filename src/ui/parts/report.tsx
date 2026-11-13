@@ -55,7 +55,7 @@ export function SummaryScreen({
   const advice = buildAdvice(adoption);
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-1">
       {/* Вердикт фразой, а под ним кольца. Цифры без вывода заставляют
           читателя гадать, хорошо это или плохо. */}
       <Card>
@@ -114,7 +114,7 @@ export function SummaryScreen({
         </Card>
       )}
 
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-2 gap-1">
         <Kpi
           label="Компонентов"
           value={adoption.mastersTotal.toLocaleString('ru')}
@@ -329,7 +329,7 @@ export function ComponentsScreen({
 
   return (
     <>
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-1">
         <Card>
           <SearchInput
             placeholder="Найти компонент"
@@ -442,7 +442,7 @@ export function TokensScreen({
 
   return (
     <>
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-1">
         <div>
           <Segmented options={TOKEN_VIEWS} value={view} onChange={setView} />
         </div>
