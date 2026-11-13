@@ -23,12 +23,6 @@ function send(message: UiMessage): void {
 const TABS = ['Сводка', 'Компоненты', 'Токены'] as const;
 type Tab = (typeof TABS)[number];
 
-const TAB_ICONS: Readonly<Record<Tab, IconName>> = {
-  Сводка: 'graph-up',
-  Компоненты: 'widget',
-  Токены: 'palette',
-};
-
 const SCOPES: readonly {
   value: ScanScope;
   label: string;
@@ -154,20 +148,24 @@ export function App(): JSX.Element {
   return (
     <div className="relative flex h-screen flex-col bg-panel text-ink">
       <header className="shrink-0 border-b border-line-subtle px-6 pb-4 pt-5">
-        <h1 className="truncate text-h4 font-semibold tracking-tight" title={report.fileName}>
-          {report.fileName}
-        </h1>
-        <div className="mt-3 flex items-center justify-between gap-6">
-          <div className="min-w-0 text-caption-l">
-            <p className="truncate font-medium text-ink-soft">{report.scope}</p>
-            <p className="mt-0.5 truncate tabular-nums text-ink-faint">
-              {report.nodesVisited.toLocaleString('ru')} слоёв
+        <div className="flex items-start gap-4">
+          <div className="min-w-0 flex-1">
+            <h1
+              className="line-clamp-2 text-h5 font-semibold tracking-tight"
+              title={report.fileName}
+            >
+              {report.fileName}
+            </h1>
+            <p className="mt-2 truncate text-caption-l text-ink-faint">
+              {report.scope} · {report.nodesVisited.toLocaleString('ru')} слоёв
               {report.cancelled ? ' · остановлено' : ''}
             </p>
           </div>
           <div className="flex shrink-0 items-center gap-2">
             <button
-              className="flex h-10 items-center gap-1.5 rounded-sm bg-panel-card px-3 text-body-m font-medium hover:bg-hover"
+              title="Повторить проверку"
+              aria-label="Повторить проверку"
+              className="flex h-10 w-10 items-center justify-center rounded-sm bg-panel-card text-ink-soft hover:bg-hover hover:text-ink"
               onClick={() => {
                 setReport(null);
                 setProgress(null);
@@ -175,32 +173,24 @@ export function App(): JSX.Element {
               }}
             >
               <Icon name="refresh" />
-              Повторить
             </button>
             <ThemeButton theme={theme} onToggle={toggleTheme} />
           </div>
         </div>
         <nav aria-label="Разделы отчёта" className="mt-4 flex rounded-md bg-panel-card p-1">
-          {TABS.map((name) => {
-            const count = countFor(name, report);
-            return (
-              <button
-                key={name}
-                aria-pressed={tab === name}
-                className={`flex h-10 min-w-0 flex-1 items-center justify-center gap-1 rounded-sm px-2 text-body-m transition-colors ${tab === name ? 'segment-selected font-medium' : 'text-ink-soft hover:bg-hover'}`}
-                onClick={() => {
-                  if (name === 'Компоненты') setComponentFilter('all');
-                  setTab(name);
-                }}
-              >
-                <Icon name={TAB_ICONS[name]} size="min" />
-                <span>{name}</span>
-                {count !== null && (
-                  <span className="text-caption-l tabular-nums text-ink-faint">{count}</span>
-                )}
-              </button>
-            );
-          })}
+          {TABS.map((name) => (
+            <button
+              key={name}
+              aria-pressed={tab === name}
+              className={`flex h-10 min-w-0 flex-1 items-center justify-center rounded-sm px-3 text-body-l transition-colors ${tab === name ? 'segment-selected font-medium' : 'text-ink-soft hover:bg-hover'}`}
+              onClick={() => {
+                if (name === 'Компоненты') setComponentFilter('all');
+                setTab(name);
+              }}
+            >
+              {name}
+            </button>
+          ))}
         </nav>
       </header>
 
@@ -365,18 +355,6 @@ function useTheme(): Theme {
     };
   }, [root]);
   return theme;
-}
-
-/** Счётчик на вкладке: сразу видно, где есть что смотреть, до перехода. */
-function countFor(tab: Tab, report: ScanReport): number | null {
-  switch (tab) {
-    case 'Компоненты':
-      return report.adoption.masters.length;
-    case 'Токены':
-      return report.adoption.topVariables.length || report.adoption.collections.length;
-    case 'Сводка':
-      return null;
-  }
 }
 
 function Content({
