@@ -245,7 +245,7 @@
   margin-top: 0;
   padding-bottom: var(--spacing-8);
 }
-.summary-screen > .list-surface > li > button {
+.summary-screen .list-surface > li > button {
   min-height: 56px;
   padding-top: var(--spacing-8);
   padding-bottom: var(--spacing-8);
@@ -280,4 +280,36 @@
   to {
     transform: translateY(0);
   }
+}
+
+.coverage-hero {
+  padding-top: var(--spacing-4);
+}
+.coverage-arc {
+  animation: coverage-reveal 700ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes coverage-reveal {
+  from {
+    stroke-dasharray: 0 100;
+  }
+}
+.summary-screen > .coverage-hero {
+  margin-top: 0;
+  padding-bottom: var(--spacing-8);
+}
+
+@font-face {
+  font-family: 'Audit Display';
+  src: local('Coolvetica-HeavyComp'), local('Coolvetica Heavy Comp');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+.coverage-gauge .summary-value {
+  font-family: 'Audit Display', var(--font-family-body);
+  font-size: var(--size-80);
+  line-height: var(--size-88);
+  font-weight: 400;
+  letter-spacing: normal;
+  font-synthesis: none;
 }

@@ -156,7 +156,7 @@ export function App(): JSX.Element {
             >
               {report.fileName}
             </h1>
-            <p className="mt-2 truncate text-caption-l text-ink-faint">
+            <p className="mt-2 truncate text-caption-l text-ink-soft">
               {report.scope.charAt(0).toUpperCase() + report.scope.slice(1)} ·{' '}
               {report.nodesVisited.toLocaleString('ru')} слоёв
               {report.cancelled ? ' · остановлено' : ''}
@@ -256,11 +256,27 @@ function Start({
         <div className="start-hero flex shrink-0 flex-col items-center text-center">
           <Mascot />
           <h1 className="start-title text-balance font-semibold tracking-tight">
-            Как файл живёт
-            <br />
-            на дизайн-системе
+            {running ? (
+              scope === 'file' || (progress?.pagesTotal ?? 0) > 1 ? (
+                'Проверяем файл'
+              ) : scope === 'selection' ? (
+                'Проверяем выделение'
+              ) : (
+                'Проверяем страницу'
+              )
+            ) : error !== null ? (
+              'Проверка не завершена'
+            ) : (
+              <>
+                Как файл живёт
+                <br />
+                на дизайн-системе
+              </>
+            )}
           </h1>
-          <p className="start-description mt-3 max-w-[360px] text-body-l leading-relaxed text-ink-soft">
+          <p
+            className={`${running ? 'hidden' : ''} start-description mt-3 max-w-[360px] text-body-l leading-relaxed text-ink-soft`}
+          >
             Компоненты из библиотеки, локальные копии и покрытие токенами — в одном отчёте.
           </p>
         </div>
@@ -268,13 +284,35 @@ function Start({
         <div
           role="radiogroup"
           aria-label="Что проверить"
-          className="start-scopes mt-6 grid shrink-0 grid-cols-3 gap-2"
+          className={`${running ? 'hidden' : 'grid'} start-scopes mt-6 shrink-0 grid-cols-3 gap-2`}
         >
           {SCOPES.map((item) => (
             <button
               key={item.value}
               role="radio"
               aria-checked={scope === item.value}
+              tabIndex={scope === item.value ? 0 : -1}
+              onKeyDown={(event) => {
+                const index = SCOPES.findIndex((s) => s.value === item.value);
+                let next: number;
+                if (event.key === 'ArrowRight' || event.key === 'ArrowDown')
+                  next = (index + 1) % SCOPES.length;
+                else if (event.key === 'ArrowLeft' || event.key === 'ArrowUp')
+                  next = (index + SCOPES.length - 1) % SCOPES.length;
+                else if (event.key === 'Home') next = 0;
+                else if (event.key === 'End') next = SCOPES.length - 1;
+                else return;
+                event.preventDefault();
+                const option = SCOPES[next];
+                if (option) {
+                  setScope(option.value);
+                  const radios =
+                    event.currentTarget.parentElement?.querySelectorAll<HTMLButtonElement>(
+                      '[role="radio"]',
+                    );
+                  radios?.item(next).focus();
+                }
+              }}
               title={item.hint}
               disabled={running}
               onClick={() => setScope(item.value)}
@@ -289,7 +327,7 @@ function Start({
                     <span data-tint={item.tint} className="tint-dot scope-preview-mark" />
                     <span className="scope-preview-line" />
                   </span>
-                  <span className="scope-preview-row text-ink-faint">
+                  <span className="scope-preview-row text-ink-soft">
                     <span className="scope-preview-mark scope-preview-mark-muted" />
                     <span className="scope-preview-line" />
                   </span>
@@ -299,14 +337,11 @@ function Start({
             </button>
           ))}
         </div>
-        <p className="mt-3 text-center text-caption-l text-ink-faint">
+        <p className={`${running ? 'hidden' : ''} mt-3 text-center text-caption-l text-ink-soft`}>
           {SCOPES.find((item) => item.value === scope)?.hint}
         </p>
-      </div>
-
-      <div className="shrink-0 px-6 pb-5 pt-4">
         {running && progress !== null && (
-          <div className="mb-4">
+          <div className="mt-6">
             <Progress
               done={progress.pagesTotal > 1 ? progress.pagesDone : progress.nodes}
               total={progress.pagesTotal > 1 ? progress.pagesTotal : Math.max(progress.nodes, 1)}
@@ -319,9 +354,13 @@ function Start({
             />
           </div>
         )}
+      </div>
+
+      <div className="shrink-0 px-6 pb-5 pt-4">
         {error !== null && (
           <p
-            className="mb-3 text-center text-caption-l leading-snug text-status-ink"
+            role="alert"
+            className="mb-3 rounded-md bg-status-soft px-4 py-3 text-body-m leading-snug text-status-ink"
             {...statusAttrs('negative')}
           >
             {error}
@@ -333,7 +372,7 @@ function Start({
           </Button>
         ) : (
           <Button size="lg" onClick={onStart} icon="play" wide>
-            Проверить
+            {error !== null ? 'Повторить проверку' : 'Проверить'}
           </Button>
         )}
       </div>

@@ -33,7 +33,6 @@ import {
   Places,
   SearchInput,
   Section,
-  StackedBar,
   statusAttrs,
   TintIcon,
 } from './primitives';
@@ -58,62 +57,67 @@ export function SummaryScreen({
 
   const state = verdict(adoption);
   const advice = buildAdvice(adoption);
-  const delta = trendDelta(adoption, trend);
+  const coverage =
+    instances === 0 ? 0 : Math.min(100, Math.max(0, (adoption.fromLibrary / instances) * 100));
 
   return (
     <div className="summary-screen flex flex-col gap-2">
-      {/* Одна крупная цифра с бейджем изменения, как баланс в Phantom, и
-          вывод фразой под ней, как в Lifesum: цифра без вывода заставляет
-          гадать, хорошо это или плохо. */}
-      <section className="relative pb-4 pt-1">
-        <div className="absolute right-0 top-1">
-          <TintIcon name="graph-up" tint="green" />
+      {report.cancelled && (
+        <div
+          role="status"
+          className="rounded-md bg-status-soft px-4 py-3 text-body-m text-status-ink"
+          {...statusAttrs('warning')}
+        >
+          <p className="font-medium">Неполный отчёт</p>
+          <p className="mt-1">Проверка остановлена. Показатели относятся к просмотренным слоям.</p>
         </div>
-        <p className="pr-12 text-body-l text-ink-soft">компоненты из библиотеки</p>
-        <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1">
-          <span className="summary-value font-semibold tabular-nums">
+      )}
+      <section className="coverage-hero text-center">
+        <h2 className="text-body-l font-medium">Компоненты из библиотеки</h2>
+        <div
+          className="coverage-gauge relative mx-auto mt-3 w-[240px]"
+          role="meter"
+          aria-label="Доля копий из библиотеки"
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-valuenow={Math.round(coverage)}
+        >
+          <svg viewBox="0 0 240 132" className="block w-full" aria-hidden="true">
+            <defs>
+              <linearGradient id="coverage-arc" x1="0" y1="1" x2="1" y2="0">
+                <stop stopColor="var(--accent-fill-solid)" />
+                <stop offset="100%" stopColor="var(--detail-violet)" />
+              </linearGradient>
+            </defs>
+            <path
+              d="M16 116 A104 104 0 0 1 224 116"
+              fill="none"
+              stroke="var(--panel-card-fill)"
+              strokeWidth="16"
+              strokeLinecap="round"
+            />
+            {coverage > 0 && (
+              <path
+                className="coverage-arc"
+                d="M16 116 A104 104 0 0 1 224 116"
+                fill="none"
+                stroke="url(#coverage-arc)"
+                strokeWidth="16"
+                strokeLinecap="round"
+                pathLength="100"
+                strokeDasharray={`${coverage} 100`}
+              />
+            )}
+          </svg>
+          <p className="absolute inset-x-0 bottom-1 summary-value font-semibold tracking-tight tabular-nums">
             {pct(adoption.fromLibrary, instances)}
-          </span>
-          {delta !== null && trend.previous !== null && (
-            <Delta points={delta} since={shortDate(trend.previous.at)} />
-          )}
+          </p>
         </div>
-        <p className="mt-2 flex items-center gap-2 text-body-l text-ink-soft">
-          <span
-            data-tint={state.tone === 'good' ? 'green' : 'orange'}
-            className="tint-dot h-1.5 w-1.5 shrink-0 rounded-pill"
-            aria-hidden
-          />
-          {state.text}
+        <p className="mt-2 text-body-m text-ink-soft">
+          {adoption.fromLibrary.toLocaleString('ru')} из {instances.toLocaleString('ru')} копий
         </p>
+        <p className="mt-1 text-body-m text-ink-soft">{state.text}</p>
       </section>
-
-      <ul className="list-surface">
-        <ListRow
-          leading={<TintIcon name="palette" tint="blue" />}
-          title="Слои на токенах"
-          value={pct(onTokens, tokenNodes)}
-          onClick={() => onGoTo('Токены')}
-        />
-        <ListRow
-          leading={<TintIcon name="widget" tint="violet" />}
-          title="Компоненты"
-          value={adoption.mastersTotal.toLocaleString('ru')}
-          onClick={() => onGoTo('Компоненты')}
-        />
-        <ListRow
-          leading={<TintIcon name="copy" tint="orange" />}
-          title="Копии"
-          value={instances.toLocaleString('ru')}
-          onClick={() => onGoTo('Компоненты')}
-        />
-        <ListRow
-          leading={<TintIcon name="folder" tint="pink" />}
-          title="Коллекции токенов"
-          value={adoption.collections.length.toLocaleString('ru')}
-          onClick={() => onGoTo('Токены')}
-        />
-      </ul>
 
       {advice.length > 0 && (
         <Section title="с чего начать">
@@ -133,8 +137,8 @@ export function SummaryScreen({
                 <AdviceRow
                   key={item.id}
                   title={item.title}
-                  value={item.value}
-                  hint={item.hint}
+                  value={item.value.match(/^[\d\s\u00a0\u202f]+/)?.[0].trim() ?? item.value}
+                  hint={`${/[^\d\s\u00a0\u202f]/.test(item.value) ? `${item.value}. ` : ''}${item.hint}`}
                   {...(onClick === undefined ? {} : { onClick })}
                 />
               );
@@ -143,68 +147,36 @@ export function SummaryScreen({
         </Section>
       )}
 
+      <Section title="показатели">
+        <ul className="list-surface">
+          <ListRow
+            leading={<TintIcon name="palette" tint="blue" />}
+            title="Слои на токенах"
+            value={pct(onTokens, tokenNodes)}
+            onClick={() => onGoTo('Токены')}
+          />
+          <ListRow
+            leading={<TintIcon name="widget" tint="violet" />}
+            title="Компоненты"
+            value={adoption.mastersTotal.toLocaleString('ru')}
+            onClick={() => onGoTo('Компоненты')}
+          />
+          <ListRow
+            leading={<TintIcon name="copy" tint="orange" />}
+            title="Копии"
+            value={instances.toLocaleString('ru')}
+            onClick={() => onGoTo('Компоненты')}
+          />
+          <ListRow
+            leading={<TintIcon name="folder" tint="pink" />}
+            title="Коллекции токенов"
+            value={adoption.collections.length.toLocaleString('ru')}
+            onClick={() => onGoTo('Токены')}
+          />
+        </ul>
+      </Section>
+
       <TrendCard adoption={adoption} trend={trend} />
-
-      <Section title="откуда компоненты" onOpen={() => onGoTo('Компоненты')}>
-        <Card plain>
-          <StackedBar
-            segments={[
-              {
-                label: 'Из библиотеки',
-                value: adoption.fromLibrary,
-                className: 'bg-[var(--detail-violet)]',
-                onClick: () => onGoTo('Компоненты', 'library'),
-              },
-              {
-                label: 'Свои в этом файле',
-                value: adoption.local,
-                className: 'bg-status',
-                status: 'warning',
-                onClick: () => onGoTo('Компоненты', 'local'),
-              },
-              {
-                label: 'Библиотека отключена',
-                value: adoption.unknown,
-                className: 'bg-ink-faint',
-                onClick: () => onGoTo('Компоненты', 'unknown'),
-              },
-            ]}
-          />
-          {adoption.unknown > 0 && (
-            <div className="mt-3">
-              <Note>
-                «Библиотека отключена» — копии, чей источник файлу больше не доступен. Это и есть
-                зависимость от чужой системы.
-              </Note>
-            </div>
-          )}
-        </Card>
-      </Section>
-
-      <Section title="откуда токены" onOpen={() => onGoTo('Токены')}>
-        <Card plain>
-          <StackedBar
-            segments={[
-              {
-                label: 'Из библиотеки',
-                value: adoption.nodesOnLibraryVariable,
-                className: 'bg-[var(--detail-blue)]',
-              },
-              {
-                label: 'Свои',
-                value: adoption.nodesOnLocalVariable,
-                className: 'bg-status',
-                status: 'warning',
-              },
-              {
-                label: 'Без токена',
-                value: adoption.nodesWithoutVariable,
-                className: 'bg-ink-faint',
-              },
-            ]}
-          />
-        </Card>
-      </Section>
 
       {adoption.librarySourcesAvailable && adoption.libraries.length > 0 && (
         <Section title="библиотеки">
@@ -232,17 +204,9 @@ export function SummaryScreen({
         </Section>
       )}
 
-      <Section title="забрать с собой">
-        <Card>
-          <Note>
-            Отчёт в Markdown: вердикт, главные цифры, приоритеты и история. Вставляется в документ
-            или сообщение как есть.
-          </Note>
-          <div className="mt-3">
-            <CopyButton text={toMarkdown(report, new Date())} label="Скопировать отчёт" wide />
-          </div>
-        </Card>
-      </Section>
+      <div className="mt-5">
+        <CopyButton text={toMarkdown(report, new Date())} label="Скопировать отчёт" wide />
+      </div>
     </div>
   );
 }
@@ -269,11 +233,11 @@ function TrendCard({ adoption, trend }: { adoption: Adoption; trend: Trend }): J
   if (trend.previous === null || delta === null) {
     return (
       <Section title="тренд">
-        <Card>
-          <Note>
-            Это первый замер по этому охвату. Прогоните ещё раз через несколько дней — появится
-            сравнение.
-          </Note>
+        <Card plain className="list-surface py-4">
+          <p className="text-body-l font-medium">Первый замер сохранён</p>
+          <p className="mt-1 text-body-m text-ink-soft">
+            Сравнение появится после следующей проверки.
+          </p>
         </Card>
       </Section>
     );
@@ -283,65 +247,61 @@ function TrendCard({ adoption, trend }: { adoption: Adoption; trend: Trend }): J
     point.instances === 0 ? 0 : (point.fromLibrary / point.instances) * 100,
   );
 
-  const low = Math.max(0, Math.floor(Math.min(...series) / 10) * 10 - 5);
-  const high = Math.min(100, Math.ceil(Math.max(...series) / 10) * 10 + 5);
-  const points = series
-    .map(
-      (value, i) =>
-        `${8 + (i / Math.max(series.length - 1, 1)) * 384},${88 - ((value - low) / Math.max(high - low, 1)) * 72}`,
-    )
-    .join(' ');
   const first = trend.points[0];
   const last = trend.points[trend.points.length - 1];
 
   return (
     <Section title="тренд">
       <Card plain className="trend-panel list-surface">
-        <div className="flex items-start justify-between gap-3 pt-3">
-          <div>
-            <p className="text-body-l text-ink-soft">Компоненты из библиотеки</p>
-            <p className="mt-2 text-h2 font-semibold tracking-tight tabular-nums">
-              {pct(adoption.fromLibrary, adoption.instancesCounted)}
-            </p>
-          </div>
-          <TintIcon name="graph-up" tint="violet" />
-        </div>
-        <div className="mt-2">
+        <div className="flex items-center justify-between gap-3 pt-2">
+          <p className="text-body-m text-ink-soft">К прошлому замеру</p>
           <Delta points={delta} since={shortDate(trend.previous.at)} />
+        </div>
+        <div className="mt-3 flex items-baseline justify-between">
+          <span className="text-body-l font-medium tabular-nums">
+            {Math.round(series[0] ?? 0)}% → {Math.round(series[series.length - 1] ?? 0)}%
+          </span>
+          <span className="text-caption-l text-ink-soft">За период</span>
         </div>
         <svg
           className="my-3 block w-full overflow-visible"
-          viewBox="0 0 400 104"
+          viewBox="0 0 400 112"
           role="img"
           aria-label={`Покрытие компонентами из библиотеки: ${series.map((v) => `${Math.round(v)}%`).join(', ')}`}
         >
-          <defs>
-            <linearGradient id="trend-area" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="var(--detail-violet)" stopOpacity=".16" />
-              <stop offset="100%" stopColor="var(--detail-violet)" stopOpacity="0" />
-            </linearGradient>
-          </defs>
-          <path d="M8 96H392" stroke="var(--surface-base-border-subtle)" fill="none" />
-          <polygon points={`8,96 ${points} 392,96`} fill="url(#trend-area)" />
-          <polyline
-            points={points}
-            stroke="var(--detail-violet)"
-            strokeWidth="2.5"
-            fill="none"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-          {series.map((value, i) => (
-            <circle
-              key={i}
-              cx={8 + (i / Math.max(series.length - 1, 1)) * 384}
-              cy={88 - ((value - low) / Math.max(high - low, 1)) * 72}
-              r={i === series.length - 1 ? 4 : 2}
-              fill="var(--detail-violet)"
-            />
-          ))}
+          {series.map((value, i) => {
+            const step = 400 / Math.max(series.length, 1);
+            const width = Math.min(36, step * 0.6);
+            const x = step * (i + 0.5);
+            const height = Math.max(1, value * 0.84);
+            return (
+              <g key={trend.points[i]?.at ?? i}>
+                <rect
+                  x={x - width / 2}
+                  y={98 - height}
+                  width={width}
+                  height={height}
+                  style={{ rx: 'var(--rounding-4)' }}
+                  fill={
+                    i === series.length - 1 ? 'var(--accent-fill-solid)' : 'var(--accent-fill-soft)'
+                  }
+                />
+                {series.length <= 10 && (
+                  <text
+                    x={x}
+                    y={90 - height}
+                    textAnchor="middle"
+                    fill="var(--surface-base-content-muted)"
+                    className="text-caption-l"
+                  >
+                    {Math.round(value)}%
+                  </text>
+                )}
+              </g>
+            );
+          })}
         </svg>
-        <div className="flex justify-between text-caption-l text-ink-faint">
+        <div className="flex justify-between text-caption-l text-ink-soft">
           <span>{first ? shortDate(first.at) : ''}</span>
           <span>{last ? shortDate(last.at) : ''}</span>
         </div>
@@ -389,12 +349,14 @@ export function ComponentsScreen({
 
   const countByOrigin = useMemo(() => {
     const counts: Record<MasterFilter, number> = { all: 0, library: 0, local: 0, unknown: 0 };
+    const needle = query.trim().toLowerCase();
     for (const master of adoption.masters) {
+      if (needle && !master.name.toLowerCase().includes(needle)) continue;
       counts.all += 1;
       counts[master.origin] += 1;
     }
     return counts;
-  }, [adoption.masters]);
+  }, [adoption.masters, query]);
 
   if (adoption.masters.length === 0) {
     return <Empty title="Копий компонентов нет" hint="В этом охвате не нашлось ни одной." />;
@@ -429,6 +391,11 @@ export function ComponentsScreen({
           ))}
         </div>
 
+        {query.trim() !== '' && (
+          <p className="text-caption-l text-ink-soft" role="status">
+            Найдено: {visible.length}
+          </p>
+        )}
         {visible.length === 0 ? (
           <Empty title="Ничего не нашлось" hint="Попробуйте другое название или снимите фильтр." />
         ) : (
@@ -460,9 +427,11 @@ export function ComponentsScreen({
 
       {selected !== null && (
         <Modal title={selected.name} caption="Компонент" onClose={() => setSelected(null)}>
+          <div className="mb-4">
+            <OriginPill origin={selected.origin} />
+          </div>
           <Facts
             items={[
-              { label: 'источник', value: <OriginPill origin={selected.origin} /> },
               { label: 'копий', value: selected.instances.toLocaleString('ru') },
               {
                 label: 'доля всех копий',
@@ -473,19 +442,17 @@ export function ComponentsScreen({
           <div className="mt-3">
             <Note>
               {selected.origin === 'library'
-                ? 'Компонент берётся из подключённой библиотеки — так и должно быть.'
+                ? 'Копии связаны с библиотечным компонентом.'
                 : selected.origin === 'local'
                   ? 'Компонент собран прямо в этом файле, а не взят из библиотеки.'
                   : 'Источник недоступен: библиотека отключена от файла либо компонент удалён.'}
             </Note>
           </div>
 
-          {/* Раздел отделён линией во всю ширину, как «описание» у HireHi. */}
-          <div className="mt-5 border-t-2 border-dotted border-line-subtle" />
-          <h4 className="mb-1 mt-3 text-caption-l text-ink-soft">
+          <h4 className="mb-2 mt-4 text-body-m font-medium">
             где посмотреть{' '}
             {selected.instances > selected.places.length && (
-              <span className="text-ink-faint">
+              <span className="text-ink-soft">
                 · {selected.places.length} из {selected.instances.toLocaleString('ru')}
               </span>
             )}
@@ -544,9 +511,11 @@ export function TokensScreen({
 
       {selected !== null && (
         <Modal title={selected.name} caption="Токен" onClose={() => setSelected(null)}>
+          <p className="mb-4 text-body-m text-ink-soft">
+            {selected.collectionName || 'Без коллекции'}
+          </p>
           <Facts
             items={[
-              { label: 'коллекция', value: selected.collectionName || '—' },
               { label: 'слоёв', value: selected.nodes.toLocaleString('ru') },
               {
                 label: plural(selected.pages, 'страница', 'страницы', 'страниц'),
@@ -555,18 +524,13 @@ export function TokensScreen({
             ]}
           />
           <div className="mt-3">
-            <Note>
-              Столько мест сломается, если токен удалить или переименовать. Это и есть ответ на
-              вопрос «можно ли его трогать».
-            </Note>
+            <Note>Перед изменением токена проверьте места использования.</Note>
           </div>
 
-          {/* Раздел отделён линией во всю ширину, как «описание» у HireHi. */}
-          <div className="mt-5 border-t-2 border-dotted border-line-subtle" />
-          <h4 className="mb-1 mt-3 text-caption-l text-ink-soft">
+          <h4 className="mb-2 mt-4 text-body-m font-medium">
             где посмотреть{' '}
             {selected.nodes > selected.places.length && (
-              <span className="text-ink-faint">
+              <span className="text-ink-soft">
                 · {selected.places.length} из {selected.nodes.toLocaleString('ru')}
               </span>
             )}
@@ -590,7 +554,7 @@ function CollectionsTable({ adoption }: { adoption: Adoption }): JSX.Element {
           {adoption.collections.map((collection) => (
             <ListRow
               key={`${collection.name}-${collection.source}`}
-              leading={<TintIcon name="palette" tint="pink" />}
+              leading={<TintIcon name="folder" tint="pink" />}
               title={collection.name}
               subtitle={<SourceText collection={collection} />}
               value={collection.variables.toLocaleString('ru')}
@@ -651,7 +615,7 @@ function VariablesTable({
                 leading={<TokenMark />}
                 title={item.name}
                 subtitle={
-                  <span className="text-ink-faint">
+                  <span className="text-ink-soft">
                     {item.collectionName || '—'} · {item.pages}{' '}
                     {plural(item.pages, 'страница', 'страницы', 'страниц')}
                   </span>
@@ -688,7 +652,7 @@ function SourceText({ collection }: { collection: CollectionUsage }): JSX.Elemen
     );
   }
   return (
-    <span className="inline-flex items-center gap-1.5 text-ink-faint">
+    <span className="inline-flex items-center gap-1.5 text-ink-soft">
       {!collection.isLocal && (
         <span data-tint="green" className="tint-dot h-1 w-1 shrink-0 rounded-pill" aria-hidden />
       )}
@@ -700,7 +664,7 @@ function SourceText({ collection }: { collection: CollectionUsage }): JSX.Elemen
 function OriginText({ origin }: { origin: MasterUsage['origin'] }): JSX.Element {
   if (origin === 'library')
     return (
-      <span className="inline-flex items-center gap-1.5 text-ink-faint">
+      <span className="inline-flex items-center gap-1.5 text-ink-soft">
         <span data-tint="green" className="tint-dot h-1 w-1 shrink-0 rounded-pill" aria-hidden />
         из библиотеки
       </span>
@@ -712,7 +676,7 @@ function OriginText({ origin }: { origin: MasterUsage['origin'] }): JSX.Element 
       </span>
     );
   }
-  return <span className="text-ink-faint">библиотека отключена</span>;
+  return <span className="text-ink-soft">библиотека отключена</span>;
 }
 
 function OriginPill({ origin }: { origin: MasterUsage['origin'] }): JSX.Element {

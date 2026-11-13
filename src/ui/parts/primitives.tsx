@@ -2,7 +2,7 @@
  * Нейтральные поверхности и точечные цветные знаки категорий.
  * Геометрия, цвет и иконки — из Box UI.
  */
-import { useEffect, useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import type { IconName } from '../icons';
 import { Icon } from './icon';
 
@@ -132,7 +132,7 @@ export function Chip({
       {icon !== undefined && <Icon name={icon} />}
       {children}
       {count !== undefined && (
-        <span className="text-caption-l tabular-nums text-ink-faint">
+        <span className="text-caption-l tabular-nums text-ink-soft">
           {count.toLocaleString('ru')}
         </span>
       )}
@@ -274,13 +274,13 @@ export function ListRow({
       <span className="min-w-0 flex-1">
         <span className="block truncate text-body-l font-medium">{title}</span>
         {subtitle !== undefined && (
-          <span className="mt-0.5 block truncate text-caption-l">{subtitle}</span>
+          <span className="mt-0.5 block truncate text-caption-l text-ink-soft">{subtitle}</span>
         )}
       </span>
       <span className="shrink-0 text-right">
-        <span className="block text-body-l font-medium tabular-nums text-ink-faint">{value}</span>
+        <span className="block text-body-l font-medium tabular-nums text-ink">{value}</span>
         {valueHint !== undefined && (
-          <span className="mt-0.5 block text-caption-l tabular-nums text-ink-faint">
+          <span className="mt-0.5 block text-caption-l tabular-nums text-ink-soft">
             {valueHint}
           </span>
         )}
@@ -313,7 +313,7 @@ export function Empty({ title, hint }: { title: string; hint?: string }): JSX.El
       </span>
       <p className="text-body-m font-medium">{title}</p>
       {hint !== undefined && (
-        <p className="mx-auto mt-1.5 max-w-[240px] text-caption-l leading-relaxed text-ink-faint">
+        <p className="mx-auto mt-1.5 max-w-[240px] text-caption-l leading-relaxed text-ink-soft">
           {hint}
         </p>
       )}
@@ -341,7 +341,7 @@ export function Kpi({
         <div className="text-caption-l text-ink-soft">{label}</div>
       </div>
       <div className="mt-3 text-h4 font-semibold leading-none tabular-nums">{value}</div>
-      {hint !== undefined && <div className="mt-1.5 text-caption-l text-ink-faint">{hint}</div>}
+      {hint !== undefined && <div className="mt-1.5 text-caption-l text-ink-soft">{hint}</div>}
     </div>
   );
 }
@@ -363,7 +363,7 @@ export interface Segment {
  */
 export function StackedBar({ segments }: { segments: readonly Segment[] }): JSX.Element {
   const total = segments.reduce((sum, s) => sum + s.value, 0);
-  if (total === 0) return <p className="text-caption-l text-ink-faint">Нет данных</p>;
+  if (total === 0) return <p className="text-caption-l text-ink-soft">Нет данных</p>;
 
   return (
     <ul className="list-surface flex flex-col">
@@ -372,10 +372,10 @@ export function StackedBar({ segments }: { segments: readonly Segment[] }): JSX.
           <>
             <span className="flex items-baseline gap-2">
               <span className="min-w-0 flex-1 truncate text-left">{segment.label}</span>
-              <span className="shrink-0 font-medium tabular-nums text-ink-faint">
+              <span className="shrink-0 font-medium tabular-nums text-ink-soft">
                 {segment.value.toLocaleString('ru')}
               </span>
-              <span className="w-9 shrink-0 text-right text-caption-l tabular-nums text-ink-faint">
+              <span className="w-9 shrink-0 text-right text-caption-l tabular-nums text-ink-soft">
                 {pct(segment.value, total)}
               </span>
             </span>
@@ -480,13 +480,56 @@ export function Modal({
   onClose: () => void;
   children: ReactNode;
 }): JSX.Element {
+  const dialogRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
+    const dialog = dialogRef.current;
+    if (dialog === null) return;
+    const previous = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    const siblings: { element: HTMLElement; inert: boolean }[] = [];
+    let branch: HTMLElement | null = dialog.parentElement;
+    while (branch?.parentElement && branch.parentElement !== document.body) {
+      for (const sibling of branch.parentElement.children) {
+        if (sibling !== branch && sibling instanceof HTMLElement) {
+          siblings.push({ element: sibling, inert: sibling.inert });
+          sibling.inert = true;
+        }
+      }
+      branch = branch.parentElement;
+    }
+    const focusable = (): HTMLElement[] =>
+      [
+        ...dialog.querySelectorAll<HTMLElement>(
+          'button:not([disabled]), input:not([disabled]), [href], [tabindex="0"]',
+        ),
+      ].filter((e) => e.getClientRects().length > 0);
+    (focusable()[0] ?? dialog).focus({ preventScroll: true });
     const onKey = (e: KeyboardEvent): void => {
-      if (e.key === 'Escape') onClose();
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        onClose();
+        return;
+      }
+      if (e.key !== 'Tab') return;
+      const items = focusable();
+      const first = items[0] ?? dialog;
+      const last = items[items.length - 1] ?? dialog;
+      if (
+        items.length === 0 ||
+        !dialog.contains(document.activeElement) ||
+        (e.shiftKey && document.activeElement === first) ||
+        (!e.shiftKey && document.activeElement === last)
+      ) {
+        e.preventDefault();
+        (e.shiftKey ? last : first).focus();
+      }
     };
     window.addEventListener('keydown', onKey);
     return () => {
       window.removeEventListener('keydown', onKey);
+      siblings.forEach(({ element, inert }) => {
+        element.inert = inert;
+      });
+      if (previous?.isConnected) previous.focus({ preventScroll: true });
     };
   }, [onClose]);
 
@@ -499,6 +542,8 @@ export function Modal({
     >
       <div aria-hidden className="modal-backdrop absolute inset-0 bg-overlay" />
       <div
+        ref={dialogRef}
+        tabIndex={-1}
         role="dialog"
         aria-modal="true"
         aria-label={title}
@@ -509,14 +554,14 @@ export function Modal({
         <span aria-hidden className="mx-auto mt-2 h-1 w-9 shrink-0 rounded-pill bg-line-strong" />
         <header className="flex items-center gap-2 px-6 pb-4 pt-4">
           <div className="min-w-0 flex-1">
-            {caption !== undefined && <p className="text-caption-l text-ink-faint">{caption}</p>}
-            <h3 className="truncate text-h5 font-semibold">{title}</h3>
+            {caption !== undefined && <p className="text-caption-l text-ink-soft">{caption}</p>}
+            <h3 className="break-words text-h5 font-semibold">{title}</h3>
           </div>
           <button
             className="flex h-10 w-10 shrink-0 items-center justify-center rounded-sm text-ink-soft hover:bg-hover hover:text-ink"
             onClick={onClose}
           >
-            <Icon name="close" size="2xs" title="Закрыть" />
+            <Icon name="close" size="m" title="Закрыть" />
           </button>
         </header>
         <div className="panel-scroll modal-scroll min-h-0 flex-1 overflow-y-auto overflow-x-hidden text-body-m">
@@ -539,10 +584,10 @@ export function Facts({
 }): JSX.Element {
   const columns = items.length >= 3 ? 'grid-cols-3' : 'grid-cols-2';
   return (
-    <dl className={`grid gap-1 border-y-2 border-dotted border-line-subtle py-3 ${columns}`}>
+    <dl className={`grid gap-1 rounded-md bg-panel-card py-3 ${columns}`}>
       {items.map((item) => (
         <div key={item.label} className="flex min-w-0 flex-col items-center px-1 text-center">
-          <dt className="order-2 mt-1 text-caption-l text-ink-faint">{item.label}</dt>
+          <dt className="order-2 mt-1 text-caption-l text-ink-soft">{item.label}</dt>
           <dd className="order-1 max-w-full truncate text-h5 font-semibold tabular-nums">
             {item.value}
           </dd>
@@ -553,7 +598,7 @@ export function Facts({
 }
 
 export function Note({ children }: { children: ReactNode }): JSX.Element {
-  return <p className="text-caption-l leading-relaxed text-ink-faint">{children}</p>;
+  return <p className="text-caption-l leading-relaxed text-ink-soft">{children}</p>;
 }
 
 /**
@@ -562,7 +607,7 @@ export function Note({ children }: { children: ReactNode }): JSX.Element {
  */
 export function Aside({ children }: { children: ReactNode }): JSX.Element {
   return (
-    <p className="mt-2 flex gap-2 text-caption-l leading-relaxed text-ink-faint">
+    <p className="mt-2 flex gap-2 text-caption-l leading-relaxed text-ink-soft">
       <span className="mt-px shrink-0">
         <Icon name="info-circle" />
       </span>
@@ -637,13 +682,13 @@ export function Places({
             title="Показать слой в Figma"
             onClick={() => onReveal(place.nodeId, place.pageId)}
           >
-            <span className="flex h-8 w-8 shrink-0 items-center justify-center text-ink-faint">
+            <span className="flex h-8 w-8 shrink-0 items-center justify-center text-ink-soft">
               <Icon name="layers" size="2xs" />
             </span>
             <span className="min-w-0 flex-1">
               <span className="block truncate text-body-l font-medium">{place.name}</span>
               {place.detail !== undefined && place.detail !== '' && (
-                <span className="mt-0.5 block truncate text-caption-l text-ink-faint">
+                <span className="mt-0.5 block truncate text-caption-l text-ink-soft">
                   {place.detail}
                 </span>
               )}
@@ -685,7 +730,7 @@ export function AdviceRow({
       </span>
       <span className="min-w-0 flex-1">
         <span className="block text-body-l font-medium">{title}</span>
-        <span className="mt-0.5 block text-caption-l leading-snug text-ink-faint">{hint}</span>
+        <span className="mt-0.5 block text-caption-l leading-snug text-ink-soft">{hint}</span>
       </span>
       {/* Число — бейджем справа, как изменения в Bevel: столбец чисел
           читается сверху вниз, а заголовок не рвётся на середине. */}
@@ -785,7 +830,7 @@ export function Delta({ points, since }: { points: number; since: string }): JSX
         {!flat && <Icon name={rising ? 'arrow-right-up' : 'arrow-right-down'} />}
         {flat ? 'без изменений' : `${Math.abs(points)} п.п.`}
       </span>
-      <span className="text-ink-faint">с {since}</span>
+      <span className="text-ink-soft">с {since}</span>
     </span>
   );
 }
@@ -824,7 +869,7 @@ export function CopyButton({
   };
 
   return (
-    <Button onClick={copy} icon={copied ? 'check-circle' : 'copy'} wide={wide}>
+    <Button variant="quiet" onClick={copy} icon={copied ? 'check-circle' : 'copy'} wide={wide}>
       {copied ? 'Скопировано' : label}
     </Button>
   );
@@ -844,10 +889,10 @@ export function SearchInput({
   placeholder: string;
 }): JSX.Element {
   return (
-    <label className="flex h-12 items-center gap-2 rounded-md bg-panel-card pl-3.5 pr-1 text-ink-faint">
+    <label className="flex h-12 items-center gap-2 rounded-md bg-panel-card pl-3.5 pr-1 text-ink-soft">
       <Icon name="magnifier" />
       <input
-        className="min-w-0 flex-1 bg-transparent text-body-m text-ink outline-none placeholder:text-ink-faint"
+        className="min-w-0 flex-1 bg-transparent text-body-m text-ink outline-none placeholder:text-ink-soft"
         placeholder={placeholder}
         value={value}
         onChange={(e) => onChange(e.target.value)}
