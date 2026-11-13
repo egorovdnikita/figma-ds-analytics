@@ -1,6 +1,6 @@
 {
   "name": "Аналитика дизайн-системы",
-  "id": "figma-ds-analytics-dev",
+  "id": "1702925687495334570",
   "api": "1.0.0",
   "main": "dist/code.js",
   "ui": "dist/index.html",
@@ -10,6 +10,7 @@
     "allowedDomains": ["none"],
     "reasoning": "Плагин работает полностью локально. Содержимое файла не покидает Figma."
   },
+  "permissions": ["teamlibrary"],
   "capabilities": [],
   "enableProposedApi": false
 }
