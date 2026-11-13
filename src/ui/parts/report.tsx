@@ -20,6 +20,7 @@ import {
   Empty,
   Facts,
   Kpi,
+  ListRow,
   Modal,
   Note,
   pct,
@@ -30,6 +31,7 @@ import {
   Section,
   Sparkline,
   StackedBar,
+  statusAttrs,
   Table,
 } from './primitives';
 
@@ -345,10 +347,6 @@ export function ComponentsScreen({
     return <Empty title="Копий компонентов нет" hint="В этом охвате не нашлось ни одной." />;
   }
 
-  // Масштаб столбцов — по видимым строкам, а не по всему списку. Иначе
-  // после фильтра все полоски схлопываются в невидимые огрызки.
-  const max = visible[0]?.instances ?? 1;
-
   return (
     <>
       <div className="flex flex-col gap-1">
@@ -381,27 +379,20 @@ export function ComponentsScreen({
         {visible.length === 0 ? (
           <Empty title="Ничего не нашлось" hint="Попробуйте другое название или снимите фильтр." />
         ) : (
-          <Card>
-            <Table head={['Компонент', 'Копий']}>
+          <Card className="py-1">
+            <ul>
               {visible.slice(0, limit).map((master) => (
-                <Row
+                <ListRow
                   key={master.key}
                   onClick={() => setSelected(master)}
-                  cells={[
-                    <div className="flex min-w-0 items-center gap-2.5">
-                      <Monogram name={master.name} />
-                      <div className="min-w-0">
-                        <div className="truncate">{master.name}</div>
-                        <div className="mt-1">
-                          <OriginPill origin={master.origin} />
-                        </div>
-                      </div>
-                    </div>,
-                    <BarCell value={master.instances} max={max} tone={toneFor(master.origin)} />,
-                  ]}
+                  leading={<Monogram name={master.name} />}
+                  title={master.name}
+                  subtitle={<OriginText origin={master.origin} />}
+                  value={master.instances.toLocaleString('ru')}
+                  valueHint={pct(master.instances, adoption.instancesCounted)}
                 />
               ))}
-            </Table>
+            </ul>
 
             {visible.length > limit && (
               <div className="mt-3 flex justify-center">
@@ -641,12 +632,6 @@ function VariablesTable({
 
 /* ---------- мелочи ---------- */
 
-function toneFor(origin: MasterUsage['origin']): 'accent' | 'warn' | 'faint' {
-  if (origin === 'library') return 'accent';
-  if (origin === 'local') return 'warn';
-  return 'faint';
-}
-
 /**
  * Знак компонента — круг 24 с первой буквой, как логотип компании в
  * карточке вакансии HireHi. Глазу проще держать строку длинного списка.
@@ -656,11 +641,24 @@ function Monogram({ name }: { name: string }): JSX.Element {
   return (
     <span
       aria-hidden
-      className="flex h-6 w-6 shrink-0 items-center justify-center rounded-pill bg-canvas text-caption-l font-medium text-ink-soft"
+      className="flex h-10 w-10 shrink-0 items-center justify-center rounded-pill bg-canvas text-body-l font-semibold text-ink-soft"
     >
       {letter}
     </span>
   );
+}
+
+/** Источник подписью под именем: цвет говорит раньше слов. */
+function OriginText({ origin }: { origin: MasterUsage['origin'] }): JSX.Element {
+  if (origin === 'library') return <span className="text-accent-ink">из библиотеки</span>;
+  if (origin === 'local') {
+    return (
+      <span className="text-status-ink" {...statusAttrs('warning')}>
+        свой, мимо библиотеки
+      </span>
+    );
+  }
+  return <span className="text-ink-faint">библиотека отключена</span>;
 }
 
 function OriginPill({ origin }: { origin: MasterUsage['origin'] }): JSX.Element {

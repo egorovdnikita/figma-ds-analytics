@@ -197,10 +197,7 @@ await click(page.getByText('Компоненты мимо библиотеки',
 hold(0.3);
 await scroll(0, 0.7);
 hold(0.6);
-await click(
-  page.getByRole('cell').getByText('Banner / Sale', { exact: true }),
-  'Карточка компонента',
-);
+await click(page.locator('main li button', { hasText: 'Banner / Sale' }), 'Карточка компонента');
 cam(330, 1.6);
 hold(1.0);
 await click(page.getByText('перейти', { exact: true }).first(), 'Перейти к слою', { fade: 0 });

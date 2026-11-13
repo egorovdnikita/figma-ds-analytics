@@ -260,6 +260,59 @@ export function Section({
   );
 }
 
+/**
+ * Строка списка, как активы в Venmo и Phantom: знак слева, имя и подпись,
+ * справа число и подпись под ним. Без шапки таблицы — подписи и так рядом.
+ */
+export function ListRow({
+  leading,
+  title,
+  subtitle,
+  value,
+  valueHint,
+  onClick,
+}: {
+  leading: ReactNode;
+  title: string;
+  subtitle: ReactNode;
+  value: string;
+  valueHint?: string;
+  onClick?: () => void;
+}): JSX.Element {
+  const body = (
+    <>
+      {leading}
+      <span className="min-w-0 flex-1">
+        <span className="block truncate text-body-m font-medium">{title}</span>
+        <span className="mt-0.5 block truncate text-caption-l">{subtitle}</span>
+      </span>
+      <span className="shrink-0 text-right">
+        <span className="block text-body-m font-semibold tabular-nums">{value}</span>
+        {valueHint !== undefined && (
+          <span className="mt-0.5 block text-caption-l tabular-nums text-ink-faint">
+            {valueHint}
+          </span>
+        )}
+      </span>
+    </>
+  );
+  const className = 'flex items-center gap-3 py-3 text-left';
+  return (
+    <li className="border-t border-line-subtle first:border-0">
+      {onClick === undefined ? (
+        <div className={`${className} w-full`}>{body}</div>
+      ) : (
+        <button
+          className={`${className} -mx-2 w-[calc(100%+16px)] rounded-sm px-2 hover:bg-hover`}
+          onClick={onClick}
+        >
+          {body}
+        </button>
+      )}
+    </li>
+  );
+}
+
 /** Пустое состояние: что случилось и что с этим делать. */
 export function Empty({ title, hint }: { title: string; hint?: string }): JSX.Element {
   return (
