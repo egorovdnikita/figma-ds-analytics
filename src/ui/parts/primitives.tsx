@@ -50,38 +50,6 @@ export function Card({
 }
 
 /**
- * Столбец внутри ячейки таблицы.
- *
- * Даёт сравнение строк между собой без отдельной диаграммы: длина
- * подложки — это и есть график, а число остаётся точным.
- */
-export function BarCell({
-  value,
-  max,
-  tone = 'accent',
-}: {
-  value: number;
-  max: number;
-  tone?: 'accent' | 'warn' | 'faint';
-}): JSX.Element {
-  const width = max === 0 ? 0 : Math.max((value / max) * 100, 2);
-  const fills = { accent: 'bg-accent-soft', warn: 'bg-status-soft', faint: 'bg-line-strong' };
-
-  return (
-    <div className="relative h-6 min-w-[64px] overflow-hidden rounded-xs">
-      <div
-        className={`absolute inset-y-0 left-0 ${fills[tone]}`}
-        style={{ width: `${width}%` }}
-        {...(tone === 'warn' ? statusAttrs('warning') : {})}
-      />
-      <span className="relative flex h-full items-center justify-end px-1.5 text-body-m font-medium tabular-nums">
-        {value.toLocaleString('ru')}
-      </span>
-    </div>
-  );
-}
-
-/**
  * Сегментированный переключатель — компактнее набора кнопок. Форма как у
  * переключателя вида у HireHi: серая подложка 12, пункт внутри 8.
  */
@@ -274,7 +242,7 @@ export function ListRow({
 }: {
   leading: ReactNode;
   title: string;
-  subtitle: ReactNode;
+  subtitle?: ReactNode;
   value: string;
   valueHint?: string;
   onClick?: () => void;
@@ -284,7 +252,9 @@ export function ListRow({
       {leading}
       <span className="min-w-0 flex-1">
         <span className="block truncate text-body-m font-medium">{title}</span>
-        <span className="mt-0.5 block truncate text-caption-l">{subtitle}</span>
+        {subtitle !== undefined && (
+          <span className="mt-0.5 block truncate text-caption-l">{subtitle}</span>
+        )}
       </span>
       <span className="shrink-0 text-right">
         <span className="block text-body-m font-semibold tabular-nums">{value}</span>
@@ -409,50 +379,6 @@ export function StackedBar({ segments }: { segments: readonly Segment[] }): JSX.
         );
       })}
     </ul>
-  );
-}
-
-export function Table({
-  head,
-  children,
-}: {
-  head: readonly string[];
-  children: ReactNode;
-}): JSX.Element {
-  return (
-    <table className="w-full border-collapse text-body-m">
-      <thead>
-        <tr className="text-left text-caption-l text-ink-faint">
-          {head.map((cell, i) => (
-            <th key={cell} className={`pb-2 font-normal ${i === 0 ? '' : 'text-right'}`}>
-              {cell}
-            </th>
-          ))}
-        </tr>
-      </thead>
-      <tbody>{children}</tbody>
-    </table>
-  );
-}
-
-export function Row({
-  cells,
-  onClick,
-}: {
-  cells: readonly ReactNode[];
-  onClick?: () => void;
-}): JSX.Element {
-  return (
-    <tr
-      className={`border-t border-line-subtle ${onClick ? 'cursor-pointer hover:bg-hover' : ''}`}
-      onClick={onClick}
-    >
-      {cells.map((cell, i) => (
-        <td key={i} className={`py-2.5 align-middle ${i === 0 ? 'pr-3' : 'pl-3 text-right'}`}>
-          {cell}
-        </td>
-      ))}
-    </tr>
   );
 }
 

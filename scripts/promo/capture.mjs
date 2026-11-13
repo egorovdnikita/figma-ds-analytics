@@ -210,10 +210,7 @@ await click(page.locator('nav button', { hasText: 'Токены' }), 'Токен
 await click(page.getByRole('button', { name: 'токены', exact: true }), 'Вид: токены', {
   after: 0.6,
 });
-await click(
-  page.getByRole('cell').getByText('color/text/primary', { exact: true }),
-  'Карточка токена',
-);
+await click(page.locator('main li button', { hasText: 'color/text/primary' }), 'Карточка токена');
 cam(320, 1.6);
 hold(1.8);
 await click(page.getByRole('button', { name: 'Закрыть' }), 'Закрыть');

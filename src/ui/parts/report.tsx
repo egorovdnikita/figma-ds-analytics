@@ -8,10 +8,10 @@ import { buildAdvice, verdict } from '../../shared/advice';
 import { toMarkdown } from '../../shared/export';
 import { plural, withCount } from '../../shared/plural';
 import { deltaPoints, shortDate, type Trend } from '../../shared/snapshot';
+import { Icon } from './icon';
 import {
   AdviceRow,
   Aside,
-  BarCell,
   Button,
   Card,
   Chip,
@@ -26,13 +26,11 @@ import {
   pct,
   Pill,
   Places,
-  Row,
   SearchInput,
   Section,
   Sparkline,
   StackedBar,
   statusAttrs,
-  Table,
 } from './primitives';
 
 /* ---------- 1. Сводка ---------- */
@@ -198,21 +196,18 @@ export function SummaryScreen({
 
       {adoption.librarySourcesAvailable && adoption.libraries.length > 0 && (
         <Section title="библиотеки">
-          <Card>
-            <Table head={['Название', 'Токенов']}>
+          <Card className="py-1">
+            <ul>
               {adoption.libraries.map((library) => (
-                <Row
+                <ListRow
                   key={library.libraryName}
-                  cells={[
-                    library.libraryName,
-                    <BarCell
-                      value={library.variables}
-                      max={Math.max(...adoption.libraries.map((item) => item.variables))}
-                    />,
-                  ]}
+                  leading={<Monogram name={library.libraryName} />}
+                  title={library.libraryName}
+                  value={library.variables.toLocaleString('ru')}
+                  valueHint={plural(library.variables, 'токен', 'токена', 'токенов')}
                 />
               ))}
-            </Table>
+            </ul>
           </Card>
         </Section>
       )}
@@ -530,31 +525,25 @@ function CollectionsTable({ adoption }: { adoption: Adoption }): JSX.Element {
     return <Empty title="Коллекций нет" />;
   }
 
-  const max = Math.max(...adoption.collections.map((collection) => collection.variables));
-
   return (
     <>
-      <Card>
-        <Table head={['Коллекция', 'Токенов']}>
+      <Card className="py-1">
+        <ul>
           {adoption.collections.map((collection) => (
-            <Row
+            <ListRow
               key={`${collection.name}-${collection.source}`}
-              cells={[
-                <div className="min-w-0">
-                  <div className="truncate">{collection.name}</div>
-                  <div className="mt-1">
-                    <Pill tone={collection.isLocal ? 'plain' : 'accent'}>{collection.source}</Pill>
-                  </div>
-                </div>,
-                <BarCell
-                  value={collection.variables}
-                  max={max}
-                  tone={collection.isLocal ? 'warn' : 'accent'}
-                />,
-              ]}
+              leading={<Monogram name={collection.name} />}
+              title={collection.name}
+              subtitle={
+                <span className={collection.isLocal ? 'text-ink-faint' : 'text-accent-ink'}>
+                  {collection.source}
+                </span>
+              }
+              value={collection.variables.toLocaleString('ru')}
+              valueHint={plural(collection.variables, 'токен', 'токена', 'токенов')}
             />
           ))}
-        </Table>
+        </ul>
       </Card>
       <Aside>
         «Библиотека не подключена» значит, что токен используется, а его источник файлу недоступен.
@@ -592,8 +581,6 @@ function VariablesTable({
     return <Empty title="Привязок к токенам нет" hint="В этом охвате ничего не привязано." />;
   }
 
-  const max = visible[0]?.nodes ?? 1;
-
   return (
     <>
       <SearchInput placeholder="Найти токен" value={query} onChange={setQuery} />
@@ -601,25 +588,25 @@ function VariablesTable({
       {visible.length === 0 ? (
         <Empty title="Ничего не нашлось" hint="Попробуйте другое название." />
       ) : (
-        <Card>
-          <Table head={['Токен', 'Слоёв']}>
+        <Card className="py-1">
+          <ul>
             {visible.map((item) => (
-              <Row
+              <ListRow
                 key={item.id}
                 onClick={() => onSelect(item)}
-                cells={[
-                  <div className="min-w-0">
-                    <div className="truncate">{item.name}</div>
-                    <div className="mt-0.5 truncate text-caption-l text-ink-faint">
-                      {item.collectionName || '—'} · {item.pages}{' '}
-                      {plural(item.pages, 'страница', 'страницы', 'страниц')}
-                    </div>
-                  </div>,
-                  <BarCell value={item.nodes} max={max} />,
-                ]}
+                leading={<TokenMark />}
+                title={item.name}
+                subtitle={
+                  <span className="text-ink-faint">
+                    {item.collectionName || '—'} · {item.pages}{' '}
+                    {plural(item.pages, 'страница', 'страницы', 'страниц')}
+                  </span>
+                }
+                value={item.nodes.toLocaleString('ru')}
+                valueHint={plural(item.nodes, 'слой', 'слоя', 'слоёв')}
               />
             ))}
-          </Table>
+          </ul>
         </Card>
       )}
 
@@ -649,6 +636,18 @@ function Monogram({ name }: { name: string }): JSX.Element {
 }
 
 /** Источник подписью под именем: цвет говорит раньше слов. */
+/** Знак токена: палитра в подложке того же размера, что знак компонента. */
+function TokenMark(): JSX.Element {
+  return (
+    <span
+      aria-hidden
+      className="flex h-10 w-10 shrink-0 items-center justify-center rounded-pill bg-canvas text-ink-soft"
+    >
+      <Icon name="palette" size="2xs" />
+    </span>
+  );
+}
+
 function OriginText({ origin }: { origin: MasterUsage['origin'] }): JSX.Element {
   if (origin === 'library') return <span className="text-accent-ink">из библиотеки</span>;
   if (origin === 'local') {
