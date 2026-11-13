@@ -409,8 +409,8 @@ export function ComponentsScreen({
               { label: 'источник', value: <OriginPill origin={selected.origin} /> },
               { label: 'копий', value: selected.instances.toLocaleString('ru') },
               {
-                label: 'доля',
-                value: `${pct(selected.instances, adoption.instancesCounted)} всех копий`,
+                label: 'доля всех копий',
+                value: pct(selected.instances, adoption.instancesCounted),
               },
             ]}
           />
@@ -491,9 +491,10 @@ export function TokensScreen({
           <Facts
             items={[
               { label: 'коллекция', value: selected.collectionName || '—' },
+              { label: 'слоёв', value: selected.nodes.toLocaleString('ru') },
               {
-                label: 'используется',
-                value: `${withCount(selected.nodes, 'слой', 'слоя', 'слоёв')} на ${withCount(selected.pages, 'странице', 'страницах', 'страницах')}`,
+                label: plural(selected.pages, 'страница', 'страницы', 'страниц'),
+                value: selected.pages,
               },
             ]}
           />

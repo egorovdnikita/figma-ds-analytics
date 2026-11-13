@@ -492,23 +492,22 @@ export function Modal({
 }
 
 /**
- * Строка фактов, как в шапке вакансии HireHi: подпись над значением,
- * колонки через вертикальную линию. Читается одним взглядом слева направо.
+ * Плитки показателей, как в деталях мобильных приложений (Cal AI, Bevel):
+ * подпись и крупное значение в своей подложке. Числа — главный ответ
+ * карточки, поэтому крупно.
  */
 export function Facts({
   items,
 }: {
   items: readonly { label: string; value: ReactNode }[];
 }): JSX.Element {
+  const columns = items.length >= 3 ? 'grid-cols-3' : 'grid-cols-2';
   return (
-    <dl className="flex flex-wrap gap-y-3">
-      {items.map((item, index) => (
-        <div
-          key={item.label}
-          className={`min-w-0 ${index === 0 ? 'pr-4' : 'border-l border-line-subtle px-4'}`}
-        >
+    <dl className={`grid gap-1 ${columns}`}>
+      {items.map((item) => (
+        <div key={item.label} className="min-w-0 rounded-md bg-canvas p-3">
           <dt className="text-caption-l text-ink-soft">{item.label}</dt>
-          <dd className="mt-1 break-words text-body-m">{item.value}</dd>
+          <dd className="mt-1 truncate text-h5 font-semibold tabular-nums">{item.value}</dd>
         </div>
       ))}
     </dl>
