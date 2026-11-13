@@ -22,6 +22,7 @@ import {
 } from './parts/primitives';
 import { ComponentsScreen, SummaryScreen, TokensScreen, type MasterFilter } from './parts/report';
 import { chooseTheme, currentTheme } from './theme';
+import { Mascot } from './parts/mascot';
 
 function send(message: UiMessage): void {
   parent.postMessage({ pluginMessage: message }, '*');
@@ -236,6 +237,9 @@ function Start({
       </div>
 
       <div className="min-h-0 flex-1 overflow-y-auto px-4 pt-10">
+        <div className="flex justify-center">
+          <Mascot />
+        </div>
         {fileName !== null && <p className="truncate pr-8 text-body-m text-ink-soft">{fileName}</p>}
         <h1 className="mt-1 text-balance text-h4 font-semibold">
           проверим, как файл живёт на дизайн-системе

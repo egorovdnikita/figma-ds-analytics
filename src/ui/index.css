@@ -8,6 +8,13 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Родной холст Lottie: визуал и анимации Cat из Agent Pulse. */
+.pulse-mascot {
+  width: 176px;
+  height: 176px;
+  flex: none;
+}
+
 @layer base {
   body {
     @apply bg-canvas font-sans text-body-m text-ink;
