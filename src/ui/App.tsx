@@ -157,7 +157,8 @@ export function App(): JSX.Element {
               {report.fileName}
             </h1>
             <p className="mt-2 truncate text-caption-l text-ink-faint">
-              {report.scope} · {report.nodesVisited.toLocaleString('ru')} слоёв
+              {report.scope.charAt(0).toUpperCase() + report.scope.slice(1)} ·{' '}
+              {report.nodesVisited.toLocaleString('ru')} слоёв
               {report.cancelled ? ' · остановлено' : ''}
             </p>
           </div>
@@ -182,7 +183,7 @@ export function App(): JSX.Element {
             <button
               key={name}
               aria-pressed={tab === name}
-              className={`flex h-10 min-w-0 flex-1 items-center justify-center rounded-sm px-3 text-body-l transition-colors ${tab === name ? 'segment-selected font-medium' : 'text-ink-soft hover:bg-hover'}`}
+              className={`flex h-10 min-w-0 flex-1 items-center justify-center rounded-sm px-3 text-body-m transition-colors ${tab === name ? 'segment-selected font-medium' : 'text-ink-soft hover:bg-hover'}`}
               onClick={() => {
                 if (name === 'Компоненты') setComponentFilter('all');
                 setTab(name);

@@ -61,7 +61,7 @@ export function SummaryScreen({
   const delta = trendDelta(adoption, trend);
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="summary-screen flex flex-col gap-2">
       {/* Одна крупная цифра с бейджем изменения, как баланс в Phantom, и
           вывод фразой под ней, как в Lifesum: цифра без вывода заставляет
           гадать, хорошо это или плохо. */}

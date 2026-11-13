@@ -32,7 +32,10 @@ export const BOLD_ICONS = [
 ] as const;
 
 export const LINEAR_ICONS = [
-  'magnifer',
+  'close',
+  'layers',
+  'target',
+  'magnifier',
   'alt-arrow-right',
   'refresh',
   'arrow-right-up',

@@ -494,13 +494,15 @@ export function Modal({
     // Нижний лист, как детали в мобильных приложениях (Cal AI, Bevel):
     // палец и взгляд уже внизу списка, а сверху остаётся видно, откуда пришли.
     <div
-      className="absolute inset-0 z-10 flex flex-col justify-end bg-overlay px-2 pb-2 pt-12"
+      className="absolute inset-0 z-10 flex flex-col justify-end px-2 pb-2 pt-12"
       onClick={onClose}
     >
+      <div aria-hidden className="modal-backdrop absolute inset-0 bg-overlay" />
       <div
         role="dialog"
+        aria-modal="true"
         aria-label={title}
-        className="flex max-h-full w-full flex-col rounded-card bg-surface ring-1 ring-line"
+        className="modal-sheet relative flex max-h-full w-full flex-col rounded-card bg-surface ring-1 ring-line"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Ручка — знак листа, как в iOS: сверху по центру, 36 × 4. */}
@@ -511,10 +513,10 @@ export function Modal({
             <h3 className="truncate text-h5 font-semibold">{title}</h3>
           </div>
           <button
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-sm bg-panel-card text-ink-faint hover:bg-hover hover:text-ink"
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-sm text-ink-soft hover:bg-hover hover:text-ink"
             onClick={onClose}
           >
-            <Icon name="close-circle" size="2xs" title="Закрыть" />
+            <Icon name="close" size="2xs" title="Закрыть" />
           </button>
         </header>
         <div className="panel-scroll modal-scroll min-h-0 flex-1 overflow-y-auto overflow-x-hidden text-body-m">
@@ -632,9 +634,12 @@ export function Places({
         <li key={place.nodeId}>
           <button
             className="-mx-2 flex min-h-16 w-[calc(100%+16px)] items-center gap-3 rounded-lg px-2 py-3 text-left hover:bg-hover"
+            title="Показать слой в Figma"
             onClick={() => onReveal(place.nodeId, place.pageId)}
           >
-            <TintIcon name="map-point" tint="blue" />
+            <span className="flex h-8 w-8 shrink-0 items-center justify-center text-ink-faint">
+              <Icon name="layers" size="2xs" />
+            </span>
             <span className="min-w-0 flex-1">
               <span className="block truncate text-body-l font-medium">{place.name}</span>
               {place.detail !== undefined && place.detail !== '' && (
@@ -643,11 +648,8 @@ export function Places({
                 </span>
               )}
             </span>
-            <span
-              data-tint="blue"
-              className="flex shrink-0 items-center text-caption-l text-ink-faint"
-            >
-              перейти
+            <span className="flex h-8 w-8 shrink-0 items-center justify-center text-ink-soft">
+              <Icon name="target" size="2xs" title="Показать слой в Figma" />
             </span>
           </button>
         </li>
@@ -843,7 +845,7 @@ export function SearchInput({
 }): JSX.Element {
   return (
     <label className="flex h-12 items-center gap-2 rounded-md bg-panel-card pl-3.5 pr-1 text-ink-faint">
-      <Icon name="magnifer" />
+      <Icon name="magnifier" />
       <input
         className="min-w-0 flex-1 bg-transparent text-body-m text-ink outline-none placeholder:text-ink-faint"
         placeholder={placeholder}
