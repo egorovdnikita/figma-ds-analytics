@@ -183,7 +183,7 @@ cam(WIDE, 1.25);
 hold(0.6);
 
 // Прокрутка до «С чего начать».
-const advice = page.getByText('С чего начать', { exact: true });
+const advice = page.getByText('с чего начать', { exact: true });
 const adviceTop = await advice.evaluate((el) => {
   const main = document.querySelector('main');
   return el.getBoundingClientRect().top - main.getBoundingClientRect().top + main.scrollTop;
