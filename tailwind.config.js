@@ -16,6 +16,8 @@ export default {
   theme: {
     extend: {
       colors: {
+        panel: 'var(--panel-fill)',
+        'panel-card': 'var(--panel-card-fill)',
         canvas: 'var(--surface-base-fill-page)',
         surface: 'var(--surface-base-fill-raised)',
         overlay: 'var(--surface-base-fill-overlay)',

@@ -15,7 +15,6 @@ import { buildAdvice, verdict } from '../../shared/advice';
 import { toMarkdown } from '../../shared/export';
 import { plural, withCount } from '../../shared/plural';
 import { deltaPoints, shortDate, type Trend } from '../../shared/snapshot';
-import { Icon } from './icon';
 import {
   AdviceRow,
   Aside,
@@ -38,6 +37,8 @@ import {
   Sparkline,
   StackedBar,
   statusAttrs,
+  TintIcon,
+  type Tint,
 } from './primitives';
 
 /* ---------- 1. Сводка ---------- */
@@ -63,47 +64,59 @@ export function SummaryScreen({
   const delta = trendDelta(adoption, trend);
 
   return (
-    <div className="flex flex-col gap-1">
+    <div className="flex flex-col gap-2">
       {/* Одна крупная цифра с бейджем изменения, как баланс в Phantom, и
           вывод фразой под ней, как в Lifesum: цифра без вывода заставляет
           гадать, хорошо это или плохо. */}
-      <section className="px-1 pb-4 pt-2">
-        <p className="text-body-m text-ink-soft">компоненты из библиотеки</p>
+      <section className="relative px-1 pb-4 pt-1">
+        <div className="absolute right-1 top-1">
+          <TintIcon name="graph-up" tint="green" />
+        </div>
+        <p className="pr-12 text-body-m text-ink-soft">компоненты из библиотеки</p>
         <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1">
-          <span className="text-h2 font-semibold tabular-nums">
+          <span className="summary-value font-semibold tabular-nums">
             {pct(adoption.fromLibrary, instances)}
           </span>
           {delta !== null && trend.previous !== null && (
             <Delta points={delta} since={shortDate(trend.previous.at)} />
           )}
         </div>
-        <p
-          className={`mt-2 text-body-m font-medium ${
-            state.tone === 'good' ? 'text-accent-ink' : 'text-ink'
-          }`}
-        >
+        <p className="mt-2 flex items-center gap-2 text-body-m text-ink-soft">
+          <span
+            data-tint={state.tone === 'good' ? 'green' : 'orange'}
+            className="tint-dot h-1.5 w-1.5 shrink-0 rounded-pill"
+            aria-hidden
+          />
           {state.text}
         </p>
       </section>
 
       {/* Ключевые цифры плитками два в ряд, как в Google Health. */}
-      <div className="grid grid-cols-2 gap-1">
+      <div className="grid grid-cols-2 gap-2">
         <Kpi
+          icon="palette"
+          tint="blue"
           label="слои на токенах"
           value={pct(onTokens, tokenNodes)}
           hint={`${onTokens.toLocaleString('ru')} из ${tokenNodes.toLocaleString('ru')}`}
         />
         <Kpi
+          icon="widget"
+          tint="violet"
           label="компонентов"
           value={adoption.mastersTotal.toLocaleString('ru')}
           hint={`${adoption.local.toLocaleString('ru')} копий мимо библиотеки`}
         />
         <Kpi
+          icon="copy"
+          tint="orange"
           label="копий"
           value={instances.toLocaleString('ru')}
           hint={`${adoption.fromLibrary.toLocaleString('ru')} из библиотеки`}
         />
         <Kpi
+          icon="folder"
+          tint="pink"
           label="коллекций токенов"
           value={adoption.collections.length.toLocaleString('ru')}
           hint={`${onTokens.toLocaleString('ru')} привязок`}
@@ -147,7 +160,7 @@ export function SummaryScreen({
               {
                 label: 'Из библиотеки',
                 value: adoption.fromLibrary,
-                className: 'bg-accent',
+                className: 'bg-[var(--detail-violet)]',
                 onClick: () => onGoTo('Компоненты', 'library'),
               },
               {
@@ -183,7 +196,7 @@ export function SummaryScreen({
               {
                 label: 'Из библиотеки',
                 value: adoption.nodesOnLibraryVariable,
-                className: 'bg-accent',
+                className: 'bg-[var(--detail-blue)]',
               },
               {
                 label: 'Свои',
@@ -208,7 +221,7 @@ export function SummaryScreen({
               {adoption.libraries.map((library) => (
                 <ListRow
                   key={library.libraryName}
-                  leading={<Monogram name={library.libraryName} />}
+                  leading={<Monogram name={library.libraryName} tint="green" />}
                   title={library.libraryName}
                   value={library.variables.toLocaleString('ru')}
                   valueHint={plural(library.variables, 'токен', 'токена', 'токенов')}
@@ -351,7 +364,7 @@ export function ComponentsScreen({
 
   return (
     <>
-      <div className="flex flex-col gap-1">
+      <div className="flex flex-col gap-3">
         <SearchInput
           placeholder="Найти компонент"
           value={query}
@@ -471,7 +484,7 @@ export function TokensScreen({
 
   return (
     <>
-      <div className="flex flex-col gap-1">
+      <div className="flex flex-col gap-3">
         <div className="-mx-1 flex gap-1 overflow-x-auto px-1">
           {TOKEN_VIEWS.map((option) => (
             <Chip
@@ -539,7 +552,7 @@ function CollectionsTable({ adoption }: { adoption: Adoption }): JSX.Element {
           {adoption.collections.map((collection) => (
             <ListRow
               key={`${collection.name}-${collection.source}`}
-              leading={<Monogram name={collection.name} />}
+              leading={<Monogram name={collection.name} tint="pink" />}
               title={collection.name}
               subtitle={<SourceText collection={collection} />}
               value={collection.variables.toLocaleString('ru')}
@@ -626,12 +639,13 @@ function VariablesTable({
  * Знак компонента — круг 24 с первой буквой, как логотип компании в
  * карточке вакансии HireHi. Глазу проще держать строку длинного списка.
  */
-function Monogram({ name }: { name: string }): JSX.Element {
+function Monogram({ name, tint = 'violet' }: { name: string; tint?: Tint }): JSX.Element {
   const letter = /[\p{L}\p{N}]/u.exec(name)?.[0]?.toUpperCase() ?? '·';
   return (
     <span
       aria-hidden
-      className="flex h-10 w-10 shrink-0 items-center justify-center rounded-pill bg-canvas text-body-l font-semibold text-ink-soft"
+      data-tint={tint}
+      className="tint-badge flex h-10 w-10 shrink-0 items-center justify-center rounded-sm text-body-l font-semibold"
     >
       {letter}
     </span>
@@ -641,14 +655,7 @@ function Monogram({ name }: { name: string }): JSX.Element {
 /** Источник подписью под именем: цвет говорит раньше слов. */
 /** Знак токена: палитра в подложке того же размера, что знак компонента. */
 function TokenMark(): JSX.Element {
-  return (
-    <span
-      aria-hidden
-      className="flex h-10 w-10 shrink-0 items-center justify-center rounded-pill bg-canvas text-ink-soft"
-    >
-      <Icon name="palette" size="2xs" />
-    </span>
-  );
+  return <TintIcon name="palette" tint="blue" />;
 }
 
 /** Источник коллекции: отключённая библиотека — предупреждение, а не норма. */
@@ -661,14 +668,19 @@ function SourceText({ collection }: { collection: CollectionUsage }): JSX.Elemen
     );
   }
   return (
-    <span className={collection.isLocal ? 'text-ink-faint' : 'text-accent-ink'}>
+    <span data-tint="green" className={collection.isLocal ? 'text-ink-faint' : 'tint-ink'}>
       {collection.source}
     </span>
   );
 }
 
 function OriginText({ origin }: { origin: MasterUsage['origin'] }): JSX.Element {
-  if (origin === 'library') return <span className="text-accent-ink">из библиотеки</span>;
+  if (origin === 'library')
+    return (
+      <span data-tint="green" className="tint-ink">
+        из библиотеки
+      </span>
+    );
   if (origin === 'local') {
     return (
       <span className="text-status-ink" {...statusAttrs('warning')}>

@@ -1,11 +1,32 @@
 /**
- * Строительные блоки по приёмам веба HireHi: серое полотно, белые карточки
- * 24 через зазор 4, чипсы-фильтры, теги, строка фактов, пояснения с иконкой.
- * Значения — только токены Box UI; отбор приёмов — docs/audits/2026-11-13-hirehi-layout.md.
+ * Нейтральные поверхности и точечные цветные знаки категорий.
+ * Геометрия, цвет и иконки — из Box UI.
  */
 import { useEffect, useState, type ReactNode } from 'react';
 import type { IconName } from '../icons';
 import { Icon } from './icon';
+
+export type Tint = 'violet' | 'blue' | 'orange' | 'green' | 'pink';
+
+/** Цвет — признак категории, а не дополнительный статус ошибки. */
+export function TintIcon({
+  name,
+  tint,
+  small = false,
+}: {
+  name: IconName;
+  tint: Tint;
+  small?: boolean;
+}): JSX.Element {
+  return (
+    <span
+      data-tint={tint}
+      className={`tint-badge flex shrink-0 items-center justify-center rounded-sm ${small ? 'h-8 w-8' : 'h-10 w-10'}`}
+    >
+      <Icon name={name} size={small ? 'min' : '2xs'} />
+    </span>
+  );
+}
 
 /**
  * Статусная тональность Box UI.
@@ -37,7 +58,7 @@ export function Card({
   className?: string;
 }): JSX.Element {
   return (
-    <section className={`rounded-card bg-surface p-4 ${className}`}>
+    <section className={`rounded-card bg-panel-card p-4 ${className}`}>
       {title !== undefined && (
         <header className="mb-3 flex items-baseline gap-2">
           <h2 className="min-w-0 flex-1 text-body-l font-medium">{title}</h2>
@@ -63,12 +84,13 @@ export function Segmented<T extends string>({
   onChange: (value: T) => void;
 }): JSX.Element {
   return (
-    <div className="inline-flex rounded-sm bg-canvas p-0.5">
+    <div className="inline-flex rounded-pill bg-panel-card p-1">
       {options.map((option) => (
         <button
           key={option.value}
-          className={`rounded-xs px-2.5 py-1 text-caption-l ${
-            value === option.value ? 'bg-surface font-medium' : 'text-ink-soft'
+          aria-pressed={value === option.value}
+          className={`rounded-pill px-3 py-1.5 text-caption-l transition-colors ${
+            value === option.value ? 'bg-accent font-medium text-accent-on' : 'text-ink-soft'
           }`}
           onClick={() => onChange(option.value)}
         >
@@ -103,7 +125,7 @@ export function Chip({
     <button
       disabled={disabled}
       aria-pressed={active}
-      className={`flex shrink-0 items-center gap-1.5 rounded-sm px-2 py-1.5 text-body-m ${
+      className={`flex shrink-0 items-center gap-1.5 rounded-pill px-3 py-2 text-body-m transition-colors ${
         active ? 'bg-accent text-accent-on' : 'text-ink hover:bg-hover'
       }`}
       onClick={onClick}
@@ -137,7 +159,7 @@ export function ThemeButton({
     <button
       title={title}
       aria-label={title}
-      className="flex h-8 w-8 shrink-0 items-center justify-center rounded-sm text-ink-soft hover:bg-hover hover:text-ink"
+      className="flex h-8 w-8 shrink-0 items-center justify-center rounded-pill bg-panel-card text-ink-soft hover:bg-hover hover:text-ink"
       onClick={onToggle}
     >
       <Icon name={theme === 'light' ? 'moon' : 'sun'} />
@@ -211,15 +233,17 @@ export function Section({
   children: ReactNode;
 }): JSX.Element {
   return (
-    <section className="mt-4">
+    <section className="mt-5">
       {onOpen === undefined ? (
-        <h2 className="mb-2 px-1 text-body-l font-semibold">{title}</h2>
+        <h2 className="mb-2 px-1 text-body-l font-semibold">
+          {title.charAt(0).toUpperCase() + title.slice(1)}
+        </h2>
       ) : (
         <button
           className="mb-2 flex items-center gap-1 px-1 text-body-l font-semibold hover:text-accent-ink"
           onClick={onOpen}
         >
-          {title}
+          {title.charAt(0).toUpperCase() + title.slice(1)}
           <Icon name="alt-arrow-right" />
         </button>
       )}
@@ -287,7 +311,7 @@ export function ListRow({
 export function Empty({ title, hint }: { title: string; hint?: string }): JSX.Element {
   return (
     <div className="flex flex-col items-center rounded-card bg-surface px-4 py-10 text-center">
-      <span className="mb-2 text-ink-faint">
+      <span data-tint="blue" className="tint-ink mb-2">
         <Icon name="info-circle" size="xs" />
       </span>
       <p className="text-body-m font-medium">{title}</p>
@@ -304,16 +328,22 @@ export function Kpi({
   label,
   value,
   hint,
+  icon,
+  tint = 'blue',
 }: {
   label: string;
   value: string;
   hint?: string;
+  icon?: IconName;
+  tint?: Tint;
 }): JSX.Element {
   return (
-    <div className="rounded-card bg-surface p-4">
-      {/* Подпись над крупным числом, как «зарплата» в карточке вакансии HireHi. */}
-      <div className="text-body-m text-ink-soft">{label}</div>
-      <div className="mt-1 text-h4 font-semibold leading-none">{value}</div>
+    <div className="rounded-card bg-panel-card p-4">
+      <div className="flex items-center gap-2">
+        {icon !== undefined && <TintIcon name={icon} tint={tint} small />}
+        <div className="text-caption-l text-ink-soft">{label}</div>
+      </div>
+      <div className="mt-3 text-h4 font-semibold leading-none tabular-nums">{value}</div>
       {hint !== undefined && <div className="mt-1.5 text-caption-l text-ink-faint">{hint}</div>}
     </div>
   );
@@ -392,13 +422,17 @@ export function Pill({
 }): JSX.Element {
   const tones = {
     plain: 'bg-canvas text-ink-soft',
-    accent: 'bg-accent-soft text-accent-ink',
+    accent: 'bg-status-soft text-status-ink',
     warn: 'bg-status-soft text-status-ink',
   };
   return (
     <span
       className={`inline-block rounded-xs px-2 py-1 text-caption-l ${tones[tone]}`}
-      {...(tone === 'warn' ? statusAttrs('warning') : {})}
+      {...(tone === 'warn'
+        ? statusAttrs('warning')
+        : tone === 'accent'
+          ? statusAttrs('positive')
+          : {})}
     >
       {children}
     </span>
@@ -431,14 +465,14 @@ export function Button({
     raised: 'bg-surface text-ink hover:bg-hover',
   }[variant];
   const dims = {
-    sm: 'h-8 shrink-0 gap-1.5 rounded-sm px-2.5 text-body-m',
+    sm: 'h-8 shrink-0 gap-1.5 rounded-pill px-3 text-body-m',
     // Как кнопки у HireHi: высота 36 и 44, скругление 12 и 16, отступ 16.
-    md: 'h-9 gap-1.5 rounded-sm px-4 text-body-m',
-    lg: 'h-11 gap-2 rounded-md px-4 text-body-l',
+    md: 'h-10 gap-1.5 rounded-pill px-4 text-body-m',
+    lg: 'h-12 gap-2 rounded-pill px-5 text-body-l',
   }[size];
   return (
     <button
-      className={`inline-flex items-center font-medium ${wide ? 'w-full justify-center' : ''} ${look} ${dims}`}
+      className={`inline-flex items-center font-medium transition-colors ${wide ? 'w-full justify-center' : ''} ${look} ${dims}`}
       onClick={onClick}
     >
       {icon !== undefined && <Icon name={icon} size={size === 'lg' ? '2xs' : 'min'} />}
@@ -608,7 +642,10 @@ export function Places({
                 </span>
               )}
             </span>
-            <span className="flex shrink-0 items-center gap-1 text-caption-l text-accent-ink">
+            <span
+              data-tint="blue"
+              className="tint-ink flex shrink-0 items-center gap-1 text-caption-l"
+            >
               <Icon name="map-point" />
               перейти
             </span>
@@ -679,7 +716,7 @@ export function AdviceRow({
  */
 export function Sparkline({
   values,
-  className = 'stroke-accent',
+  className = 'stroke-[var(--detail-violet)]',
 }: {
   values: readonly number[];
   className?: string;
@@ -713,7 +750,7 @@ export function Sparkline({
         strokeLinejoin="round"
         className={className}
       />
-      <circle cx={width} cy={lastY} r="2.5" className="fill-accent" />
+      <circle cx={width} cy={lastY} r="2.5" className="fill-[var(--detail-violet)]" />
     </svg>
   );
 }
@@ -728,14 +765,14 @@ export function Delta({ points, since }: { points: number; since: string }): JSX
   const tone = flat
     ? 'bg-canvas text-ink-soft'
     : rising
-      ? 'bg-accent-soft text-accent-ink'
+      ? 'bg-status-soft text-status-ink'
       : 'bg-status-soft text-status-ink';
 
   return (
     <span className="inline-flex items-center gap-1.5 text-caption-l">
       <span
         className={`inline-flex items-center gap-0.5 rounded-xs px-1.5 py-0.5 font-medium tabular-nums ${tone}`}
-        {...(!flat && !rising ? statusAttrs('warning') : {})}
+        {...(!flat ? statusAttrs(rising ? 'positive' : 'warning') : {})}
       >
         {!flat && <Icon name={rising ? 'arrow-right-up' : 'arrow-right-down'} />}
         {flat ? 'без изменений' : `${Math.abs(points)} п.п.`}
@@ -799,7 +836,7 @@ export function SearchInput({
   placeholder: string;
 }): JSX.Element {
   return (
-    <label className="flex h-11 items-center gap-2 rounded-md bg-surface px-3.5 text-ink-faint">
+    <label className="flex h-11 items-center gap-2 rounded-pill bg-panel-card px-3.5 text-ink-faint">
       <Icon name="magnifer" />
       <input
         className="min-w-0 flex-1 bg-transparent text-body-m text-ink outline-none placeholder:text-ink-faint"

@@ -12,8 +12,8 @@
 import { resolveTheme, type Theme } from '../shared/theme';
 
 const FIXED_MODES = {
-  'data-accent': 'deep',
-  // Скругления крупные, как у веба HireHi: карточка 24, поле 16, чипс 12.
+  'data-accent': 'monochrome',
+  // Крупные нейтральные поверхности; отдельные детали получают свои оттенки.
   'data-radius': 'medium',
   'data-font': 'inter',
   // Панель плагина — всегда десктоп: ширина iframe 480px не телефон, и

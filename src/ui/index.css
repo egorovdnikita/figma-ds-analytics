@@ -10,9 +10,84 @@
 
 /* Родной холст Lottie: визуал и анимации Cat из Agent Pulse. */
 .pulse-mascot {
-  width: 176px;
-  height: 176px;
+  width: 208px;
+  height: 184px;
   flex: none;
+}
+
+/* Малые цветные детали берут палитру Box UI, поверхности остаются нейтральными. */
+:root {
+  --panel-fill: var(--surface-base-fill-raised);
+  --panel-card-fill: var(--surface-base-fill-page);
+  --detail-violet: var(--color-violet-600);
+  --detail-blue: var(--color-blue-600);
+  --detail-orange: var(--color-orange-600);
+  --detail-green: var(--color-green-700);
+  --detail-pink: var(--color-pink-600);
+}
+[data-theme='dark'] {
+  --panel-fill: var(--surface-base-fill-page);
+  --panel-card-fill: var(--surface-base-fill-raised);
+  --detail-violet: var(--color-violet-450);
+  --detail-blue: var(--color-blue-450);
+  --detail-orange: var(--color-orange-450);
+  --detail-green: var(--color-green-450);
+  --detail-pink: var(--color-pink-450);
+}
+[data-tint='violet'] {
+  --tint-ink: var(--detail-violet);
+  --tint-soft: var(--color-violet-alpha-8);
+}
+[data-tint='blue'] {
+  --tint-ink: var(--detail-blue);
+  --tint-soft: var(--color-blue-alpha-8);
+}
+[data-tint='orange'] {
+  --tint-ink: var(--detail-orange);
+  --tint-soft: var(--color-orange-alpha-8);
+}
+[data-tint='green'] {
+  --tint-ink: var(--detail-green);
+  --tint-soft: var(--color-green-alpha-8);
+}
+[data-tint='pink'] {
+  --tint-ink: var(--detail-pink);
+  --tint-soft: var(--color-pink-alpha-8);
+}
+.tint-badge {
+  color: var(--tint-ink);
+  background: var(--tint-soft);
+}
+.tint-ink {
+  color: var(--tint-ink);
+}
+.tint-dot {
+  background: var(--tint-ink);
+}
+.start-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-bottom: var(--spacing-16);
+}
+.start-title {
+  font-size: var(--type-h3-font-size);
+  line-height: var(--type-h3-line-height);
+}
+.summary-value {
+  font-size: var(--type-h1-font-size);
+  line-height: var(--type-h1-line-height);
+  letter-spacing: -0.05em;
+}
+
+@media (max-height: 600px) {
+  .start-content {
+    display: block;
+    padding-top: var(--spacing-16);
+  }
+  .start-hero .pulse-mascot {
+    height: 120px;
+  }
 }
 
 @layer base {

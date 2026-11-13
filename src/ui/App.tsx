@@ -13,13 +13,15 @@ import type { IconName } from './icons';
 import {
   Button,
   Chip,
-  ChoiceCard,
   Pill,
   Progress,
   Segmented,
   statusAttrs,
   ThemeButton,
+  TintIcon,
+  type Tint,
 } from './parts/primitives';
+import { Icon } from './parts/icon';
 import { ComponentsScreen, SummaryScreen, TokensScreen, type MasterFilter } from './parts/report';
 import { chooseTheme, currentTheme } from './theme';
 import { Mascot } from './parts/mascot';
@@ -37,10 +39,34 @@ const TAB_ICONS: Readonly<Record<Tab, IconName>> = {
   Токены: 'palette',
 };
 
-const SCOPES: readonly { value: ScanScope; label: string; hint: string; icon: IconName }[] = [
-  { value: 'selection', label: 'выделение', hint: 'Только выделенные слои', icon: 'cursor-square' },
-  { value: 'page', label: 'страница', hint: 'Текущая страница целиком', icon: 'document' },
-  { value: 'file', label: 'весь файл', hint: 'Все страницы по очереди — дольше', icon: 'folder' },
+const SCOPES: readonly {
+  value: ScanScope;
+  label: string;
+  hint: string;
+  icon: IconName;
+  tint: Tint;
+}[] = [
+  {
+    value: 'selection',
+    label: 'Выделение',
+    hint: 'Только выделенные слои',
+    icon: 'cursor-square',
+    tint: 'violet',
+  },
+  {
+    value: 'page',
+    label: 'Страница',
+    hint: 'Текущая страница целиком',
+    icon: 'document',
+    tint: 'blue',
+  },
+  {
+    value: 'file',
+    label: 'Весь файл',
+    hint: 'Все страницы по очереди — дольше',
+    icon: 'folder',
+    tint: 'orange',
+  },
 ];
 
 interface Progressing {
@@ -136,11 +162,13 @@ export function App(): JSX.Element {
   }
 
   return (
-    <div className="relative flex h-screen flex-col bg-canvas">
-      <header className="shrink-0 px-4 pt-4">
-        {/* Крошки над заголовком, как у веба HireHi: что проверено и сколько. */}
+    <div className="relative flex h-screen flex-col bg-panel text-ink">
+      <header className="shrink-0 border-b border-line-subtle px-5 pb-3 pt-5">
         <div className="flex items-center gap-2">
-          <p className="flex min-w-0 flex-1 items-center gap-1.5 text-body-m text-ink-soft">
+          <p className="flex min-w-0 flex-1 items-center gap-1.5 text-caption-l text-ink-soft">
+            <span data-tint="violet" className="tint-ink">
+              <Icon name="widget" />
+            </span>
             <span>{report.scope}</span>
             <span aria-hidden>/</span>
             <span className="tabular-nums">{report.nodesVisited.toLocaleString('ru')} слоёв</span>
@@ -154,11 +182,10 @@ export function App(): JSX.Element {
 
         {/* Имя файла — отдельной строкой во всю ширину: рядом с кнопкой на
             480px оно схлопывалось в «Дизайн…». */}
-        <h1 className="mt-1 truncate text-h4 font-semibold">{report.fileName}</h1>
+        <h1 className="mt-2 truncate text-h4 font-semibold tracking-tight">{report.fileName}</h1>
 
-        {/* Тулбар — одна белая панель, как сортировка и вид у HireHi: охват
-            слева, повторная проверка справа. */}
-        <div className="mt-3 flex items-center gap-1 rounded-md bg-surface p-1">
+        {/* Охват слева, повторная проверка справа; главные действия нейтральные. */}
+        <div className="mt-4 flex items-center gap-3">
           <div className="min-w-0 flex-1">
             <Segmented options={SCOPES} value={scope} onChange={setScope} />
           </div>
@@ -167,7 +194,7 @@ export function App(): JSX.Element {
           </Button>
         </div>
 
-        <nav className="-mx-1 mt-1 flex gap-1 overflow-x-auto px-1 pb-1">
+        <nav aria-label="Разделы отчёта" className="-mx-1 mt-3 flex gap-1 overflow-x-auto px-1">
           {TABS.map((name) => {
             const count = countFor(name, report);
             return (
@@ -188,7 +215,7 @@ export function App(): JSX.Element {
         </nav>
       </header>
 
-      <main className="min-h-0 flex-1 overflow-y-auto px-4 pb-4">
+      <main className="min-h-0 flex-1 overflow-y-auto px-5 pb-5 pt-4">
         <Content
           tab={tab}
           report={report}
@@ -228,43 +255,54 @@ function Start({
   theme: Theme;
   onToggleTheme: () => void;
 }): JSX.Element {
-  // Устроен как шаг онбординга (Snapchat, Cal AI): вопрос слева сверху,
-  // варианты карточками, главное действие прижато к низу во всю ширину.
   return (
-    <div className="relative flex h-screen flex-col bg-canvas">
-      <div className="absolute right-2 top-2">
-        <ThemeButton theme={theme} onToggle={onToggleTheme} />
-      </div>
-
-      <div className="min-h-0 flex-1 overflow-y-auto px-4 pt-10">
-        <div className="flex justify-center">
-          <Mascot />
-        </div>
-        {fileName !== null && <p className="truncate pr-8 text-body-m text-ink-soft">{fileName}</p>}
-        <h1 className="mt-1 text-balance text-h4 font-semibold">
-          проверим, как файл живёт на дизайн-системе
-        </h1>
-        <p className="mt-2 text-body-m leading-relaxed text-ink-soft">
-          Сколько компонентов берётся из библиотеки, сколько сделано мимо неё и на чём держатся
-          цвета.
+    <div className="relative flex h-screen flex-col bg-panel text-ink">
+      <header className="flex shrink-0 items-center gap-2 px-5 pt-4">
+        <span data-tint="violet" className="tint-ink">
+          <Icon name="widget" />
+        </span>
+        <p className="min-w-0 flex-1 truncate text-caption-l text-ink-soft">
+          {fileName ?? 'Дизайн-система'}
         </p>
+        <ThemeButton theme={theme} onToggle={onToggleTheme} />
+      </header>
 
-        <div role="radiogroup" aria-label="Что проверить" className="mt-6 flex flex-col gap-1">
+      <div className="start-content min-h-0 flex-1 overflow-y-auto px-6">
+        <div className="start-hero flex flex-col items-center text-center">
+          <Mascot />
+          <h1 className="start-title text-balance font-semibold tracking-tight">
+            Как файл живёт
+            <br />
+            на дизайн-системе
+          </h1>
+          <p className="mt-3 max-w-[340px] text-body-m leading-relaxed text-ink-soft">
+            Сколько компонентов берётся из библиотеки, сколько сделано мимо неё и на чём держатся
+            цвета.
+          </p>
+        </div>
+
+        <div role="radiogroup" aria-label="Что проверить" className="mt-8 grid grid-cols-3 gap-2">
           {SCOPES.map((item) => (
-            <ChoiceCard
+            <button
               key={item.value}
-              icon={item.icon}
-              title={item.label}
-              hint={item.hint}
-              selected={scope === item.value}
+              role="radio"
+              aria-checked={scope === item.value}
+              title={item.hint}
               disabled={running}
-              onSelect={() => setScope(item.value)}
-            />
+              onClick={() => setScope(item.value)}
+              className={`scope-choice relative flex flex-col items-center gap-2 rounded-md border px-2 py-3 text-body-m transition-colors ${scope === item.value ? 'border-ink bg-panel-card font-medium' : 'border-line-subtle hover:bg-panel-card'} disabled:opacity-50`}
+            >
+              <TintIcon name={item.icon} tint={item.tint} small />
+              {item.label}
+            </button>
           ))}
         </div>
+        <p className="mt-3 text-center text-caption-l text-ink-faint">
+          {SCOPES.find((item) => item.value === scope)?.hint}
+        </p>
       </div>
 
-      <div className="shrink-0 px-4 pb-4 pt-3">
+      <div className="shrink-0 px-6 pb-5 pt-4">
         {running && progress !== null && (
           <div className="mb-4">
             <Progress
