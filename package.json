@@ -1,6 +1,6 @@
 {
   "name": "figma-ds-analytics",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "private": true,
   "description": "Плагин Figma для анализа использования компонентов и токенов дизайн-системы",
   "license": "MIT",

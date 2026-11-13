@@ -64,7 +64,7 @@ TypeScript · React · Vite · Tailwind · Vitest
 - [Архитектурные решения](docs/decisions/) — где паспорт расходился с Figma API
 - [Протокол валидации сигнала](docs/validation/protocol.md) · [результаты](docs/validation/results.md)
 - [Аудит перед запуском](docs/audits/2026-08-23-pre-launch.md)
-- [Политика приватности](PRIVACY.md) — черновик, требует проверки
+- [Политика приватности](PRIVACY.md)
 
 ## Лицензия
 
