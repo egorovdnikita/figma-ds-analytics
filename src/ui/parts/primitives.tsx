@@ -294,7 +294,7 @@ export function ListRow({
         <div className={`${className} w-full`}>{body}</div>
       ) : (
         <button
-          className={`${className} -mx-2 w-[calc(100%+16px)] rounded-sm px-2 hover:bg-hover`}
+          className={`${className} -mx-2 w-[calc(100%+16px)] rounded-lg px-2 hover:bg-hover`}
           onClick={onClick}
         >
           {body}
@@ -388,7 +388,7 @@ export function StackedBar({ segments }: { segments: readonly Segment[] }): JSX.
               <div className="flex min-h-[72px] flex-col justify-center text-body-l">{body}</div>
             ) : (
               <button
-                className="-mx-1.5 flex min-h-[72px] w-[calc(100%+12px)] flex-col justify-center rounded-sm px-1.5 text-body-l hover:bg-hover"
+                className="-mx-2 flex min-h-[72px] w-[calc(100%+16px)] flex-col justify-center rounded-lg px-2 text-body-l hover:bg-hover"
                 onClick={segment.onClick}
               >
                 {body}
@@ -631,7 +631,7 @@ export function Places({
       {places.map((place) => (
         <li key={place.nodeId}>
           <button
-            className="flex min-h-16 w-full items-center gap-3 rounded-sm py-3 text-left hover:bg-hover"
+            className="-mx-2 flex min-h-16 w-[calc(100%+16px)] items-center gap-3 rounded-lg px-2 py-3 text-left hover:bg-hover"
             onClick={() => onReveal(place.nodeId, place.pageId)}
           >
             <TintIcon name="map-point" tint="blue" />
@@ -701,11 +701,14 @@ export function AdviceRow({
     </>
   );
 
-  const className = 'flex min-h-[72px] w-full items-center gap-3 py-3 text-left';
+  const className = 'flex min-h-[72px] items-center gap-3 py-3 text-left';
   return onClick === undefined ? (
     <div className={className}>{body}</div>
   ) : (
-    <button className={`${className} hover:bg-hover`} onClick={onClick}>
+    <button
+      className={`${className} -mx-2 w-[calc(100%+16px)] rounded-lg px-2 hover:bg-hover`}
+      onClick={onClick}
+    >
       {body}
     </button>
   );
