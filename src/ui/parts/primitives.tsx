@@ -465,12 +465,16 @@ export function Modal({
   }, [onClose]);
 
   return (
+    // Нижний лист, как детали в мобильных приложениях (Cal AI, Bevel):
+    // палец и взгляд уже внизу списка, а сверху остаётся видно, откуда пришли.
     <div
-      className="absolute inset-0 z-10 flex items-center justify-center bg-overlay p-4"
+      className="absolute inset-0 z-10 flex flex-col justify-end bg-overlay pt-12"
       onClick={onClose}
     >
       <div
-        className="flex max-h-full w-full flex-col rounded-card bg-surface ring-1 ring-line"
+        role="dialog"
+        aria-label={title}
+        className="flex max-h-full w-full flex-col rounded-t-card bg-surface ring-1 ring-line"
         onClick={(e) => e.stopPropagation()}
       >
         <header className="flex items-center gap-2 px-4 pb-4 pt-4">
