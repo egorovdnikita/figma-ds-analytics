@@ -399,8 +399,9 @@ export function Button({
       : 'bg-canvas text-ink hover:bg-hover';
   const dims = {
     sm: 'h-8 shrink-0 gap-1.5 rounded-sm px-2.5 text-body-m',
-    md: 'gap-1.5 rounded-pill px-4 py-2 text-body-m',
-    lg: 'gap-2 rounded-pill px-6 py-2.5 text-body-l',
+    // Как кнопки у HireHi: высота 36 и 44, скругление 12 и 16, отступ 16.
+    md: 'h-9 gap-1.5 rounded-sm px-4 text-body-m',
+    lg: 'h-11 gap-2 rounded-md px-4 text-body-l',
   }[size];
   return (
     <button className={`inline-flex items-center font-medium ${look} ${dims}`} onClick={onClick}>
