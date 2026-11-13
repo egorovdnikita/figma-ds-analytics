@@ -28,7 +28,6 @@ import {
   Ring,
   Row,
   SearchInput,
-  Segmented,
   Sparkline,
   StackedBar,
   Table,
@@ -467,8 +466,16 @@ export function TokensScreen({
   return (
     <>
       <div className="flex flex-col gap-1">
-        <div>
-          <Segmented options={TOKEN_VIEWS} value={view} onChange={setView} />
+        <div className="-mx-1 flex gap-1 overflow-x-auto px-1">
+          {TOKEN_VIEWS.map((option) => (
+            <Chip
+              key={option.value}
+              active={view === option.value}
+              onClick={() => setView(option.value)}
+            >
+              {option.label}
+            </Chip>
+          ))}
         </div>
 
         {view === 'collections' ? (
