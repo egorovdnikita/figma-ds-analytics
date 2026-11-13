@@ -488,7 +488,7 @@ export function ComponentsScreen({
           </div>
 
           <h4 className="mb-2 mt-4 text-body-m font-medium">
-            где посмотреть{' '}
+            Где посмотреть{' '}
             {selected.instances > selected.places.length && (
               <span className="text-ink-soft">
                 · {selected.places.length} из {selected.instances.toLocaleString('ru')}
@@ -566,7 +566,7 @@ export function TokensScreen({
           </div>
 
           <h4 className="mb-2 mt-4 text-body-m font-medium">
-            где посмотреть{' '}
+            Где посмотреть{' '}
             {selected.nodes > selected.places.length && (
               <span className="text-ink-soft">
                 · {selected.places.length} из {selected.nodes.toLocaleString('ru')}
