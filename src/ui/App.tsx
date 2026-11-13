@@ -10,7 +10,7 @@ import type { MainMessage, UiMessage } from '../shared/messages';
 import type { ScanScope } from '../shared/types';
 import type { IconName } from './icons';
 import { Icon } from './parts/icon';
-import { Button, Pill, Progress, Segmented, statusAttrs } from './parts/primitives';
+import { Button, Chip, Pill, Progress, Segmented, statusAttrs } from './parts/primitives';
 import { ComponentsScreen, SummaryScreen, TokensScreen, type MasterFilter } from './parts/report';
 
 function send(message: UiMessage): void {
@@ -143,28 +143,19 @@ export function App(): JSX.Element {
         <nav className="-mx-1 mt-2.5 flex gap-1 overflow-x-auto px-1 pb-3">
           {TABS.map((name) => {
             const count = countFor(name, report);
-            const active = tab === name;
             return (
-              <button
+              <Chip
                 key={name}
-                className={`flex shrink-0 items-center gap-1.5 rounded-pill px-3 py-1.5 text-body-m ${
-                  active ? 'bg-accent font-medium text-accent-on' : 'bg-surface text-ink-soft'
-                }`}
+                active={tab === name}
+                icon={TAB_ICONS[name]}
+                {...(count === null ? {} : { count })}
                 onClick={() => {
                   if (name === 'Компоненты') setComponentFilter('all');
                   setTab(name);
                 }}
               >
-                <Icon name={TAB_ICONS[name]} />
                 {name}
-                {count !== null && (
-                  <span
-                    className={`tabular-nums text-caption-l ${active ? 'text-accent-on-muted' : 'text-ink-faint'}`}
-                  >
-                    {count.toLocaleString('ru')}
-                  </span>
-                )}
-              </button>
+              </Chip>
             );
           })}
         </nav>

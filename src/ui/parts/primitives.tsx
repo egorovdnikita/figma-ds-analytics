@@ -163,6 +163,48 @@ export function Segmented<T extends string>({
   );
 }
 
+/**
+ * Чипс-фильтр, как ряд категорий у веба HireHi: выбранный залит акцентом,
+ * остальные без фона и проявляются только при наведении. Счётчик рядом
+ * показывает, сколько там, до перехода.
+ */
+export function Chip({
+  children,
+  active,
+  onClick,
+  icon,
+  count,
+  disabled = false,
+}: {
+  children: ReactNode;
+  active: boolean;
+  onClick: () => void;
+  icon?: IconName;
+  count?: number;
+  disabled?: boolean;
+}): JSX.Element {
+  return (
+    <button
+      disabled={disabled}
+      aria-pressed={active}
+      className={`flex shrink-0 items-center gap-1.5 rounded-sm px-2 py-1.5 text-body-m ${
+        active ? 'bg-accent text-accent-on' : 'text-ink hover:bg-hover'
+      }`}
+      onClick={onClick}
+    >
+      {icon !== undefined && <Icon name={icon} />}
+      {children}
+      {count !== undefined && (
+        <span
+          className={`text-caption-l tabular-nums ${active ? 'text-accent-on-muted' : 'text-ink-faint'}`}
+        >
+          {count.toLocaleString('ru')}
+        </span>
+      )}
+    </button>
+  );
+}
+
 /** Пустое состояние: что случилось и что с этим делать. */
 export function Empty({ title, hint }: { title: string; hint?: string }): JSX.Element {
   return (
