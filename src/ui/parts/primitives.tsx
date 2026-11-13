@@ -574,7 +574,8 @@ export function Modal({
 /**
  * Плитки показателей, как в деталях мобильных приложений (Cal AI, Bevel):
  * подпись и крупное значение в своей подложке. Числа — главный ответ
- * карточки, поэтому крупно.
+ * карточки, поэтому крупно. Подложка — цвет полотна: плитки живут в листе
+ * деталей, а он в тёмной теме того же цвета, что `panel-card`.
  */
 export function Facts({
   items,
@@ -583,7 +584,7 @@ export function Facts({
 }): JSX.Element {
   const columns = items.length >= 3 ? 'grid-cols-3' : 'grid-cols-2';
   return (
-    <dl className={`grid gap-1 rounded-md bg-panel-card py-3 ${columns}`}>
+    <dl className={`grid gap-1 rounded-md bg-canvas py-3 ${columns}`}>
       {items.map((item) => (
         <div key={item.label} className="flex min-w-0 flex-col items-center px-1 text-center">
           <dt className="order-2 mt-1 text-caption-l text-ink-soft">{item.label}</dt>
