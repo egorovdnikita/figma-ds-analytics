@@ -540,26 +540,35 @@ export function pct(part: number, total: number): string {
   return `${Math.round(value)}%`;
 }
 
-/** Полоса выполнения. Два уровня: страницы и слои. */
+/**
+ * Прогресс проверки. Крупно — сколько уже найдено, ниже — что происходит,
+ * под ними полоса, как экран импорта в Brink: растущее число успокаивает
+ * лучше, чем одна полоса. Два уровня: страницы и слои.
+ */
 export function Progress({
   done,
   total,
+  headline,
   caption,
 }: {
   done: number;
   total: number;
-  caption: string;
+  headline: string;
+  caption?: string;
 }): JSX.Element {
   const share = total === 0 ? 0 : Math.min(done / total, 1);
   return (
-    <div className="w-full">
-      <div className="h-1.5 w-full overflow-hidden rounded-pill bg-canvas">
+    <div className="w-full text-center">
+      <p className="text-h5 font-semibold tabular-nums">{headline}</p>
+      {caption !== undefined && (
+        <p className="mt-1 text-caption-l tabular-nums text-ink-soft">{caption}</p>
+      )}
+      <div className="mt-3 h-1.5 w-full overflow-hidden rounded-pill bg-surface">
         <div
           className="h-full rounded-pill bg-accent transition-[width] duration-300"
           style={{ width: `${share * 100}%` }}
         />
       </div>
-      <p className="mt-2 text-center text-caption-l tabular-nums text-ink-soft">{caption}</p>
     </div>
   );
 }

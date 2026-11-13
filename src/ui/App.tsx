@@ -271,16 +271,17 @@ function Start({
           )}
         </div>
 
-        <div className="mt-5 min-h-[46px]">
+        <div className="mt-5 min-h-16 w-full">
           {running && progress !== null && (
             <Progress
               done={progress.pagesTotal > 1 ? progress.pagesDone : progress.nodes}
               total={progress.pagesTotal > 1 ? progress.pagesTotal : Math.max(progress.nodes, 1)}
-              caption={
-                progress.pagesTotal > 1
-                  ? `${progress.page} · страница ${progress.pagesDone + 1} из ${progress.pagesTotal} · ${progress.nodes.toLocaleString('ru')} слоёв`
-                  : `${progress.nodes.toLocaleString('ru')} слоёв`
-              }
+              headline={`${progress.nodes.toLocaleString('ru')} слоёв`}
+              {...(progress.pagesTotal > 1
+                ? {
+                    caption: `${progress.page} · страница ${progress.pagesDone + 1} из ${progress.pagesTotal}`,
+                  }
+                : {})}
             />
           )}
           {error !== null && (
