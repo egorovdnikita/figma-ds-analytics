@@ -29,6 +29,7 @@ export const BOLD_ICONS = [
   'cursor-square',
   'document',
   'folder',
+  'library',
 ] as const;
 
 export const LINEAR_ICONS = [

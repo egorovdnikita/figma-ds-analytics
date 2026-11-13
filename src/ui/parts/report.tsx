@@ -185,7 +185,7 @@ export function SummaryScreen({
               {adoption.libraries.map((library) => (
                 <ListRow
                   key={library.libraryName}
-                  leading={<TintIcon name="folder" tint="green" />}
+                  leading={<TintIcon name="library" tint="green" />}
                   title={library.libraryName}
                   value={library.variables.toLocaleString('ru')}
                   valueHint={plural(library.variables, 'токен', 'токена', 'токенов')}
