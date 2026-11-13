@@ -19,6 +19,36 @@
     @apply rounded-xs outline-none ring-2 ring-accent ring-offset-1 ring-offset-surface;
   }
 
+  /* Свой скроллбар: тонкий бегунок без подложки. Системный рисовал белую
+     дорожку поверх серого полотна. Ширина 12 — зона захвата, видимая
+     полоса 4: прозрачная рамка обрезается background-clip. */
+  ::-webkit-scrollbar {
+    width: var(--spacing-12);
+    height: var(--spacing-12);
+    background: transparent;
+  }
+  ::-webkit-scrollbar-track,
+  ::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    border: var(--spacing-4) solid transparent;
+    border-radius: var(--rounding-base-full);
+    background: var(--surface-base-border-strong);
+    background-clip: padding-box;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--surface-base-content-subtle);
+    background-clip: padding-box;
+  }
+  /* Firefox не знает ::-webkit-scrollbar — там стандартные свойства. */
+  @supports not selector(::-webkit-scrollbar) {
+    * {
+      scrollbar-width: thin;
+      scrollbar-color: var(--surface-base-border-strong) transparent;
+    }
+  }
+
   /* Ничего не двигается, если пользователь просил не двигать. */
   @media (prefers-reduced-motion: reduce) {
     *,
