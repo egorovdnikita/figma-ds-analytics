@@ -84,7 +84,7 @@ export function SummaryScreen({
           сообщение как есть.
         </Note>
         <div className="mt-3">
-          <CopyButton text={toMarkdown(report, new Date())} label="Скопировать отчёт" />
+          <CopyButton text={toMarkdown(report, new Date())} label="Скопировать отчёт" wide />
         </div>
       </Card>
 

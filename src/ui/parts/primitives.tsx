@@ -384,6 +384,7 @@ export function Button({
   variant = 'accent',
   size = 'md',
   icon,
+  wide = false,
 }: {
   children: ReactNode;
   onClick: () => void;
@@ -391,6 +392,8 @@ export function Button({
   /** `sm` — кнопка внутри тулбара, по высоте пункта переключателя. */
   size?: 'sm' | 'md' | 'lg';
   icon?: IconName;
+  /** Во всю ширину, как кнопки в боковой панели вакансии HireHi. */
+  wide?: boolean;
 }): JSX.Element {
   // Наведение — токены interaction Box UI, а не фильтр яркости: так кнопка
   // ведёт себя одинаково в светлой и тёмной теме.
@@ -405,7 +408,10 @@ export function Button({
     lg: 'h-11 gap-2 rounded-md px-4 text-body-l',
   }[size];
   return (
-    <button className={`inline-flex items-center font-medium ${look} ${dims}`} onClick={onClick}>
+    <button
+      className={`inline-flex items-center font-medium ${wide ? 'w-full justify-center' : ''} ${look} ${dims}`}
+      onClick={onClick}
+    >
       {icon !== undefined && <Icon name={icon} size={size === 'lg' ? '2xs' : 'min'} />}
       {children}
     </button>
@@ -663,7 +669,15 @@ export function Delta({ points, since }: { points: number; since: string }): JSX
  * Через скрытое поле и execCommand: в iframe плагина navigator.clipboard
  * доступен не всегда, а молча ничего не скопировать — худший исход.
  */
-export function CopyButton({ text, label }: { text: string; label: string }): JSX.Element {
+export function CopyButton({
+  text,
+  label,
+  wide = false,
+}: {
+  text: string;
+  label: string;
+  wide?: boolean;
+}): JSX.Element {
   const [copied, setCopied] = useState(false);
 
   const copy = (): void => {
@@ -683,7 +697,7 @@ export function CopyButton({ text, label }: { text: string; label: string }): JS
   };
 
   return (
-    <Button onClick={copy} icon={copied ? 'check-circle' : 'copy'}>
+    <Button onClick={copy} icon={copied ? 'check-circle' : 'copy'} wide={wide}>
       {copied ? 'Скопировано' : label}
     </Button>
   );
