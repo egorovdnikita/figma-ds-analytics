@@ -40,10 +40,11 @@ function isSnapshot(value: unknown): value is Snapshot {
  * ожидаемое следствие обновления плагина.
  */
 export function loadHistory(gateway: SnapshotGateway): readonly Snapshot[] {
-  const stored = gateway.getPluginData(SNAPSHOTS_KEY);
-  if (stored === '') return [];
-
   try {
+    // Хранилище может быть недоступно (у плагина без id в манифесте Figma
+    // бросает из getPluginData). Без истории нет тренда, но отчёт будет.
+    const stored = gateway.getPluginData(SNAPSHOTS_KEY);
+    if (stored === '') return [];
     const parsed: unknown = JSON.parse(stored);
     if (!Array.isArray(parsed)) return [];
     return parsed.filter(isSnapshot);
@@ -60,6 +61,15 @@ export function loadHistory(gateway: SnapshotGateway): readonly Snapshot[] {
  * и новую точку тоже.
  */
 export function saveHistory(gateway: SnapshotGateway, history: readonly Snapshot[]): number {
+  try {
+    return writeHistory(gateway, history);
+  } catch {
+    // Недоступное хранилище: точку тренда теряем, отчёт — нет.
+    return 0;
+  }
+}
+
+function writeHistory(gateway: SnapshotGateway, history: readonly Snapshot[]): number {
   let kept: readonly Snapshot[] = history;
 
   // Урезаем не по одному, а сразу до оценочного размера: снимки примерно

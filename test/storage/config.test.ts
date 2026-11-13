@@ -169,3 +169,17 @@ describe('экспорт', () => {
     expect(parseConfig(JSON.parse(text)).config).toEqual(DEFAULT_CONFIG);
   });
 });
+
+describe('недоступное хранилище', () => {
+  it('конфиг берётся по умолчанию с объяснением, а не роняет проверку', () => {
+    const broken: ConfigGateway = {
+      getPluginData() {
+        throw new Error('Cannot get private plugin data in a plugin without an ID.');
+      },
+      setPluginData() {},
+    };
+    const result = loadConfig(broken);
+    expect(result.config).toEqual(DEFAULT_CONFIG);
+    expect(result.problems).toHaveLength(1);
+  });
+});

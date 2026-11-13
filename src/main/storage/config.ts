@@ -185,7 +185,16 @@ export class ConfigTooLargeError extends Error {
 }
 
 export function loadConfig(gateway: ConfigGateway): ParseResult {
-  const stored = gateway.getPluginData(CONFIG_KEY);
+  let stored: string;
+  try {
+    stored = gateway.getPluginData(CONFIG_KEY);
+  } catch {
+    // У плагина без id в манифесте Figma бросает из getPluginData.
+    return {
+      config: DEFAULT_CONFIG,
+      problems: [{ at: '', message: 'Конфиг документа недоступен — взяты значения по умолчанию.' }],
+    };
+  }
   if (stored === '') return { config: DEFAULT_CONFIG, problems: [] };
 
   try {

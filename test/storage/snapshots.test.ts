@@ -81,3 +81,24 @@ describe('хранение истории', () => {
     expect(HISTORY_LIMIT).toBeGreaterThanOrEqual(10);
   });
 });
+
+describe('недоступное хранилище', () => {
+  // Боевой случай: в манифесте не было id, и Figma бросала из getPluginData
+  // «Cannot get private plugin data in a plugin without an ID» — падал весь скан.
+  const broken: SnapshotGateway = {
+    getPluginData() {
+      throw new Error('Cannot get private plugin data in a plugin without an ID.');
+    },
+    setPluginData() {
+      throw new Error('Cannot set private plugin data in a plugin without an ID.');
+    },
+  };
+
+  it('история читается как пустая, а не роняет проверку', () => {
+    expect(loadHistory(broken)).toEqual([]);
+  });
+
+  it('несохранённая история не роняет проверку', () => {
+    expect(saveHistory(broken, [snap()])).toBe(0);
+  });
+});
