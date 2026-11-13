@@ -376,10 +376,13 @@ export function ComponentsScreen({
                   key={master.key}
                   onClick={() => setSelected(master)}
                   cells={[
-                    <div className="min-w-0">
-                      <div className="truncate">{master.name}</div>
-                      <div className="mt-1">
-                        <OriginPill origin={master.origin} />
+                    <div className="flex min-w-0 items-center gap-2.5">
+                      <Monogram name={master.name} />
+                      <div className="min-w-0">
+                        <div className="truncate">{master.name}</div>
+                        <div className="mt-1">
+                          <OriginPill origin={master.origin} />
+                        </div>
                       </div>
                     </div>,
                     <BarCell value={master.instances} max={max} tone={toneFor(master.origin)} />,
@@ -609,6 +612,22 @@ function toneFor(origin: MasterUsage['origin']): 'accent' | 'warn' | 'faint' {
   if (origin === 'library') return 'accent';
   if (origin === 'local') return 'warn';
   return 'faint';
+}
+
+/**
+ * Знак компонента — круг 24 с первой буквой, как логотип компании в
+ * карточке вакансии HireHi. Глазу проще держать строку длинного списка.
+ */
+function Monogram({ name }: { name: string }): JSX.Element {
+  const letter = /[\p{L}\p{N}]/u.exec(name)?.[0]?.toUpperCase() ?? '·';
+  return (
+    <span
+      aria-hidden
+      className="flex h-6 w-6 shrink-0 items-center justify-center rounded-pill bg-canvas text-caption-l font-medium text-ink-soft"
+    >
+      {letter}
+    </span>
+  );
 }
 
 function OriginPill({ origin }: { origin: MasterUsage['origin'] }): JSX.Element {
