@@ -117,8 +117,6 @@ export function App(): JSX.Element {
   return (
     <div className="relative flex h-screen flex-col bg-canvas">
       <header className="shrink-0 px-4 pt-4">
-        {/* Три строки, а не одна: на 480px имя файла, переключатель охвата и
-            кнопка в один ряд не помещаются — имя схлопывалось в «Дизайн…». */}
         {/* Крошки над заголовком, как у веба HireHi: что проверено и сколько. */}
         <p className="flex items-center gap-1.5 text-body-m text-ink-soft">
           <span>{report.scope}</span>
@@ -127,15 +125,19 @@ export function App(): JSX.Element {
           {report.cancelled && <Pill tone="warn">остановлено</Pill>}
         </p>
 
-        <div className="mt-1 flex items-center gap-3">
-          <h1 className="min-w-0 flex-1 truncate text-h4 font-semibold">{report.fileName}</h1>
+        {/* Имя файла — отдельной строкой во всю ширину: рядом с кнопкой на
+            480px оно схлопывалось в «Дизайн…». */}
+        <h1 className="mt-1 truncate text-h4 font-semibold">{report.fileName}</h1>
+
+        {/* Тулбар — одна белая панель, как сортировка и вид у HireHi: охват
+            слева, повторная проверка справа. */}
+        <div className="mt-2.5 flex items-center gap-1 rounded-md bg-surface p-1">
+          <div className="min-w-0 flex-1">
+            <Segmented options={SCOPES} value={scope} onChange={setScope} />
+          </div>
           <Button onClick={start} icon="refresh">
             Ещё раз
           </Button>
-        </div>
-
-        <div className="mt-2.5">
-          <Segmented options={SCOPES} value={scope} onChange={setScope} />
         </div>
 
         <nav className="-mx-1 mt-2.5 flex gap-1 overflow-x-auto px-1 pb-3">
