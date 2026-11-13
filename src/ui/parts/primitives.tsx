@@ -342,7 +342,8 @@ export function Button({
   children: ReactNode;
   onClick: () => void;
   variant?: 'accent' | 'quiet';
-  size?: 'md' | 'lg';
+  /** `sm` — кнопка внутри тулбара, по высоте пункта переключателя. */
+  size?: 'sm' | 'md' | 'lg';
   icon?: IconName;
 }): JSX.Element {
   // Наведение — токены interaction Box UI, а не фильтр яркости: так кнопка
@@ -351,12 +352,13 @@ export function Button({
     variant === 'accent'
       ? 'bg-accent text-accent-on hover:bg-accent-hover'
       : 'bg-canvas text-ink hover:bg-hover';
-  const dims = size === 'lg' ? 'gap-2 px-6 py-2.5 text-body-l' : 'gap-1.5 px-4 py-2 text-body-m';
+  const dims = {
+    sm: 'h-8 shrink-0 gap-1.5 rounded-sm px-2.5 text-body-m',
+    md: 'gap-1.5 rounded-pill px-4 py-2 text-body-m',
+    lg: 'gap-2 rounded-pill px-6 py-2.5 text-body-l',
+  }[size];
   return (
-    <button
-      className={`inline-flex items-center rounded-pill font-medium ${look} ${dims}`}
-      onClick={onClick}
-    >
+    <button className={`inline-flex items-center font-medium ${look} ${dims}`} onClick={onClick}>
       {icon !== undefined && <Icon name={icon} size={size === 'lg' ? '2xs' : 'min'} />}
       {children}
     </button>

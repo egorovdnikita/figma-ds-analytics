@@ -135,7 +135,7 @@ export function App(): JSX.Element {
           <div className="min-w-0 flex-1">
             <Segmented options={SCOPES} value={scope} onChange={setScope} />
           </div>
-          <Button onClick={start} icon="refresh">
+          <Button size="sm" onClick={start} icon="refresh">
             Ещё раз
           </Button>
         </div>
