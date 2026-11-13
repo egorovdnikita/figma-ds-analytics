@@ -1,16 +1,22 @@
 {
   "name": "Аналитика дизайн-системы",
-  "id": "1702925687495334570",
+  "id": "1702928879530401459",
   "api": "1.0.0",
   "main": "dist/code.js",
   "ui": "dist/index.html",
-  "editorType": ["figma"],
+  "editorType": [
+    "figma"
+  ],
   "documentAccess": "dynamic-page",
   "networkAccess": {
-    "allowedDomains": ["none"],
+    "allowedDomains": [
+      "none"
+    ],
     "reasoning": "Плагин работает полностью локально. Содержимое файла не покидает Figma."
   },
-  "permissions": ["teamlibrary"],
+  "permissions": [
+    "teamlibrary"
+  ],
   "capabilities": [],
   "enableProposedApi": false
 }
