@@ -25,6 +25,8 @@ export const BOLD_ICONS = [
   'play',
   'link-broken',
   'clipboard',
+  'sun',
+  'moon',
 ] as const;
 
 export const LINEAR_ICONS = ['magnifer', 'alt-arrow-right', 'refresh'] as const;

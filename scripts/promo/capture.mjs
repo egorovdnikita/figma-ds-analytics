@@ -133,7 +133,7 @@ const WIDE = PANEL.height / 2;
 
 // ---------- сценарий ----------
 
-await main({ type: 'main/booted', fileName: FILE_NAME, lastScope: 'page' });
+await main({ type: 'main/booted', fileName: FILE_NAME, lastScope: 'page', theme: null });
 current = await snap();
 const first = current;
 cam(WIDE, 1.25, 0);

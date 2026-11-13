@@ -9,6 +9,8 @@
  * там, где объявлена, и мода, выставленная ниже по дереву, до уже
  * разрешённых токенов не дотянется (см. README Box UI).
  */
+import { resolveTheme, type Theme } from '../shared/theme';
+
 const FIXED_MODES = {
   'data-accent': 'deep',
   // Скругления крупные, как у веба HireHi: карточка 24, поле 16, чипс 12.
@@ -23,17 +25,28 @@ const FIXED_MODES = {
   'data-icon-style': 'bold',
 } as const;
 
-export type Theme = 'light' | 'dark';
-
 export function figmaTheme(root: HTMLElement): Theme {
   return root.classList.contains('figma-dark') ? 'dark' : 'light';
+}
+
+/** Тема, выбранная вручную; `null` — следовать за Figma. */
+let chosen: Theme | null = null;
+
+export function currentTheme(root: HTMLElement): Theme {
+  return resolveTheme(chosen, figmaTheme(root));
+}
+
+/** Выбор пользователя перекрывает тему Figma до конца сессии. */
+export function chooseTheme(root: HTMLElement, theme: Theme | null): void {
+  chosen = theme;
+  root.setAttribute('data-theme', currentTheme(root));
 }
 
 export function applyModes(root: HTMLElement): () => void {
   for (const [name, value] of Object.entries(FIXED_MODES)) root.setAttribute(name, value);
 
   const sync = (): void => {
-    root.setAttribute('data-theme', figmaTheme(root));
+    root.setAttribute('data-theme', currentTheme(root));
   };
   sync();
 

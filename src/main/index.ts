@@ -13,6 +13,7 @@ import type { ScanScope } from '../shared/types';
 import { buildAdoption, type MasterRef } from './analysis/adoption';
 import { VariableUsageIndex } from './analysis/usage';
 import { appendSnapshot, buildSnapshot, buildTrend } from './analysis/snapshot';
+import { parseTheme, type Theme } from '../shared/theme';
 import { loadConfig } from './storage/config';
 import { HISTORY_LIMIT, loadHistory, saveHistory } from './storage/snapshots';
 import { traverse, type ScanTarget } from './scanner/traversal';
@@ -20,6 +21,7 @@ import { VariableResolver } from './scanner/variables';
 
 const UI_SIZE = { width: 480, height: 640 } as const;
 const SCOPE_KEY = 'last-scope';
+const THEME_KEY = 'theme';
 
 /** Сколько токенов показываем в impact-списке. Хвост никто не читает. */
 const TOP_VARIABLES = 60;
@@ -46,6 +48,15 @@ async function loadLastScope(): Promise<ScanScope | null> {
  * сканировал весь файл, он и сейчас хочет весь файл. Конфиг команды
  * работает как значение по умолчанию для тех, кто ещё ничего не выбирал.
  */
+/** Тема, выбранная вручную. Личная, как и охват, — тоже в clientStorage. */
+async function loadTheme(): Promise<Theme | null> {
+  try {
+    return parseTheme(await figma.clientStorage.getAsync(THEME_KEY));
+  } catch {
+    return null;
+  }
+}
+
 async function startingScope(): Promise<ScanScope> {
   const personal = await loadLastScope();
   if (personal !== null) return personal;
@@ -261,8 +272,8 @@ async function reveal(nodeId: string, pageId: string): Promise<void> {
 function handle(message: UiMessage): void {
   switch (message.type) {
     case 'ui/ready':
-      void startingScope().then((lastScope) => {
-        post({ type: 'main/booted', fileName: figma.root.name, lastScope });
+      void Promise.all([startingScope(), loadTheme()]).then(([lastScope, theme]) => {
+        post({ type: 'main/booted', fileName: figma.root.name, lastScope, theme });
       });
       return;
     case 'ui/scan-requested':
@@ -271,6 +282,11 @@ function handle(message: UiMessage): void {
           type: 'main/error',
           message: error instanceof Error ? error.message : String(error),
         });
+      });
+      return;
+    case 'ui/theme-chosen':
+      void figma.clientStorage.setAsync(THEME_KEY, message.theme).catch(() => {
+        // Не сохранилась тема — в этом запуске она всё равно уже применена.
       });
       return;
     case 'ui/scan-cancelled':

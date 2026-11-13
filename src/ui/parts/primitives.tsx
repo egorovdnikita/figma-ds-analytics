@@ -209,6 +209,30 @@ export function Chip({
   );
 }
 
+/**
+ * Переключатель темы. Иконка — тема, на которую переключит: луна в светлой,
+ * солнце в тёмной.
+ */
+export function ThemeButton({
+  theme,
+  onToggle,
+}: {
+  theme: 'light' | 'dark';
+  onToggle: () => void;
+}): JSX.Element {
+  const title = theme === 'light' ? 'Тёмная тема' : 'Светлая тема';
+  return (
+    <button
+      title={title}
+      aria-label={title}
+      className="flex h-8 w-8 shrink-0 items-center justify-center rounded-sm text-ink-soft hover:bg-hover hover:text-ink"
+      onClick={onToggle}
+    >
+      <Icon name={theme === 'light' ? 'moon' : 'sun'} />
+    </button>
+  );
+}
+
 /** Пустое состояние: что случилось и что с этим делать. */
 export function Empty({ title, hint }: { title: string; hint?: string }): JSX.Element {
   return (

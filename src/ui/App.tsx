@@ -7,11 +7,21 @@
 import { useEffect, useState } from 'react';
 import type { ScanReport } from '../shared/adoption';
 import type { MainMessage, UiMessage } from '../shared/messages';
+import { oppositeTheme, type Theme } from '../shared/theme';
 import type { ScanScope } from '../shared/types';
 import type { IconName } from './icons';
 import { Icon } from './parts/icon';
-import { Button, Chip, Pill, Progress, Segmented, statusAttrs } from './parts/primitives';
+import {
+  Button,
+  Chip,
+  Pill,
+  Progress,
+  Segmented,
+  statusAttrs,
+  ThemeButton,
+} from './parts/primitives';
 import { ComponentsScreen, SummaryScreen, TokensScreen, type MasterFilter } from './parts/report';
+import { chooseTheme, currentTheme } from './theme';
 
 function send(message: UiMessage): void {
   parent.postMessage({ pluginMessage: message }, '*');
@@ -48,6 +58,7 @@ export function App(): JSX.Element {
   const [tab, setTab] = useState<Tab>('Сводка');
   const [componentFilter, setComponentFilter] = useState<MasterFilter>('all');
   const [error, setError] = useState<string | null>(null);
+  const theme = useTheme();
 
   useEffect(() => {
     function onMessage(event: MessageEvent<{ pluginMessage?: MainMessage }>): void {
@@ -58,6 +69,7 @@ export function App(): JSX.Element {
         case 'main/booted':
           setFileName(message.fileName);
           if (message.lastScope !== null) setScope(message.lastScope);
+          if (message.theme !== null) chooseTheme(document.documentElement, message.theme);
           return;
         case 'main/scan-progress':
           setProgress({
@@ -91,6 +103,12 @@ export function App(): JSX.Element {
     send({ type: 'ui/reveal', nodeId, pageId });
   };
 
+  const toggleTheme = (): void => {
+    const next = oppositeTheme(currentTheme(document.documentElement));
+    chooseTheme(document.documentElement, next);
+    send({ type: 'ui/theme-chosen', theme: next });
+  };
+
   const start = (): void => {
     setError(null);
     setReport(null);
@@ -110,6 +128,8 @@ export function App(): JSX.Element {
         error={error}
         onStart={start}
         onCancel={() => send({ type: 'ui/scan-cancelled' })}
+        theme={theme}
+        onToggleTheme={toggleTheme}
       />
     );
   }
@@ -118,12 +138,18 @@ export function App(): JSX.Element {
     <div className="relative flex h-screen flex-col bg-canvas">
       <header className="shrink-0 px-4 pt-4">
         {/* Крошки над заголовком, как у веба HireHi: что проверено и сколько. */}
-        <p className="flex items-center gap-1.5 text-body-m text-ink-soft">
-          <span>{report.scope}</span>
-          <span aria-hidden>/</span>
-          <span className="tabular-nums">{report.nodesVisited.toLocaleString('ru')} слоёв</span>
-          {report.cancelled && <Pill tone="warn">остановлено</Pill>}
-        </p>
+        <div className="flex items-center gap-2">
+          <p className="flex min-w-0 flex-1 items-center gap-1.5 text-body-m text-ink-soft">
+            <span>{report.scope}</span>
+            <span aria-hidden>/</span>
+            <span className="tabular-nums">{report.nodesVisited.toLocaleString('ru')} слоёв</span>
+            {report.cancelled && <Pill tone="warn">остановлено</Pill>}
+          </p>
+          {/* Отрицательный отступ: кнопка 32 не раздвигает строку крошек. */}
+          <div className="-my-2 -mr-2">
+            <ThemeButton theme={theme} onToggle={toggleTheme} />
+          </div>
+        </div>
 
         {/* Имя файла — отдельной строкой во всю ширину: рядом с кнопкой на
             480px оно схлопывалось в «Дизайн…». */}
@@ -187,6 +213,8 @@ function Start({
   error,
   onStart,
   onCancel,
+  theme,
+  onToggleTheme,
 }: {
   fileName: string | null;
   scope: ScanScope;
@@ -196,9 +224,14 @@ function Start({
   error: string | null;
   onStart: () => void;
   onCancel: () => void;
+  theme: Theme;
+  onToggleTheme: () => void;
 }): JSX.Element {
   return (
-    <div className="flex h-screen flex-col items-center justify-center bg-canvas px-6 text-center">
+    <div className="relative flex h-screen flex-col items-center justify-center bg-canvas px-6 text-center">
+      <div className="absolute right-2 top-2">
+        <ThemeButton theme={theme} onToggle={onToggleTheme} />
+      </div>
       <div className="flex w-full max-w-xs flex-col items-center">
         <span className="mb-4 flex h-14 w-14 items-center justify-center rounded-pill bg-accent-soft text-accent-ink">
           <Icon name="library" size="s" />
@@ -263,6 +296,23 @@ function Start({
       </div>
     </div>
   );
+}
+
+/**
+ * Текущая тема панели. Меняется и от кнопки, и от самой Figma, поэтому
+ * источник правды — атрибут `data-theme` на корне, а не состояние React.
+ */
+function useTheme(): Theme {
+  const root = document.documentElement;
+  const [theme, setTheme] = useState<Theme>(() => currentTheme(root));
+  useEffect(() => {
+    const observer = new MutationObserver(() => setTheme(currentTheme(root)));
+    observer.observe(root, { attributes: true, attributeFilter: ['data-theme'] });
+    return () => {
+      observer.disconnect();
+    };
+  }, [root]);
+  return theme;
 }
 
 /** Счётчик на вкладке: сразу видно, где есть что смотреть, до перехода. */
