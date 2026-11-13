@@ -229,6 +229,37 @@ export function ChoiceCard({
   );
 }
 
+/**
+ * Раздел: заголовок на полотне, карточка под ним — как «Tokens ›» в
+ * Phantom. Если раздел ведёт дальше, заголовок со стрелкой и кликабелен.
+ */
+export function Section({
+  title,
+  onOpen,
+  children,
+}: {
+  title: string;
+  onOpen?: () => void;
+  children: ReactNode;
+}): JSX.Element {
+  return (
+    <section className="mt-4">
+      {onOpen === undefined ? (
+        <h2 className="mb-2 px-1 text-body-l font-semibold">{title}</h2>
+      ) : (
+        <button
+          className="mb-2 flex items-center gap-1 px-1 text-body-l font-semibold hover:text-accent-ink"
+          onClick={onOpen}
+        >
+          {title}
+          <Icon name="alt-arrow-right" />
+        </button>
+      )}
+      {children}
+    </section>
+  );
+}
+
 /** Пустое состояние: что случилось и что с этим делать. */
 export function Empty({ title, hint }: { title: string; hint?: string }): JSX.Element {
   return (

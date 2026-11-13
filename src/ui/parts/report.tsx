@@ -8,7 +8,6 @@ import { buildAdvice, verdict } from '../../shared/advice';
 import { toMarkdown } from '../../shared/export';
 import { plural, withCount } from '../../shared/plural';
 import { deltaPoints, shortDate, type Trend } from '../../shared/snapshot';
-import { Icon } from './icon';
 import {
   AdviceRow,
   Aside,
@@ -28,6 +27,7 @@ import {
   Places,
   Row,
   SearchInput,
+  Section,
   Sparkline,
   StackedBar,
   Table,
@@ -105,142 +105,134 @@ export function SummaryScreen({
 
       <TrendCard adoption={adoption} trend={trend} />
 
-      <Card title="забрать с собой">
-        <Note>
-          Отчёт в Markdown: вердикт, главные цифры, приоритеты и история. Вставляется в документ или
-          сообщение как есть.
-        </Note>
-        <div className="mt-3">
-          <CopyButton text={toMarkdown(report, new Date())} label="Скопировать отчёт" wide />
-        </div>
-      </Card>
+      <Section title="забрать с собой">
+        <Card>
+          <Note>
+            Отчёт в Markdown: вердикт, главные цифры, приоритеты и история. Вставляется в документ
+            или сообщение как есть.
+          </Note>
+          <div className="mt-3">
+            <CopyButton text={toMarkdown(report, new Date())} label="Скопировать отчёт" wide />
+          </div>
+        </Card>
+      </Section>
 
       {advice.length > 0 && (
-        <Card title="с чего начать">
-          {advice.map((item) => {
-            // Через локальную константу: внутри замыкания TypeScript не
-            // удерживает сужение по `item.target.kind`.
-            const target = item.target;
-            const onClick =
-              target.kind === 'components'
-                ? () => onGoTo('Компоненты', target.filter)
-                : target.kind === 'tokens'
-                  ? () => onGoTo('Токены')
-                  : undefined;
+        <Section title="с чего начать">
+          <Card>
+            {advice.map((item) => {
+              // Через локальную константу: внутри замыкания TypeScript не
+              // удерживает сужение по `item.target.kind`.
+              const target = item.target;
+              const onClick =
+                target.kind === 'components'
+                  ? () => onGoTo('Компоненты', target.filter)
+                  : target.kind === 'tokens'
+                    ? () => onGoTo('Токены')
+                    : undefined;
 
-            return (
-              <AdviceRow
-                key={item.id}
-                title={item.title}
-                value={item.value}
-                hint={item.hint}
-                {...(onClick === undefined ? {} : { onClick })}
-              />
-            );
-          })}
-        </Card>
+              return (
+                <AdviceRow
+                  key={item.id}
+                  title={item.title}
+                  value={item.value}
+                  hint={item.hint}
+                  {...(onClick === undefined ? {} : { onClick })}
+                />
+              );
+            })}
+          </Card>
+        </Section>
       )}
 
-      <Card
-        title="откуда компоненты"
-        action={
-          <button
-            className="flex items-center gap-0.5 text-caption-l text-accent-ink"
-            onClick={() => onGoTo('Компоненты')}
-          >
-            все <Icon name="alt-arrow-right" />
-          </button>
-        }
-      >
-        <StackedBar
-          segments={[
-            {
-              label: 'Из библиотеки',
-              value: adoption.fromLibrary,
-              className: 'bg-accent',
-              onClick: () => onGoTo('Компоненты', 'library'),
-            },
-            {
-              label: 'Свои в этом файле',
-              value: adoption.local,
-              className: 'bg-status',
-              status: 'warning',
-              onClick: () => onGoTo('Компоненты', 'local'),
-            },
-            {
-              label: 'Библиотека отключена',
-              value: adoption.unknown,
-              className: 'bg-ink-faint',
-              onClick: () => onGoTo('Компоненты', 'unknown'),
-            },
-          ]}
-        />
-        {adoption.unknown > 0 && (
-          <div className="mt-3">
-            <Note>
-              «Библиотека отключена» — копии, чей источник файлу больше не доступен. Это и есть
-              зависимость от чужой системы.
-            </Note>
-          </div>
-        )}
-      </Card>
+      <Section title="откуда компоненты" onOpen={() => onGoTo('Компоненты')}>
+        <Card>
+          <StackedBar
+            segments={[
+              {
+                label: 'Из библиотеки',
+                value: adoption.fromLibrary,
+                className: 'bg-accent',
+                onClick: () => onGoTo('Компоненты', 'library'),
+              },
+              {
+                label: 'Свои в этом файле',
+                value: adoption.local,
+                className: 'bg-status',
+                status: 'warning',
+                onClick: () => onGoTo('Компоненты', 'local'),
+              },
+              {
+                label: 'Библиотека отключена',
+                value: adoption.unknown,
+                className: 'bg-ink-faint',
+                onClick: () => onGoTo('Компоненты', 'unknown'),
+              },
+            ]}
+          />
+          {adoption.unknown > 0 && (
+            <div className="mt-3">
+              <Note>
+                «Библиотека отключена» — копии, чей источник файлу больше не доступен. Это и есть
+                зависимость от чужой системы.
+              </Note>
+            </div>
+          )}
+        </Card>
+      </Section>
 
-      <Card
-        title="откуда токены"
-        action={
-          <button
-            className="flex items-center gap-0.5 text-caption-l text-accent-ink"
-            onClick={() => onGoTo('Токены')}
-          >
-            все <Icon name="alt-arrow-right" />
-          </button>
-        }
-      >
-        <StackedBar
-          segments={[
-            {
-              label: 'Из библиотеки',
-              value: adoption.nodesOnLibraryVariable,
-              className: 'bg-accent',
-            },
-            {
-              label: 'Свои',
-              value: adoption.nodesOnLocalVariable,
-              className: 'bg-status',
-              status: 'warning',
-            },
-            {
-              label: 'Без токена',
-              value: adoption.nodesWithoutVariable,
-              className: 'bg-ink-faint',
-            },
-          ]}
-        />
-      </Card>
+      <Section title="откуда токены" onOpen={() => onGoTo('Токены')}>
+        <Card>
+          <StackedBar
+            segments={[
+              {
+                label: 'Из библиотеки',
+                value: adoption.nodesOnLibraryVariable,
+                className: 'bg-accent',
+              },
+              {
+                label: 'Свои',
+                value: adoption.nodesOnLocalVariable,
+                className: 'bg-status',
+                status: 'warning',
+              },
+              {
+                label: 'Без токена',
+                value: adoption.nodesWithoutVariable,
+                className: 'bg-ink-faint',
+              },
+            ]}
+          />
+        </Card>
+      </Section>
 
       {adoption.librarySourcesAvailable && adoption.libraries.length > 0 && (
-        <Card title="библиотеки">
-          <Table head={['Название', 'Токенов']}>
-            {adoption.libraries.map((library) => (
-              <Row
-                key={library.libraryName}
-                cells={[
-                  library.libraryName,
-                  <BarCell
-                    value={library.variables}
-                    max={Math.max(...adoption.libraries.map((item) => item.variables))}
-                  />,
-                ]}
-              />
-            ))}
-          </Table>
-        </Card>
+        <Section title="библиотеки">
+          <Card>
+            <Table head={['Название', 'Токенов']}>
+              {adoption.libraries.map((library) => (
+                <Row
+                  key={library.libraryName}
+                  cells={[
+                    library.libraryName,
+                    <BarCell
+                      value={library.variables}
+                      max={Math.max(...adoption.libraries.map((item) => item.variables))}
+                    />,
+                  ]}
+                />
+              ))}
+            </Table>
+          </Card>
+        </Section>
       )}
 
       {!adoption.librarySourcesAvailable && (
-        <Card title="библиотеки">
-          <Note>Не удалось прочитать — это не значит, что библиотек нет.</Note>
-        </Card>
+        <Section title="библиотеки">
+          <Card>
+            <Note>Не удалось прочитать — это не значит, что библиотек нет.</Note>
+          </Card>
+        </Section>
       )}
     </div>
   );
@@ -267,12 +259,14 @@ function TrendCard({ adoption, trend }: { adoption: Adoption; trend: Trend }): J
 
   if (trend.previous === null || delta === null) {
     return (
-      <Card title="тренд">
-        <Note>
-          Это первый замер по этому охвату. Прогоните ещё раз через несколько дней — появится
-          сравнение.
-        </Note>
-      </Card>
+      <Section title="тренд">
+        <Card>
+          <Note>
+            Это первый замер по этому охвату. Прогоните ещё раз через несколько дней — появится
+            сравнение.
+          </Note>
+        </Card>
+      </Section>
     );
   }
 
@@ -281,24 +275,26 @@ function TrendCard({ adoption, trend }: { adoption: Adoption; trend: Trend }): J
   );
 
   return (
-    <Card title="тренд">
-      <div className="flex items-center gap-3">
-        <div className="min-w-0 flex-1">
-          <p className="text-body-m">Компоненты из библиотеки</p>
-          <p className="mt-1">
-            <Delta points={delta} since={shortDate(trend.previous.at)} />
-          </p>
+    <Section title="тренд">
+      <Card>
+        <div className="flex items-center gap-3">
+          <div className="min-w-0 flex-1">
+            <p className="text-body-m">Компоненты из библиотеки</p>
+            <p className="mt-1">
+              <Delta points={delta} since={shortDate(trend.previous.at)} />
+            </p>
+          </div>
+          <Sparkline values={series} />
         </div>
-        <Sparkline values={series} />
-      </div>
-      <div className="mt-3">
-        <Note>
-          {withCount(trend.points.length, 'замер', 'замера', 'замеров')} по охвату «
-          {trend.points[0]?.scope ?? ''}». Один снимок в день: повторный прогон заменяет
-          сегодняшний.
-        </Note>
-      </div>
-    </Card>
+        <div className="mt-3">
+          <Note>
+            {withCount(trend.points.length, 'замер', 'замера', 'замеров')} по охвату «
+            {trend.points[0]?.scope ?? ''}». Один снимок в день: повторный прогон заменяет
+            сегодняшний.
+          </Note>
+        </div>
+      </Card>
+    </Section>
   );
 }
 
