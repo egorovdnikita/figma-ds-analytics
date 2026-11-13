@@ -424,8 +424,10 @@ export function ComponentsScreen({
             </Note>
           </div>
 
-          <h4 className="mb-1 mt-4 text-caption-l text-ink-soft">
-            Где посмотреть{' '}
+          {/* Раздел отделён линией во всю ширину, как «описание» у HireHi. */}
+          <div className="-mx-4 mt-4 border-t border-line-subtle" />
+          <h4 className="mb-1 mt-3 text-caption-l text-ink-soft">
+            где посмотреть{' '}
             {selected.instances > selected.places.length && (
               <span className="text-ink-faint">
                 · {selected.places.length} из {selected.instances.toLocaleString('ru')}
@@ -494,8 +496,10 @@ export function TokensScreen({
             </Note>
           </div>
 
-          <h4 className="mb-1 mt-4 text-caption-l text-ink-soft">
-            Где посмотреть{' '}
+          {/* Раздел отделён линией во всю ширину, как «описание» у HireHi. */}
+          <div className="-mx-4 mt-4 border-t border-line-subtle" />
+          <h4 className="mb-1 mt-3 text-caption-l text-ink-soft">
+            где посмотреть{' '}
             {selected.nodes > selected.places.length && (
               <span className="text-ink-faint">
                 · {selected.places.length} из {selected.nodes.toLocaleString('ru')}
