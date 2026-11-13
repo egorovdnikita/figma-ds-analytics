@@ -477,7 +477,9 @@ export function Modal({
         className="flex max-h-full w-full flex-col rounded-t-card bg-surface ring-1 ring-line"
         onClick={(e) => e.stopPropagation()}
       >
-        <header className="flex items-center gap-2 px-4 pb-4 pt-4">
+        {/* Ручка — знак листа, как в iOS: сверху по центру, 36 × 4. */}
+        <span aria-hidden className="mx-auto mt-2 h-1 w-9 shrink-0 rounded-pill bg-line-strong" />
+        <header className="flex items-center gap-2 px-4 pb-4 pt-2">
           <h3 className="min-w-0 flex-1 truncate text-h5 font-semibold">{title}</h3>
           <button className="shrink-0 px-1 text-ink-faint hover:text-ink" onClick={onClose}>
             <Icon name="close-circle" size="2xs" title="Закрыть" />
