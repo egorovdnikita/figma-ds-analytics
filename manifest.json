@@ -1,5 +1,5 @@
 {
-  "name": "figma-ds-analytics",
+  "name": "Аналитика дизайн-системы",
   "id": "figma-ds-analytics-dev",
   "api": "1.0.0",
   "main": "dist/code.js",
