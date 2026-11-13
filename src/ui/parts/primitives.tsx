@@ -688,7 +688,10 @@ export function CopyButton({ text, label }: { text: string; label: string }): JS
   );
 }
 
-/** Поле поиска с иконкой Box UI. Очистка — кнопкой, а не только Backspace. */
+/**
+ * Поле поиска с иконкой Box UI — белое поле 44 на полотне, как поиск
+ * вакансий у HireHi. Очистка — кнопкой, а не только Backspace.
+ */
 export function SearchInput({
   value,
   onChange,
@@ -699,7 +702,7 @@ export function SearchInput({
   placeholder: string;
 }): JSX.Element {
   return (
-    <label className="flex items-center gap-2 rounded-pill bg-canvas px-3.5 py-2 text-ink-faint">
+    <label className="flex h-11 items-center gap-2 rounded-md bg-surface px-3.5 text-ink-faint">
       <Icon name="magnifer" />
       <input
         className="min-w-0 flex-1 bg-transparent text-body-m text-ink outline-none placeholder:text-ink-faint"

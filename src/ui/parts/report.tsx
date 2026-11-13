@@ -330,26 +330,24 @@ export function ComponentsScreen({
   return (
     <>
       <div className="flex flex-col gap-1">
-        <Card>
-          <SearchInput
-            placeholder="Найти компонент"
-            value={query}
+        <SearchInput
+          placeholder="Найти компонент"
+          value={query}
+          onChange={(value) => {
+            setQuery(value);
+            setLimit(PAGE_SIZE);
+          }}
+        />
+        <div className="overflow-x-auto">
+          <Segmented
+            options={MASTER_FILTERS}
+            value={filter}
             onChange={(value) => {
-              setQuery(value);
+              setFilter(value);
               setLimit(PAGE_SIZE);
             }}
           />
-          <div className="mt-3 overflow-x-auto">
-            <Segmented
-              options={MASTER_FILTERS}
-              value={filter}
-              onChange={(value) => {
-                setFilter(value);
-                setLimit(PAGE_SIZE);
-              }}
-            />
-          </div>
-        </Card>
+        </div>
 
         {visible.length === 0 ? (
           <Empty title="Ничего не нашлось" hint="Попробуйте другое название или снимите фильтр." />
@@ -554,9 +552,7 @@ function VariablesTable({
 
   return (
     <>
-      <Card>
-        <SearchInput placeholder="Найти токен" value={query} onChange={setQuery} />
-      </Card>
+      <SearchInput placeholder="Найти токен" value={query} onChange={setQuery} />
 
       {visible.length === 0 ? (
         <Empty title="Ничего не нашлось" hint="Попробуйте другое название." />
