@@ -438,8 +438,8 @@ export function Button({
 }: {
   children: ReactNode;
   onClick: () => void;
-  /** `quiet` — серая на белой карточке, `raised` — белая на сером полотне. */
-  variant?: 'accent' | 'quiet' | 'raised';
+  /** `quiet` — серая на белом полотне в обеих темах. */
+  variant?: 'accent' | 'quiet';
   /** `sm` — кнопка внутри тулбара, по высоте пункта переключателя. */
   size?: 'sm' | 'md' | 'lg';
   icon?: IconName;
@@ -450,8 +450,7 @@ export function Button({
   // ведёт себя одинаково в светлой и тёмной теме.
   const look = {
     accent: 'bg-accent text-accent-on hover:bg-accent-hover',
-    quiet: 'bg-canvas text-ink hover:bg-hover',
-    raised: 'bg-surface text-ink hover:bg-hover',
+    quiet: 'bg-panel-card text-ink hover:bg-hover',
   }[variant];
   const dims = {
     sm: 'h-12 shrink-0 gap-1.5 rounded-sm px-3 text-body-m',
@@ -646,7 +645,7 @@ export function Progress({
       {caption !== undefined && (
         <p className="mt-1 text-caption-l tabular-nums text-ink-soft">{caption}</p>
       )}
-      <div className="mt-3 h-1.5 w-full overflow-hidden rounded-pill bg-surface">
+      <div className="mt-3 h-1.5 w-full overflow-hidden rounded-pill bg-panel-card">
         <div
           className="h-full rounded-pill bg-accent transition-[width] duration-300"
           style={{ width: `${share * 100}%` }}

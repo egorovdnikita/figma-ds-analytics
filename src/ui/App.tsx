@@ -275,7 +275,7 @@ function Start({
             )}
           </h1>
           <p
-            className={`${running ? 'hidden' : ''} start-description mt-3 max-w-[360px] text-body-l leading-relaxed text-ink-soft`}
+            className={`${running || error !== null ? 'hidden' : ''} start-description mt-3 max-w-[360px] text-body-l leading-relaxed text-ink-soft`}
           >
             Компоненты из библиотеки, локальные копии и покрытие токенами — в одном отчёте.
           </p>
@@ -367,7 +367,7 @@ function Start({
           </p>
         )}
         {running ? (
-          <Button variant="raised" size="lg" onClick={onCancel} icon="stop-circle" wide>
+          <Button variant="quiet" size="lg" onClick={onCancel} icon="stop-circle" wide>
             Остановить
           </Button>
         ) : (
