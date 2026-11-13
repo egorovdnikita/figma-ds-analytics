@@ -113,7 +113,8 @@ export function SummaryScreen({
           </p>
         </div>
         <p className="mt-2 text-body-m text-ink">
-          {adoption.fromLibrary.toLocaleString('ru')} из {instances.toLocaleString('ru')} копий
+          {adoption.fromLibrary.toLocaleString('ru')} из {instances.toLocaleString('ru')}{' '}
+          {plural(instances, 'копии', 'копий', 'копий')} — из библиотеки
         </p>
         <p className="mt-1 text-body-m text-ink-soft">{state.text}</p>
       </section>
@@ -466,7 +467,10 @@ export function ComponentsScreen({
           </div>
           <Facts
             items={[
-              { label: 'копий', value: selected.instances.toLocaleString('ru') },
+              {
+                label: plural(selected.instances, 'копия', 'копии', 'копий'),
+                value: selected.instances.toLocaleString('ru'),
+              },
               {
                 label: 'доля всех копий',
                 value: pct(selected.instances, adoption.instancesCounted),

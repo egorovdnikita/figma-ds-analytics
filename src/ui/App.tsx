@@ -15,6 +15,7 @@ import { Icon } from './parts/icon';
 import { ComponentsScreen, SummaryScreen, TokensScreen, type MasterFilter } from './parts/report';
 import { chooseTheme, currentTheme } from './theme';
 import { Mascot } from './parts/mascot';
+import { withCount } from '../shared/plural';
 
 function send(message: UiMessage): void {
   parent.postMessage({ pluginMessage: message }, '*');
@@ -158,7 +159,7 @@ export function App(): JSX.Element {
             </h1>
             <p className="mt-2 truncate text-caption-l text-ink-soft">
               {report.scope.charAt(0).toUpperCase() + report.scope.slice(1)} ·{' '}
-              {report.nodesVisited.toLocaleString('ru')} слоёв
+              {withCount(report.nodesVisited, 'слой', 'слоя', 'слоёв')}
               {report.cancelled ? ' · остановлено' : ''}
             </p>
           </div>
@@ -345,7 +346,7 @@ function Start({
             <Progress
               done={progress.pagesTotal > 1 ? progress.pagesDone : progress.nodes}
               total={progress.pagesTotal > 1 ? progress.pagesTotal : Math.max(progress.nodes, 1)}
-              headline={`${progress.nodes.toLocaleString('ru')} слоёв`}
+              headline={withCount(progress.nodes, 'слой', 'слоя', 'слоёв')}
               {...(progress.pagesTotal > 1
                 ? {
                     caption: `${progress.page} · страница ${progress.pagesDone + 1} из ${progress.pagesTotal}`,
