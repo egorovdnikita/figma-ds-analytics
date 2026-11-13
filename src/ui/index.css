@@ -182,7 +182,7 @@
   border: 1px solid var(--surface-base-border-subtle);
   border-radius: var(--rounding-32);
   background: var(--panel-fill);
-  padding: var(--spacing-12) var(--spacing-20);
+  padding: var(--spacing-8) var(--spacing-16);
 }
 
 /* Миниатюра: две строки без вложенных рамок и отдельных карточек. */
@@ -231,4 +231,9 @@
 }
 [data-theme='dark'] .scope-preview-line {
   background: var(--surface-base-border-strong);
+}
+
+.list-surface > li > button,
+.list-surface > button {
+  border-radius: var(--rounding-24);
 }
