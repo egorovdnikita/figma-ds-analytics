@@ -116,12 +116,12 @@ export function SummaryScreen({
 
       <div className="grid grid-cols-2 gap-1">
         <Kpi
-          label="Компонентов"
+          label="компонентов"
           value={adoption.mastersTotal.toLocaleString('ru')}
           hint={`${instances.toLocaleString('ru')} копий`}
         />
         <Kpi
-          label="Коллекций токенов"
+          label="коллекций токенов"
           value={adoption.collections.length.toLocaleString('ru')}
           hint={`${(adoption.nodesOnLibraryVariable + adoption.nodesOnLocalVariable).toLocaleString('ru')} привязок`}
         />
