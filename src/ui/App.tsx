@@ -131,7 +131,7 @@ export function App(): JSX.Element {
 
         {/* Тулбар — одна белая панель, как сортировка и вид у HireHi: охват
             слева, повторная проверка справа. */}
-        <div className="mt-2.5 flex items-center gap-1 rounded-md bg-surface p-1">
+        <div className="mt-3 flex items-center gap-1 rounded-md bg-surface p-1">
           <div className="min-w-0 flex-1">
             <Segmented options={SCOPES} value={scope} onChange={setScope} />
           </div>
@@ -140,7 +140,7 @@ export function App(): JSX.Element {
           </Button>
         </div>
 
-        <nav className="-mx-1 mt-2.5 flex gap-1 overflow-x-auto px-1 pb-3">
+        <nav className="-mx-1 mt-1 flex gap-1 overflow-x-auto px-1 pb-1">
           {TABS.map((name) => {
             const count = countFor(name, report);
             return (
