@@ -29,7 +29,13 @@ export const BOLD_ICONS = [
   'moon',
 ] as const;
 
-export const LINEAR_ICONS = ['magnifer', 'alt-arrow-right', 'refresh'] as const;
+export const LINEAR_ICONS = [
+  'magnifer',
+  'alt-arrow-right',
+  'refresh',
+  'arrow-right-up',
+  'arrow-right-down',
+] as const;
 
 export const ICON_NAMES = [...BOLD_ICONS, ...LINEAR_ICONS] as const;
 

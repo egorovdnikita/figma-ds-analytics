@@ -707,20 +707,29 @@ export function Sparkline({
   );
 }
 
-/** Изменение в процентных пунктах со знаком. */
+/**
+ * Изменение в процентных пунктах — бейдж со стрелкой, как изменения
+ * за неделю в Bevel. Направление видно до того, как прочитано число.
+ */
 export function Delta({ points, since }: { points: number; since: string }): JSX.Element {
   const rising = points > 0;
   const flat = points === 0;
-  const tone = flat ? 'text-ink-faint' : rising ? 'text-accent-ink' : 'text-status-ink';
-  const sign = flat ? '' : rising ? '+' : '−';
+  const tone = flat
+    ? 'bg-canvas text-ink-soft'
+    : rising
+      ? 'bg-accent-soft text-accent-ink'
+      : 'bg-status-soft text-status-ink';
 
   return (
-    <span
-      className={`text-caption-l tabular-nums ${tone}`}
-      {...(!flat && !rising ? statusAttrs('warning') : {})}
-    >
-      {flat ? 'без изменений' : `${sign}${Math.abs(points)} п.п.`}
-      <span className="ml-1 text-ink-faint">с {since}</span>
+    <span className="inline-flex items-center gap-1.5 text-caption-l">
+      <span
+        className={`inline-flex items-center gap-0.5 rounded-xs px-1.5 py-0.5 font-medium tabular-nums ${tone}`}
+        {...(!flat && !rising ? statusAttrs('warning') : {})}
+      >
+        {!flat && <Icon name={rising ? 'arrow-right-up' : 'arrow-right-down'} />}
+        {flat ? 'без изменений' : `${Math.abs(points)} п.п.`}
+      </span>
+      <span className="text-ink-faint">с {since}</span>
     </span>
   );
 }

@@ -18,5 +18,7 @@
   "moon": "<path fill=\"currentColor\" d=\"M12 22c5.523 0 10-4.477 10-10c0-.463-.694-.54-.933-.143a6.5 6.5 0 1 1-8.924-8.924C12.54 2.693 12.463 2 12 2C6.477 2 2 6.477 2 12s4.477 10 10 10\"/>",
   "magnifer": "<g fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\"><circle cx=\"11.5\" cy=\"11.5\" r=\"9.5\"/><path stroke-linecap=\"round\" d=\"M18.5 18.5L22 22\"/></g>",
   "alt-arrow-right": "<path fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"1.5\" d=\"m9 5l6 7l-6 7\"/>",
-  "refresh": "<path fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"1.5\" d=\"M3.68 13v-1.667C3.68 6.731 7.44 3 12.079 3a8.41 8.41 0 0 1 7.176 4M2 11.333L3.68 13l1.68-1.667M20.314 11v1.667c0 4.602-3.775 8.333-8.431 8.333a8.45 8.45 0 0 1-7.203-4M22 12.667L20.314 11l-1.686 1.667\"/>"
+  "refresh": "<path fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"1.5\" d=\"M3.68 13v-1.667C3.68 6.731 7.44 3 12.079 3a8.41 8.41 0 0 1 7.176 4M2 11.333L3.68 13l1.68-1.667M20.314 11v1.667c0 4.602-3.775 8.333-8.431 8.333a8.45 8.45 0 0 1-7.203-4M22 12.667L20.314 11l-1.686 1.667\"/>",
+  "arrow-right-up": "<path fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"1.5\" d=\"M6 18L18 6m0 9V6H9\"/>",
+  "arrow-right-down": "<path fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"1.5\" d=\"m6 6l12 12m-9 0h9V9\"/>"
 }
