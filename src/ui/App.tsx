@@ -15,7 +15,6 @@ import {
   Chip,
   Pill,
   Progress,
-  Segmented,
   statusAttrs,
   ThemeButton,
   type Tint,
@@ -173,7 +172,17 @@ export function App(): JSX.Element {
             <span className="tabular-nums">{report.nodesVisited.toLocaleString('ru')} слоёв</span>
             {report.cancelled && <Pill tone="warn">остановлено</Pill>}
           </p>
-          {/* Отрицательный отступ: кнопка 32 не раздвигает строку крошек. */}
+          <button
+            className="-my-2 flex h-10 shrink-0 items-center gap-1.5 rounded-sm bg-panel-card px-3 text-body-m font-medium hover:bg-hover"
+            onClick={() => {
+              setReport(null);
+              setProgress(null);
+              setError(null);
+            }}
+          >
+            <Icon name="refresh" />
+            Повторить
+          </button>
           <div className="-my-2 -mr-2">
             <ThemeButton theme={theme} onToggle={toggleTheme} />
           </div>
@@ -218,14 +227,6 @@ export function App(): JSX.Element {
           />
         </div>
       </main>
-      <footer className="flex shrink-0 items-center gap-3 border-t border-line-subtle px-6 py-3">
-        <div className="min-w-0 flex-1">
-          <Segmented options={SCOPES} value={scope} onChange={setScope} />
-        </div>
-        <Button size="sm" onClick={start} icon="refresh">
-          Ещё раз
-        </Button>
-      </footer>
     </div>
   );
 }
