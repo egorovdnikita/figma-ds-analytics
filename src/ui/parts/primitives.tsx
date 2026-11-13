@@ -447,7 +447,7 @@ export function Modal({
         onClick={(e) => e.stopPropagation()}
       >
         <header className="flex items-center gap-2 px-4 pb-2 pt-4">
-          <h3 className="min-w-0 flex-1 truncate text-body-l font-medium">{title}</h3>
+          <h3 className="min-w-0 flex-1 truncate text-h5 font-semibold">{title}</h3>
           <button className="shrink-0 px-1 text-ink-faint hover:text-ink" onClick={onClose}>
             <Icon name="close-circle" size="2xs" title="Закрыть" />
           </button>
