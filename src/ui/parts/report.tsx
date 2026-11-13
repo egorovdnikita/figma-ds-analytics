@@ -18,7 +18,7 @@ import {
   CopyButton,
   Delta,
   Empty,
-  Field,
+  Facts,
   Kpi,
   Modal,
   Note,
@@ -404,11 +404,15 @@ export function ComponentsScreen({
 
       {selected !== null && (
         <Modal title={selected.name} onClose={() => setSelected(null)}>
-          <Field label="Источник" value={<OriginPill origin={selected.origin} />} />
-          <Field label="Копий" value={selected.instances.toLocaleString('ru')} />
-          <Field
-            label="Доля"
-            value={`${pct(selected.instances, adoption.instancesCounted)} всех копий`}
+          <Facts
+            items={[
+              { label: 'источник', value: <OriginPill origin={selected.origin} /> },
+              { label: 'копий', value: selected.instances.toLocaleString('ru') },
+              {
+                label: 'доля',
+                value: `${pct(selected.instances, adoption.instancesCounted)} всех копий`,
+              },
+            ]}
           />
           <div className="mt-3">
             <Note>
@@ -474,10 +478,14 @@ export function TokensScreen({
 
       {selected !== null && (
         <Modal title={selected.name} onClose={() => setSelected(null)}>
-          <Field label="Коллекция" value={selected.collectionName || '—'} />
-          <Field
-            label="Используется"
-            value={`${withCount(selected.nodes, 'слой', 'слоя', 'слоёв')} на ${withCount(selected.pages, 'странице', 'страницах', 'страницах')}`}
+          <Facts
+            items={[
+              { label: 'коллекция', value: selected.collectionName || '—' },
+              {
+                label: 'используется',
+                value: `${withCount(selected.nodes, 'слой', 'слоя', 'слоёв')} на ${withCount(selected.pages, 'странице', 'страницах', 'страницах')}`,
+              },
+            ]}
           />
           <div className="mt-3">
             <Note>

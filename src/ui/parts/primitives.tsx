@@ -458,12 +458,27 @@ export function Modal({
   );
 }
 
-export function Field({ label, value }: { label: string; value: ReactNode }): JSX.Element {
+/**
+ * Строка фактов, как в шапке вакансии HireHi: подпись над значением,
+ * колонки через вертикальную линию. Читается одним взглядом слева направо.
+ */
+export function Facts({
+  items,
+}: {
+  items: readonly { label: string; value: ReactNode }[];
+}): JSX.Element {
   return (
-    <div className="flex gap-3 border-t border-line-subtle py-2 first:border-0">
-      <span className="w-24 shrink-0 text-ink-soft">{label}</span>
-      <span className="min-w-0 flex-1 break-words">{value}</span>
-    </div>
+    <dl className="flex flex-wrap gap-y-3">
+      {items.map((item, index) => (
+        <div
+          key={item.label}
+          className={`min-w-0 ${index === 0 ? 'pr-4' : 'border-l border-line-subtle px-4'}`}
+        >
+          <dt className="text-caption-l text-ink-soft">{item.label}</dt>
+          <dd className="mt-1 break-words text-body-m">{item.value}</dd>
+        </div>
+      ))}
+    </dl>
   );
 }
 
