@@ -88,7 +88,7 @@ function writeHistory(gateway: SnapshotGateway, history: readonly Snapshot[]): n
     const estimate = Math.floor((kept.length * MAX_BYTES) / bytes);
     // Гарантируем прогресс: оценка может не уменьшить длину из-за округления.
     const nextLength = Math.min(estimate, kept.length - 1);
-    kept = kept.slice(-Math.max(nextLength, 0));
+    kept = nextLength > 0 ? kept.slice(-nextLength) : [];
   }
 
   gateway.setPluginData(SNAPSHOTS_KEY, '[]');

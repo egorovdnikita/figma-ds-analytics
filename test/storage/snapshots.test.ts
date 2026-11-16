@@ -103,3 +103,9 @@ describe('недоступное хранилище', () => {
     expect(saveHistory(broken, [snap()])).toBe(0);
   });
 });
+
+it('один снимок больше лимита не зацикливает сохранение', () => {
+  const g = gateway();
+  expect(saveHistory(g, [snap({ target: 'selection:' + 'x'.repeat(100_000) })])).toBe(0);
+  expect(g.stored).toBe('[]');
+});
