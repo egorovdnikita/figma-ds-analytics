@@ -44,6 +44,11 @@ window.addEventListener('message',e=>{
   send(w,{type:'main/scan-progress',nodesVisited:14820,pagesDone:2,pagesTotal:6,currentPageName:'Карточка товара'});
   if(screen!=='progress')setTimeout(()=>report(w),700);
  }
+ if(m.type==='ui/tokens-search'){
+  const needle=m.query.trim().toLowerCase();
+  const items=REPORT.adoption.topVariables.filter(v=>v.name.toLowerCase().includes(needle)||v.collectionName.toLowerCase().includes(needle));
+  send(w,{type:'main/tokens-found',requestId:m.requestId,query:m.query,offset:m.offset,total:items.length,items:items.slice(m.offset,m.offset+50)});
+ }
  if(m.type==='ui/scan-cancelled')void report(w);
 });
 </script></html>`;

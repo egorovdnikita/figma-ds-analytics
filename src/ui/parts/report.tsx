@@ -2,7 +2,7 @@
  * Экраны отчёта. Три уровня: сводка → таблицы → карточка по клику.
  * Тексты бытовые: «токен», «копия», «библиотека», без терминов из кода.
  */
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   DISCONNECTED_LIBRARY,
   type Adoption,
@@ -13,6 +13,7 @@ import {
 } from '../../shared/adoption';
 import { buildAdvice, verdict } from '../../shared/advice';
 import { toMarkdown } from '../../shared/export';
+import type { MainMessage, UiMessage } from '../../shared/messages';
 import { plural, withCount } from '../../shared/plural';
 import { deltaPoints, shortDate, type Trend } from '../../shared/snapshot';
 import {
@@ -637,6 +638,8 @@ function CollectionsTable({ adoption }: { adoption: Adoption }): JSX.Element {
  * Паспорт: «что сломается, если удалить этот токен» — до рефакторинга,
  * а не после. Число мест и есть цена вопроса.
  */
+let tokenRequestId = 0;
+
 function VariablesTable({
   adoption,
   onSelect,
@@ -645,53 +648,102 @@ function VariablesTable({
   onSelect: (usage: VariableUsage) => void;
 }): JSX.Element {
   const [query, setQuery] = useState('');
+  const [offset, setOffset] = useState(0);
+  const [result, setResult] = useState<Extract<MainMessage, { type: 'main/tokens-found' }> | null>(
+    null,
+  );
 
-  const visible = useMemo(() => {
-    const needle = query.trim().toLowerCase();
-    if (needle === '') return adoption.topVariables;
-    return adoption.topVariables.filter(
-      (item) =>
-        item.name.toLowerCase().includes(needle) ||
-        item.collectionName.toLowerCase().includes(needle),
-    );
-  }, [adoption.topVariables, query]);
+  useEffect(() => {
+    const requestId = ++tokenRequestId;
+    const receive = (event: MessageEvent<{ pluginMessage?: MainMessage }>): void => {
+      const message = event.data.pluginMessage;
+      if (message?.type === 'main/tokens-found' && message.requestId === requestId)
+        setResult(message);
+    };
+    window.addEventListener('message', receive);
+    const timer = setTimeout(() => {
+      const message: UiMessage = { type: 'ui/tokens-search', requestId, query, offset };
+      parent.postMessage({ pluginMessage: message }, '*');
+    }, 150);
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('message', receive);
+    };
+  }, [query, offset]);
 
-  if (adoption.topVariables.length === 0) {
-    return <Empty title="Привязок к токенам нет" hint="В этом охвате ничего не привязано." />;
-  }
-
+  const current = result?.query === query && result.offset === offset ? result : null;
   return (
     <>
-      <SearchInput placeholder="Найти токен" value={query} onChange={setQuery} />
-
-      {visible.length === 0 ? (
-        <Empty title="Ничего не нашлось" hint="Попробуйте другое название." />
+      <SearchInput
+        placeholder="Найти токен"
+        value={query}
+        onChange={(value) => {
+          setQuery(value);
+          setOffset(0);
+        }}
+      />
+      {current === null ? (
+        <p role="status" className="text-caption-l text-ink-soft">
+          Ищем токены…
+        </p>
       ) : (
-        <Card plain>
-          <ul className="list-surface">
-            {visible.map((item) => (
-              <ListRow
-                key={item.id}
-                onClick={() => onSelect(item)}
-                leading={<TokenMark />}
-                title={item.name}
-                subtitle={
-                  <span className="text-ink-soft">
-                    {item.collectionName || '—'} · {item.pages}{' '}
-                    {plural(item.pages, 'страница', 'страницы', 'страниц')}
-                  </span>
-                }
-                value={item.nodes.toLocaleString('ru')}
-                valueHint={plural(item.nodes, 'слой', 'слоя', 'слоёв')}
-              />
-            ))}
-          </ul>
-        </Card>
+        <>
+          <p role="status" className="text-caption-l text-ink-soft">
+            Найдено: {current.total.toLocaleString('ru')}
+            {current.items.length > 0 ? ` · ${offset + 1}–${offset + current.items.length}` : ''}
+          </p>
+          {current.items.length === 0 ? (
+            <Empty
+              title={query.trim() ? 'Ничего не нашлось' : 'Привязок к доступным токенам нет'}
+              hint={
+                query.trim()
+                  ? 'Попробуйте другое название.'
+                  : 'Недоступные переменные нельзя показать по имени.'
+              }
+            />
+          ) : (
+            <Card plain>
+              <ul className="list-surface">
+                {current.items.map((item) => (
+                  <ListRow
+                    key={item.id}
+                    onClick={() => onSelect(item)}
+                    leading={<TokenMark />}
+                    title={item.name}
+                    subtitle={
+                      <span className="text-ink-soft">
+                        {item.collectionName || '—'} ·{' '}
+                        {withCount(item.pages, 'страница', 'страницы', 'страниц')}
+                      </span>
+                    }
+                    value={item.nodes.toLocaleString('ru')}
+                    valueHint={plural(item.nodes, 'слой', 'слоя', 'слоёв')}
+                  />
+                ))}
+              </ul>
+            </Card>
+          )}
+          <div className="flex justify-between gap-2">
+            {offset > 0 && (
+              <Button variant="quiet" onClick={() => setOffset(Math.max(0, offset - 50))}>
+                Назад
+              </Button>
+            )}
+            {offset + current.items.length < current.total && (
+              <Button variant="quiet" onClick={() => setOffset(offset + 50)}>
+                Далее
+              </Button>
+            )}
+          </div>
+        </>
       )}
-
       <Aside>
-        Число слоёв — цена изменения: столько мест сломается, если токен удалить или переименовать.
+        Поиск по всем доступным токенам в проверенном охвате. Число слоёв показывает места
+        использования.
       </Aside>
+      {adoption.nodesOnUnavailableVariable > 0 && (
+        <Note>Часть переменных недоступна и не участвует в поиске по имени.</Note>
+      )}
     </>
   );
 }

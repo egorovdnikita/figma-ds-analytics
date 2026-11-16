@@ -84,6 +84,25 @@ export class VariableUsageIndex {
     return { onLocal, onLibrary, unavailable };
   }
 
+  /** Поиск по всему индексу с ограниченной порцией для iframe. */
+  search(
+    resolve: (id: string) => { name: string; collectionName: string } | null,
+    query: string,
+    offset: number,
+  ): { items: readonly VariableUsage[]; total: number } {
+    const needle = query.trim().toLowerCase();
+    const all = this.describe((id) => {
+      const token = resolve(id);
+      if (token === null) return null;
+      return token.name.toLowerCase().includes(needle) ||
+        token.collectionName.toLowerCase().includes(needle)
+        ? token
+        : null;
+    }, Infinity);
+    const start = Number.isFinite(offset) ? Math.max(0, Math.floor(offset)) : 0;
+    return { items: all.slice(start, start + 50), total: all.length };
+  }
+
   /** Использование токенов, от самых востребованных к редким. */
   describe(
     resolve: (id: string) => { name: string; collectionName: string } | null,

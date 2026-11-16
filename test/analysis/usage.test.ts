@@ -124,3 +124,27 @@ it('недоступные переменные не увеличивают би
     ),
   ).toEqual({ onLocal: 1, onLibrary: 1, unavailable: 1 });
 });
+
+it('поиск находит токены после первых 60 и возвращает ограниченную порцию', () => {
+  const index = new VariableUsageIndex();
+  for (let i = 0; i < 125; i++) index.add(String(i), place(String(i)));
+  expect(index.search(resolveAll, 'token-124', 0).items[0]?.id).toBe('124');
+  const first = index.search(resolveAll, '', 0);
+  const second = index.search(resolveAll, '', 50);
+  const last = index.search(resolveAll, '', 100);
+  expect([first.items.length, second.items.length, last.items.length]).toEqual([50, 50, 25]);
+  expect(first.total).toBe(125);
+  expect(
+    new Set([...first.items, ...second.items, ...last.items].map((item) => item.id)).size,
+  ).toBe(125);
+});
+
+it('поиск по коллекции не включает недоступные переменные', () => {
+  const index = new VariableUsageIndex();
+  index.add('a', place('a'));
+  index.add('missing', place('b'));
+  expect(index.search((id) => (id === 'missing' ? null : resolveAll(id)), ' BRAND ', 0).total).toBe(
+    1,
+  );
+  expect(index.search(resolveAll, '', -1).items).toHaveLength(2);
+});

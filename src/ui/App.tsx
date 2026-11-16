@@ -79,6 +79,8 @@ export function App(): JSX.Element {
       if (message === undefined) return;
 
       switch (message.type) {
+        case 'main/tokens-found':
+          return;
         case 'main/booted':
           setFileName(message.fileName);
           if (message.lastScope !== null) setScope(message.lastScope);

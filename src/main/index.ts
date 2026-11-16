@@ -68,6 +68,7 @@ async function startingScope(): Promise<ScanScope> {
 
 let cancelled = false;
 let scanning = false;
+let tokenCatalog: { usage: VariableUsageIndex; resolver: VariableResolver } | null = null;
 
 function post(message: MainMessage): void {
   figma.ui.postMessage(message);
@@ -213,6 +214,7 @@ async function scan(scope: ScanScope): Promise<void> {
     trend = buildTrend(history, identity.key);
   }
 
+  tokenCatalog = { usage, resolver };
   post({
     type: 'main/scan-finished',
     report: {
@@ -273,6 +275,23 @@ function handle(message: UiMessage): void {
           scanning = false;
         });
       return;
+    case 'ui/tokens-search': {
+      const { requestId, query, offset } = message;
+      const catalog = tokenCatalog;
+      const result =
+        catalog === null
+          ? { items: [], total: 0 }
+          : catalog.usage.search(
+              (id) => {
+                const resolved = catalog.resolver.resolve(id);
+                return resolved.state === 'unavailable' ? null : resolved;
+              },
+              query,
+              offset,
+            );
+      post({ type: 'main/tokens-found', requestId, query, offset, ...result });
+      return;
+    }
     case 'ui/theme-chosen':
       void figma.clientStorage.setAsync(THEME_KEY, message.theme).catch(() => {
         // Не сохранилась тема — в этом запуске она всё равно уже применена.
