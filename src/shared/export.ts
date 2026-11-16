@@ -55,6 +55,10 @@ export function toMarkdown(report: ScanReport, at: Date): string {
     );
     lines.push('');
   }
+  if (!trend.saved && !report.cancelled) {
+    lines.push('> Замер не сохранён в истории документа.');
+    lines.push('');
+  }
   lines.push('## Главное');
   lines.push('');
   lines.push('| Показатель | Значение |');

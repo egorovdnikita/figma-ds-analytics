@@ -45,7 +45,7 @@ function report(over: Partial<Adoption> = {}, trend?: ScanReport['trend']): Scan
       topVariables: [],
       ...over,
     },
-    trend: trend ?? { points: [], previous: null },
+    trend: trend ?? { saved: true, points: [], previous: null },
   };
 }
 
@@ -83,7 +83,14 @@ describe('отчёт в Markdown', () => {
     expect(text).not.toContain('Изменение с');
 
     const withTrend = toMarkdown(
-      report({}, { points: [snap(), snap({ at: '2026-08-23T10:00:00.000Z' })], previous: snap() }),
+      report(
+        {},
+        {
+          saved: true,
+          points: [snap(), snap({ at: '2026-08-23T10:00:00.000Z' })],
+          previous: snap(),
+        },
+      ),
       at,
     );
     expect(withTrend).toContain('Изменение с 20 авг | +15 п.п.');
@@ -125,7 +132,14 @@ describe('отчёт в Markdown', () => {
     expect(toMarkdown(report(), at)).not.toContain('Как менялось');
 
     const withHistory = toMarkdown(
-      report({}, { points: [snap(), snap({ at: '2026-08-22T10:00:00.000Z' })], previous: snap() }),
+      report(
+        {},
+        {
+          saved: true,
+          points: [snap(), snap({ at: '2026-08-22T10:00:00.000Z' })],
+          previous: snap(),
+        },
+      ),
       at,
     );
     expect(withHistory).toContain('## Как менялось');

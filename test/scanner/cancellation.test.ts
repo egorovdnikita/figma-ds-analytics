@@ -19,6 +19,7 @@ it('отмена во время мастеров не запускает ост
   expect((await h.finished()).cancelled).toBe(true);
   expect(next).not.toHaveBeenCalled();
   expect(h.root.setPluginData).not.toHaveBeenCalled();
+  expect((await h.finished()).trend.saved).toBe(false);
   expect(h.library).not.toHaveBeenCalled();
 });
 
@@ -35,6 +36,7 @@ it('отмена во время переменных не запускает с
   expect((await h.finished()).cancelled).toBe(true);
   expect(request).toHaveBeenCalledTimes(1);
   expect(h.root.setPluginData).not.toHaveBeenCalled();
+  expect((await h.finished()).trend.saved).toBe(false);
 });
 
 it('отмена после получения переменной не начинает загрузку её коллекции', async () => {

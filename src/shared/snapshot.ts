@@ -28,6 +28,8 @@ export interface Snapshot {
 }
 
 export interface Trend {
+  /** Записан ли текущий замер в документ. */
+  readonly saved: boolean;
   /** Снимки того же охвата, от старых к новым, включая текущий. */
   readonly points: readonly Snapshot[];
   /** Предыдущий снимок для сравнения. null — сравнивать не с чем. */

@@ -8,6 +8,7 @@
  * в scanner/traversal.ts.
  */
 import type { MainMessage, UiMessage } from '../shared/messages';
+import type { Trend } from '../shared/snapshot';
 import type { ScanScope } from '../shared/types';
 import { resolveMasters } from './analysis/masters';
 import { buildAdoption } from './analysis/adoption';
@@ -199,7 +200,7 @@ async function scan(scope: ScanScope): Promise<void> {
 
   // Снимок пишем только за полный обход: отменённый замер занизил бы
   // покрытие и оставил в истории ложную яму.
-  let trend = buildTrend(loadHistory(figma.root), identity.key);
+  let trend: Trend = { points: [], previous: null, saved: false };
   const wasCancelled = result.cancelled || cancelled;
   if (!wasCancelled) {
     const snapshot = buildSnapshot({
@@ -210,8 +211,8 @@ async function scan(scope: ScanScope): Promise<void> {
       adoption,
     });
     const history = appendSnapshot(loadHistory(figma.root), snapshot, HISTORY_LIMIT);
-    saveHistory(figma.root, history);
-    trend = buildTrend(history, identity.key);
+    const kept = saveHistory(figma.root, history);
+    if (kept > 0) trend = buildTrend(history.slice(-kept), identity.key);
   }
 
   tokenCatalog = { usage, resolver };

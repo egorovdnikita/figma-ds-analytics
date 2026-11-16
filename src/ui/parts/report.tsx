@@ -321,6 +321,14 @@ function TrendCard({
         </Note>
       </Section>
     );
+  if (!trend.saved)
+    return (
+      <Section title="тренд">
+        <Note>
+          Не удалось сохранить замер в документе. Отчёт доступен, но точка не добавлена в историю.
+        </Note>
+      </Section>
+    );
   const delta = trendDelta(adoption, trend);
 
   if (trend.previous === null || delta === null) {

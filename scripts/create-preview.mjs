@@ -16,7 +16,7 @@ function send(w,m){w.postMessage({pluginMessage:m},'*')}
 async function report(w){
  const r=structuredClone(REPORT);
  if(screen==='empty'){r.adoption.masters=[];r.adoption.mastersTotal=0;r.adoption.instancesCounted=0;r.adoption.fromLibrary=0;r.adoption.local=0;r.adoption.unknown=0;}
- if(screen==='first'){r.trend={points:r.trend.points.slice(-1),previous:null};}
+ if(screen==='first'){r.trend={saved:true,points:r.trend.points.slice(-1),previous:null};}
  send(w,{type:'main/scan-finished',report:r});
  await waitFor(w,()=>w.document.querySelector('nav'));
  if(['components','component-detail','empty'].includes(screen))w.document.querySelectorAll('nav button')[1].click();

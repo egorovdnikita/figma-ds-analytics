@@ -59,5 +59,9 @@ export function appendSnapshot(
 /** Тренд по текущему охвату: точки по порядку и с чем сравнивать. */
 export function buildTrend(history: readonly Snapshot[], target: string): Trend {
   const points = history.filter((item) => item.target === target);
-  return { points, previous: points.length >= 2 ? (points[points.length - 2] ?? null) : null };
+  return {
+    saved: true,
+    points,
+    previous: points.length >= 2 ? (points[points.length - 2] ?? null) : null,
+  };
 }

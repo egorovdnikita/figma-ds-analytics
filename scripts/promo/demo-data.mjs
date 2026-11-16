@@ -214,5 +214,5 @@ export const REPORT = {
     nodesOnUnavailableVariable: 0,
     topVariables,
   },
-  trend: { points, previous: points[points.length - 2] },
+  trend: { saved: true, points, previous: points[points.length - 2] },
 };

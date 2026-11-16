@@ -122,6 +122,7 @@ describe('тренд', () => {
 
   it('чужой охват не даёт ложного сравнения', () => {
     expect(buildTrend([snap({ scope: 'весь файл', target: 'file' })], 'page:1')).toEqual({
+      saved: true,
       points: [],
       previous: null,
     });
