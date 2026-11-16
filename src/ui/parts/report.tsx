@@ -158,7 +158,7 @@ export function SummaryScreen({
         <ul className="list-surface">
           <ListRow
             leading={<TintIcon name="palette" tint="blue" />}
-            title="Слои на токенах"
+            title="Заливки на токенах"
             value={pct(onTokens, tokenNodes)}
             onClick={() => onGoTo('Токены')}
           />

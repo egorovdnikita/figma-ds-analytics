@@ -17,6 +17,7 @@ import { parseTheme, type Theme } from '../shared/theme';
 import { loadConfig } from './storage/config';
 import { HISTORY_LIMIT, loadHistory, saveHistory } from './storage/snapshots';
 import { traverse, type ScanTarget } from './scanner/traversal';
+import { fillBindings } from './scanner/fills';
 import { allAliases } from './scanner/aliases';
 import { VariableResolver } from './scanner/variables';
 
@@ -87,13 +88,6 @@ const SCOPE_LABEL: Readonly<Record<ScanScope, string>> = {
   file: 'весь файл',
 };
 
-/** Есть ли у ноды видимая заливка — кандидат на токенизацию. */
-function hasVisibleFill(node: SceneNode): boolean {
-  if (!('fills' in node)) return false;
-  const fills: readonly Paint[] = Array.isArray(node.fills) ? (node.fills as readonly Paint[]) : [];
-  return fills.some((paint) => paint.type === 'SOLID' && paint.visible !== false);
-}
-
 async function scan(scope: ScanScope): Promise<void> {
   cancelled = false;
   void figma.clientStorage.setAsync(SCOPE_KEY, scope).catch(() => {
@@ -107,6 +101,7 @@ async function scan(scope: ScanScope): Promise<void> {
   const aliasIds = new Set<string>();
   const topLevelInstances: { node: InstanceNode; pageId: string }[] = [];
   const usage = new VariableUsageIndex();
+  const fillUsage = new VariableUsageIndex();
   let withoutVariable = 0;
 
   const result = await traverse(
@@ -117,8 +112,15 @@ async function scan(scope: ScanScope): Promise<void> {
         aliasIds.add(alias.id);
         usage.add(alias.id, { nodeId: node.id, pageId: context.pageId, name: node.name });
       }
-      if (aliases.length === 0 && !context.insideInstance && hasVisibleFill(node)) {
-        withoutVariable++;
+      const fill = fillBindings(node);
+      if (fill.kind === 'raw') withoutVariable++;
+      if (fill.kind === 'bound') {
+        for (const id of fill.ids) {
+          aliasIds.add(id);
+          const place = { nodeId: node.id, pageId: context.pageId, name: node.name };
+          fillUsage.add(id, place);
+          usage.add(id, place);
+        }
       }
 
       // Мастер резолвим только для инстансов верхнего уровня: вложенные
@@ -161,7 +163,7 @@ async function scan(scope: ScanScope): Promise<void> {
     onLocal: onLocalVariable,
     onLibrary: onLibraryVariable,
     unavailable,
-  } = usage.splitByLocality((id: string) => resolver.resolve(id).state);
+  } = fillUsage.splitByLocality((id: string) => resolver.resolve(id).state);
 
   // Обратный индекс: какие токены держат на себе файл и что сломается,
   // если их тронуть.

@@ -101,7 +101,7 @@ export function buildAdvice(adoption: Adoption): readonly Advice[] {
       id: 'no-tokens',
       title: 'Цвета без токенов',
       value: withCount(adoption.nodesWithoutVariable, 'слой', 'слоя', 'слоёв'),
-      hint: `Это ${percent(adoption.nodesWithoutVariable, tokenNodes)} слоёв с заливкой. При смене темы они не переключатся.`,
+      hint: `Это ${percent(adoption.nodesWithoutVariable, tokenNodes)} слоёв с заливкой. Хотя бы один видимый цвет не привязан к токену.`,
       target: { kind: 'none' },
       weight: 40 * share(adoption.nodesWithoutVariable, tokenNodes),
     });

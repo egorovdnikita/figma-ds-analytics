@@ -62,7 +62,9 @@ export function toMarkdown(report: ScanReport, at: Date): string {
   lines.push(
     `| Компонентов из библиотеки | ${pct(adoption.fromLibrary, instances)} · ${num(adoption.fromLibrary)} из ${num(instances)} ${plural(instances, 'копии', 'копий', 'копий')} |`,
   );
-  lines.push(`| Слоёв на токенах | ${pct(onTokens, fills)} · ${num(onTokens)} из ${num(fills)} |`);
+  lines.push(
+    `| Заливки на токенах | ${pct(onTokens, fills)} · ${num(onTokens)} из ${num(fills)} |`,
+  );
   lines.push(`| Разных компонентов | ${num(adoption.mastersTotal)} |`);
   lines.push(`| Копий без доступной библиотеки | ${num(adoption.unknown)} |`);
 

@@ -63,8 +63,9 @@ export interface Adoption {
   readonly masters: readonly MasterUsage[];
   readonly libraries: readonly LibrarySource[];
   readonly collections: readonly CollectionUsage[];
-  /** Нод с биндингом на библиотечную переменную. */
+  /** Слоёв, у которых все видимые SOLID-заливки на токенах; есть библиотечные. */
   readonly nodesOnLibraryVariable: number;
+  /** Полностью токенизированные заливки с хотя бы одной локальной переменной. */
   readonly nodesOnLocalVariable: number;
   /** Нод, которые могли бы иметь переменную (есть заливка), но не имеют. */
   readonly nodesWithoutVariable: number;
