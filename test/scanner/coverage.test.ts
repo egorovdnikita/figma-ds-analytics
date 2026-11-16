@@ -77,3 +77,16 @@ it('текстовая и булева привязки свойств дост�
   expect(report.adoption.topVariables.map((v) => v.id).sort()).toEqual(['boolean', 'text']);
   expect(report.adoption.nodesOnLocalVariable).toBe(0);
 });
+
+it('не подтверждает покрытие, если одна из цветовых привязок недоступна', async () => {
+  const h = await setupScan([rectangle({ fills: [boundPaint('local'), boundPaint('missing')] })], {
+    getLocalVariablesAsync: () => Promise.resolve([variable('local')]),
+  });
+  h.send({ type: 'ui/scan-requested', scope: 'page' });
+  const report = await h.finished();
+  expect(report.adoption).toMatchObject({
+    nodesOnLocalVariable: 0,
+    nodesOnLibraryVariable: 0,
+    nodesOnUnavailableVariable: 1,
+  });
+});

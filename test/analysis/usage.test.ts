@@ -118,11 +118,13 @@ it('недоступные переменные не увеличивают би
   index.add('library', place('mixed'));
   index.add('local', place('local'));
   index.add('missing', place('local'));
+  index.add('local', place('known-local'));
+  index.add('library', place('known-library'));
   expect(
     index.splitByLocality((id) =>
       id === 'missing' ? 'unavailable' : id === 'local' ? 'local' : 'library',
     ),
-  ).toEqual({ onLocal: 1, onLibrary: 1, unavailable: 1 });
+  ).toEqual({ onLocal: 1, onLibrary: 1, unavailable: 3 });
 });
 
 it('поиск находит токены после первых 60 и возвращает ограниченную порцию', () => {

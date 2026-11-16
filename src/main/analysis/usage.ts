@@ -60,8 +60,8 @@ export class VariableUsageIndex {
   /**
    * Делит ноды на живущие на локальных и на библиотечных токенах.
    *
-   * Нода считается один раз: если на ней есть хоть одна локальная привязка,
-   * она локальная. Иначе двойной учёт раздул бы сумму выше числа нод.
+   * Нода считается один раз. Непроверенная привязка делает покрытие
+   * непроверенным; среди полностью известных привязок локальная имеет приоритет. Иначе двойной учёт раздул бы сумму выше числа нод.
    */
   splitByLocality(state: (variableId: string) => 'local' | 'library' | 'unavailable'): {
     onLocal: number;
@@ -76,9 +76,9 @@ export class VariableUsageIndex {
       // Нода с локальной и библиотечной привязками считается локальной:
       // иначе она попала бы в оба счётчика и сумма превысила бы число нод.
       const states = variableIds.map(state);
-      if (states.includes('local')) onLocal++;
-      else if (states.includes('library')) onLibrary++;
-      else unavailable++;
+      if (states.includes('unavailable')) unavailable++;
+      else if (states.includes('local')) onLocal++;
+      else onLibrary++;
     }
 
     return { onLocal, onLibrary, unavailable };
