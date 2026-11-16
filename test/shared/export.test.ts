@@ -6,7 +6,8 @@ import type { Snapshot } from '../../src/shared/snapshot';
 
 function snap(over: Partial<Snapshot> = {}): Snapshot {
   return {
-    v: 1,
+    v: 2,
+    target: 'page:1',
     at: '2026-08-20T10:00:00.000Z',
     scope: 'весь файл',
     nodes: 1000,

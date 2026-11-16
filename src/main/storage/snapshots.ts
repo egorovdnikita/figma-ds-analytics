@@ -8,7 +8,7 @@
 import { utf8ByteLength } from '../../shared/bytes';
 import type { Snapshot } from '../../shared/snapshot';
 
-export const SNAPSHOTS_KEY = 'adoption-snapshots';
+export const SNAPSHOTS_KEY = 'adoption-snapshots-v2';
 
 /** Сколько снимков держим. Дальше история вытесняется по одному. */
 export const HISTORY_LIMIT = 40;
@@ -25,7 +25,8 @@ function isSnapshot(value: unknown): value is Snapshot {
   if (typeof value !== 'object' || value === null) return false;
   const item = value as Record<string, unknown>;
   return (
-    item['v'] === 1 &&
+    item['v'] === 2 &&
+    typeof item['target'] === 'string' &&
     typeof item['at'] === 'string' &&
     typeof item['scope'] === 'string' &&
     typeof item['instances'] === 'number' &&

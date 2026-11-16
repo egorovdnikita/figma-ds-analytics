@@ -165,7 +165,8 @@ const nodesWithoutVariable = 2_310;
 function snapshot(at, libShare, onShare) {
   const fills = nodesOnLibraryVariable + nodesOnLocalVariable + nodesWithoutVariable;
   return {
-    v: 1,
+    v: 2,
+    target: 'page:1',
     at,
     scope: 'весь файл',
     nodes: 35_240,

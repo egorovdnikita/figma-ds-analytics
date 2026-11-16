@@ -17,6 +17,7 @@ import { parseTheme, type Theme } from '../shared/theme';
 import { loadConfig } from './storage/config';
 import { HISTORY_LIMIT, loadHistory, saveHistory } from './storage/snapshots';
 import { traverse, type ScanTarget } from './scanner/traversal';
+import { scanIdentity } from './scanner/scope';
 import { fillBindings } from './scanner/fills';
 import { allAliases } from './scanner/aliases';
 import { VariableResolver } from './scanner/variables';
@@ -82,14 +83,10 @@ function targetFor(scope: ScanScope): ScanTarget {
   }
 }
 
-const SCOPE_LABEL: Readonly<Record<ScanScope, string>> = {
-  selection: 'выделение',
-  page: 'страница',
-  file: 'весь файл',
-};
-
 async function scan(scope: ScanScope): Promise<void> {
   cancelled = false;
+  const target = targetFor(scope);
+  const identity = scanIdentity(target);
   void figma.clientStorage.setAsync(SCOPE_KEY, scope).catch(() => {
     // Не сохранился охват — не повод мешать скану.
   });
@@ -105,7 +102,7 @@ async function scan(scope: ScanScope): Promise<void> {
   let withoutVariable = 0;
 
   const result = await traverse(
-    targetFor(scope),
+    target,
     (node, context) => {
       const aliases = allAliases(node);
       for (const alias of aliases) {
@@ -193,21 +190,22 @@ async function scan(scope: ScanScope): Promise<void> {
     },
   );
 
-  const scopeLabel = SCOPE_LABEL[scope];
+  const scopeLabel = identity.label;
 
   // Снимок пишем только за полный обход: отменённый замер занизил бы
   // покрытие и оставил в истории ложную яму.
-  let trend = buildTrend(loadHistory(figma.root), scopeLabel);
+  let trend = buildTrend(loadHistory(figma.root), identity.key);
   if (!result.cancelled) {
     const snapshot = buildSnapshot({
       at: new Date(),
       scope: scopeLabel,
+      target: identity.key,
       nodes: result.nodesVisited,
       adoption,
     });
     const history = appendSnapshot(loadHistory(figma.root), snapshot, HISTORY_LIMIT);
     saveHistory(figma.root, history);
-    trend = buildTrend(history, scopeLabel);
+    trend = buildTrend(history, identity.key);
   }
 
   post({

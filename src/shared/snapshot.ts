@@ -10,10 +10,12 @@
 
 export interface Snapshot {
   /** Версия формата. Снимки чужой версии не читаются, а отбрасываются. */
-  readonly v: 1;
+  readonly v: 2;
   /** ISO-дата. По ней же снимки схлопываются: один на день на охват. */
   readonly at: string;
   readonly scope: string;
+  /** Стабильный ключ страницы, файла или набора выделенных корней. */
+  readonly target: string;
   readonly nodes: number;
   readonly instances: number;
   readonly fromLibrary: number;

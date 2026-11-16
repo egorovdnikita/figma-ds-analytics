@@ -22,7 +22,8 @@ function gateway(initial = ''): SnapshotGateway & { stored: string } {
 
 function snap(over: Partial<Snapshot> = {}): Snapshot {
   return {
-    v: 1,
+    v: 2,
+    target: 'page:1',
     at: '2026-08-20T10:00:00.000Z',
     scope: 'страница',
     nodes: 1000,
@@ -55,7 +56,7 @@ describe('хранение истории', () => {
 
   it('снимки чужой версии отбрасываются молча', () => {
     // Не ошибка файла, а ожидаемое следствие обновления плагина.
-    const g = gateway(JSON.stringify([snap(), { v: 2, at: '2026-08-21', scope: 'страница' }]));
+    const g = gateway(JSON.stringify([snap(), { v: 1, at: '2026-08-21', scope: 'страница' }]));
 
     expect(loadHistory(g)).toHaveLength(1);
   });

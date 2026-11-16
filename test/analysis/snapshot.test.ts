@@ -25,7 +25,8 @@ function adoption(over: Partial<Adoption> = {}): Adoption {
 
 function snap(over: Partial<Snapshot> = {}): Snapshot {
   return {
-    v: 1,
+    v: 2,
+    target: 'page:1',
     at: '2026-08-20T10:00:00.000Z',
     scope: 'страница',
     nodes: 1000,
@@ -45,13 +46,14 @@ describe('снимок', () => {
     const result = buildSnapshot({
       at: new Date('2026-08-23T12:00:00Z'),
       scope: 'страница',
+      target: 'page:1',
       nodes: 5000,
       adoption: adoption(),
     });
 
     expect(result.onTokens).toBe(50);
     expect(result.fills).toBe(100);
-    expect(result.v).toBe(1);
+    expect(result.v).toBe(2);
   });
 });
 
@@ -68,7 +70,7 @@ describe('история', () => {
 
   it('снимки разных охватов в один день не схлопываются', () => {
     const page = snap({ scope: 'страница' });
-    const file = snap({ scope: 'весь файл' });
+    const file = snap({ scope: 'весь файл', target: 'file' });
 
     expect(appendSnapshot([page], file, 40)).toHaveLength(2);
   });
@@ -104,22 +106,22 @@ describe('тренд', () => {
     // в разы, который читается как обвал покрытия.
     const history = [
       snap({ scope: 'страница', at: '2026-08-20', fromLibrary: 40 }),
-      snap({ scope: 'весь файл', at: '2026-08-21', fromLibrary: 90 }),
+      snap({ scope: 'весь файл', target: 'file', at: '2026-08-21', fromLibrary: 90 }),
       snap({ scope: 'страница', at: '2026-08-22', fromLibrary: 60 }),
     ];
 
-    const trend = buildTrend(history, 'страница');
+    const trend = buildTrend(history, 'page:1');
 
     expect(trend.points).toHaveLength(2);
     expect(trend.previous?.fromLibrary).toBe(40);
   });
 
   it('одна точка — сравнивать не с чем', () => {
-    expect(buildTrend([snap()], 'страница').previous).toBeNull();
+    expect(buildTrend([snap()], 'page:1').previous).toBeNull();
   });
 
   it('чужой охват не даёт ложного сравнения', () => {
-    expect(buildTrend([snap({ scope: 'весь файл' })], 'страница')).toEqual({
+    expect(buildTrend([snap({ scope: 'весь файл', target: 'file' })], 'page:1')).toEqual({
       points: [],
       previous: null,
     });
@@ -148,4 +150,14 @@ describe('дата', () => {
   it('мусор не роняет отчёт', () => {
     expect(shortDate('не дата')).toBe('—');
   });
+});
+
+it('замеры разных страниц не схлопываются в один день и не смешивают тренд', () => {
+  const a = snap({ target: 'page:a' });
+  const b = snap({ target: 'page:b', at: '2026-08-20T12:00:00Z' });
+  const aNext = snap({ target: 'page:a', at: '2026-08-21T12:00:00Z' });
+  const history = appendSnapshot(appendSnapshot([a], b, 40), aNext, 40);
+  expect(history).toHaveLength(3);
+  expect(buildTrend(history, 'page:a').points).toEqual([a, aNext]);
+  expect(buildTrend(history, 'page:b').previous).toBeNull();
 });

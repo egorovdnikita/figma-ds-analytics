@@ -11,6 +11,7 @@ import type { Snapshot, Trend } from '../../shared/snapshot';
 export function buildSnapshot(input: {
   at: Date;
   scope: string;
+  target: string;
   nodes: number;
   adoption: Adoption;
 }): Snapshot {
@@ -18,9 +19,10 @@ export function buildSnapshot(input: {
   const onTokens = adoption.nodesOnLibraryVariable + adoption.nodesOnLocalVariable;
 
   return {
-    v: 1,
+    v: 2,
     at: input.at.toISOString(),
     scope: input.scope,
+    target: input.target,
     nodes: input.nodes,
     instances: adoption.instancesCounted,
     fromLibrary: adoption.fromLibrary,
@@ -34,7 +36,7 @@ export function buildSnapshot(input: {
 
 /** Один снимок на день на охват: последний за день вытесняет предыдущий. */
 function sameDayAndScope(a: Snapshot, b: Snapshot): boolean {
-  return a.scope === b.scope && a.at.slice(0, 10) === b.at.slice(0, 10);
+  return a.target === b.target && a.at.slice(0, 10) === b.at.slice(0, 10);
 }
 
 /**
@@ -55,7 +57,7 @@ export function appendSnapshot(
 }
 
 /** Тренд по текущему охвату: точки по порядку и с чем сравнивать. */
-export function buildTrend(history: readonly Snapshot[], scope: string): Trend {
-  const points = history.filter((item) => item.scope === scope);
+export function buildTrend(history: readonly Snapshot[], target: string): Trend {
+  const points = history.filter((item) => item.target === target);
   return { points, previous: points.length >= 2 ? (points[points.length - 2] ?? null) : null };
 }
