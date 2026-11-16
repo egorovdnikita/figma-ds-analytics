@@ -1,0 +1,95 @@
+import { afterEach, expect, it, vi } from 'vitest';
+import type { MainMessage, UiMessage } from '../src/shared/messages';
+import { instance, page, document, rectangle, solidPaint, variableAlias } from './factories/node';
+import { VariableUsageIndex } from '../src/main/analysis/usage';
+import { VariableResolver } from '../src/main/scanner/variables';
+import { appendSnapshot, buildTrend } from '../src/main/analysis/snapshot';
+import type { Snapshot } from '../src/shared/snapshot';
+
+afterEach(() => vi.unstubAllGlobals());
+
+async function run(nodes: SceneNode[], options: { local?: Variable[]; cancelAtMaster?: boolean } = {}) {
+  vi.resetModules();
+  const currentPage = page({ children: nodes });
+  const messages: MainMessage[] = [];
+  const ui = { onmessage: (_message: UiMessage): void => {}, postMessage: (message: MainMessage) => messages.push(message) };
+  vi.stubGlobal('__html__', '');
+  vi.stubGlobal('figma', {
+    root: { ...document([currentPage]), getPluginData: () => '', setPluginData: vi.fn() },
+    currentPage, ui, showUI: vi.fn(),
+    clientStorage: { setAsync: vi.fn().mockResolvedValue(undefined) },
+    variables: {
+      getLocalVariableCollectionsAsync: async () => [],
+      getLocalVariablesAsync: async () => options.local ?? [],
+      getVariableByIdAsync: async () => null,
+    },
+    teamLibrary: { getAvailableLibraryVariableCollectionsAsync: async () => [] },
+  });
+  if (options.cancelAtMaster) {
+    const node = nodes[0] as InstanceNode;
+    node.getMainComponentAsync = async () => {
+      ui.onmessage({ type: 'ui/scan-cancelled' });
+      return null;
+    };
+  }
+  await import('../src/main/index');
+  ui.onmessage({ type: 'ui/scan-requested', scope: 'page' });
+  await vi.waitFor(() => expect(messages.some(m => m.type === 'main/scan-finished')).toBe(true));
+  const result = messages.find(m => m.type === 'main/scan-finished');
+  if (!result) throw new Error('no report');
+  return result.report;
+}
+
+it('A1: unavailable counted as library', async () => {
+  const report = await run([rectangle({ boundVariables: { fills: [variableAlias('missing')] } })]);
+  expect(report.adoption.nodesOnLibraryVariable).toBe(1);
+  expect(report.adoption.topVariables).toHaveLength(0);
+});
+
+it('A2: spacing binding masks raw color', async () => {
+  const variable = { id: 'spacing', name: 'spacing/8', remote: false, variableCollectionId: 'local' } as Variable;
+  const report = await run([rectangle({ fills: [solidPaint(1, 0, 0)], boundVariables: { width: variableAlias('spacing') } })], { local: [variable] });
+  expect(report.adoption.nodesWithoutVariable).toBe(0);
+  expect(report.adoption.nodesOnLocalVariable).toBe(1);
+});
+
+it('A3: page snapshots overwrite another page', () => {
+  const a: Snapshot = { v: 1, at: '2026-11-16T08:00:00Z', scope: 'страница', nodes: 1, instances: 1, fromLibrary: 1, local: 0, unknown: 0, fills: 0, onTokens: 0, masters: 1 };
+  const b: Snapshot = { ...a, at: '2026-11-16T09:00:00Z', fromLibrary: 0 };
+  expect(appendSnapshot([a], b, 40)).toEqual([b]);
+  expect(buildTrend([a, { ...b, at: '2026-11-17T09:00:00Z' }], 'страница').previous).toEqual(a);
+});
+
+it('A4: cancel at master resolution is ignored', async () => {
+  const report = await run([instance()], { cancelAtMaster: true });
+  expect(report.cancelled).toBe(false);
+  expect(report.trend.points).toHaveLength(1);
+});
+
+it('A5: sixty-first token cannot be searched in UI data', () => {
+  const usage = new VariableUsageIndex();
+  for (let i = 0; i < 61; i++) usage.add(String(i), { nodeId: String(i), pageId: 'p', name: String(i) });
+  const data = usage.describe(id => ({ name: `token-${id}`, collectionName: 'c' }), 60);
+  expect(data.find(item => item.name === 'token-60')).toBeUndefined();
+  expect(usage.size).toBe(61);
+});
+
+it('A6: unused local variables included in usage collections', async () => {
+  const variables = Array.from({ length: 100 }, (_, i) => ({ id: String(i), name: String(i), remote: false, variableCollectionId: 'c' }) as Variable);
+  const resolver = await VariableResolver.build({
+    getLocalVariableCollectionsAsync: async () => [{ id: 'c', key: 'c', name: 'c' } as VariableCollection],
+    getLocalVariablesAsync: async () => variables,
+    getVariableByIdAsync: async () => null,
+    getVariableCollectionByIdAsync: async () => null,
+  });
+  expect(resolver.collectionsWithUsage()[0]?.variables).toBe(100);
+});
+
+it('A7: component property bindings omitted', async () => {
+  const node = instance();
+  Object.assign(node, { boundVariables: { componentProperties: { 'label#1': variableAlias('label') } } });
+  const variable = { id: 'label', name: 'label', remote: false, variableCollectionId: 'c' } as Variable;
+  const report = await run([node], { local: [variable] });
+  expect(report.adoption.topVariables).toHaveLength(0);
+  expect(report.adoption.nodesOnLocalVariable).toBe(0);
+});
