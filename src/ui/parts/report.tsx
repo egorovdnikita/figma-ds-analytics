@@ -183,7 +183,7 @@ export function SummaryScreen({
         </ul>
       </Section>
 
-      <TrendCard adoption={adoption} trend={trend} />
+      <TrendCard adoption={adoption} trend={trend} cancelled={report.cancelled} />
 
       {adoption.librarySourcesAvailable && adoption.libraries.length > 0 && (
         <Section title="библиотеки">
@@ -303,7 +303,23 @@ function Bars({
   );
 }
 
-function TrendCard({ adoption, trend }: { adoption: Adoption; trend: Trend }): JSX.Element {
+function TrendCard({
+  adoption,
+  trend,
+  cancelled,
+}: {
+  adoption: Adoption;
+  trend: Trend;
+  cancelled: boolean;
+}): JSX.Element {
+  if (cancelled)
+    return (
+      <Section title="тренд">
+        <Note>
+          Неполный замер не сохранён. Повторите проверку до конца для сравнения с историей.
+        </Note>
+      </Section>
+    );
   const delta = trendDelta(adoption, trend);
 
   if (trend.previous === null || delta === null) {

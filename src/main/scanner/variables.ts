@@ -72,6 +72,7 @@ export class VariableResolver {
   static async build(
     gateway: VariablesGateway,
     layerConfig: TokenLayerConfig = {},
+    cancelled: () => boolean = () => false,
   ): Promise<VariableResolver> {
     const resolver = new VariableResolver(gateway, layerConfig);
 
@@ -86,6 +87,7 @@ export class VariableResolver {
       });
     }
 
+    if (cancelled()) return resolver;
     const variables = await gateway.getLocalVariablesAsync();
     for (const variable of variables) resolver.#index(variable);
 
@@ -99,16 +101,18 @@ export class VariableResolver {
    * Ошибка на конкретном id трактуется как `unavailable`: один сломанный
    * биндинг не должен ронять скан целиком.
    */
-  async hydrate(ids: Iterable<string>): Promise<void> {
+  async hydrate(ids: Iterable<string>, cancelled: () => boolean = () => false): Promise<void> {
     const unknown = [...new Set(ids)].filter((id) => !this.#byId.has(id));
 
     for (const id of unknown) {
+      if (cancelled()) break;
       try {
         const variable = await this.#gateway.getVariableByIdAsync(id);
         if (variable === null) {
           this.#byId.set(id, { state: 'unavailable', id });
           continue;
         }
+        if (cancelled()) break;
         // Коллекция библиотечной переменной не попадает в локальный индекс,
         // а без неё не определить слой — и layer-violation молча не работает
         // на любом файле-потребителе. Найдено боевым замером.

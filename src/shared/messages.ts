@@ -31,6 +31,7 @@ export type MainMessage =
       readonly pagesDone: number;
       readonly pagesTotal: number;
       readonly currentPageName: string;
+      readonly detail?: string;
     }
   | { readonly type: 'main/scan-finished'; readonly report: ScanReport }
   | { readonly type: 'main/error'; readonly message: string };

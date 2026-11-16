@@ -8,9 +8,9 @@
  * в scanner/traversal.ts.
  */
 import type { MainMessage, UiMessage } from '../shared/messages';
-import type { Place } from '../shared/adoption';
 import type { ScanScope } from '../shared/types';
-import { buildAdoption, type MasterRef } from './analysis/adoption';
+import { resolveMasters } from './analysis/masters';
+import { buildAdoption } from './analysis/adoption';
 import { VariableUsageIndex } from './analysis/usage';
 import { appendSnapshot, buildSnapshot, buildTrend } from './analysis/snapshot';
 import { parseTheme, type Theme } from '../shared/theme';
@@ -67,6 +67,7 @@ async function startingScope(): Promise<ScanScope> {
 }
 
 let cancelled = false;
+let scanning = false;
 
 function post(message: MainMessage): void {
   figma.ui.postMessage(message);
@@ -92,7 +93,7 @@ async function scan(scope: ScanScope): Promise<void> {
   });
 
   // Фаза 1 — локальный индекс переменных.
-  const resolver = await VariableResolver.build(figma.variables);
+  const resolver = await VariableResolver.build(figma.variables, {}, () => cancelled);
 
   // Фаза 2 — обход дерева со сбором привязок и инстансов.
   const aliasIds = new Set<string>();
@@ -136,23 +137,23 @@ async function scan(scope: ScanScope): Promise<void> {
   );
 
   // Фаза 3 — догрузка библиотечных переменных и мастеров.
-  await resolver.hydrate(aliasIds);
-
-  const masterRefs: (MasterRef | null)[] = [];
-  for (const { node, pageId } of topLevelInstances) {
-    const place: Place = { nodeId: node.id, pageId, name: node.name };
-    const unknown: MasterRef = { key: node.id, name: node.name, remote: null, place };
-    try {
-      const master = await node.getMainComponentAsync();
-      if (master === null) {
-        masterRefs.push(unknown);
-        continue;
-      }
-      masterRefs.push({ key: master.key, name: master.name, remote: master.remote, place });
-    } catch {
-      masterRefs.push(unknown);
-    }
-  }
+  const phaseProgress = (detail: string): void =>
+    post({
+      type: 'main/scan-progress',
+      nodesVisited: result.nodesVisited,
+      pagesDone: result.pagesVisited,
+      pagesTotal: target.kind === 'file' ? target.document.children.length : 1,
+      currentPageName: '',
+      detail,
+    });
+  if (!cancelled) phaseProgress('Проверяем переменные');
+  await resolver.hydrate(aliasIds, () => cancelled);
+  if (!cancelled) phaseProgress('Проверяем источники компонентов');
+  const masterRefs = await resolveMasters(
+    topLevelInstances,
+    () => cancelled,
+    (done) => phaseProgress(`Источники компонентов · ${done} из ${topLevelInstances.length}`),
+  );
 
   // Фаза 4 — покрытие по нодам. Локальность известна только после гидрации,
   // поэтому считается здесь, а не во время обхода.
@@ -185,8 +186,11 @@ async function scan(scope: ScanScope): Promise<void> {
       // Обращение к figma.teamLibrary само бросает исключение, если в
       // манифесте нет разрешения. Оборачиваем в функцию, чтобы бросок
       // случился внутри перехвата, а не убил весь прогон.
-      getAvailableLibraryVariableCollectionsAsync: () =>
-        figma.teamLibrary.getAvailableLibraryVariableCollectionsAsync(),
+      getAvailableLibraryVariableCollectionsAsync: async () => {
+        if (cancelled) throw new Error('Проверка остановлена');
+        phaseProgress('Проверяем библиотеки');
+        return figma.teamLibrary.getAvailableLibraryVariableCollectionsAsync();
+      },
     },
   );
 
@@ -195,7 +199,8 @@ async function scan(scope: ScanScope): Promise<void> {
   // Снимок пишем только за полный обход: отменённый замер занизил бы
   // покрытие и оставил в истории ложную яму.
   let trend = buildTrend(loadHistory(figma.root), identity.key);
-  if (!result.cancelled) {
+  const wasCancelled = result.cancelled || cancelled;
+  if (!wasCancelled) {
     const snapshot = buildSnapshot({
       at: new Date(),
       scope: scopeLabel,
@@ -214,7 +219,7 @@ async function scan(scope: ScanScope): Promise<void> {
       fileName: figma.root.name,
       scope: scopeLabel,
       nodesVisited: result.nodesVisited,
-      cancelled: result.cancelled,
+      cancelled: wasCancelled,
       adoption,
       trend,
     },
@@ -255,12 +260,18 @@ function handle(message: UiMessage): void {
       });
       return;
     case 'ui/scan-requested':
-      scan(message.scope).catch((error: unknown) => {
-        post({
-          type: 'main/error',
-          message: error instanceof Error ? error.message : String(error),
+      if (scanning) return;
+      scanning = true;
+      scan(message.scope)
+        .catch((error: unknown) => {
+          post({
+            type: 'main/error',
+            message: error instanceof Error ? error.message : String(error),
+          });
+        })
+        .finally(() => {
+          scanning = false;
         });
-      });
       return;
     case 'ui/theme-chosen':
       void figma.clientStorage.setAsync(THEME_KEY, message.theme).catch(() => {

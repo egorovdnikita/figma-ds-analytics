@@ -59,6 +59,7 @@ interface Progressing {
   pagesDone: number;
   pagesTotal: number;
   page: string;
+  detail?: string;
 }
 
 export function App(): JSX.Element {
@@ -89,6 +90,7 @@ export function App(): JSX.Element {
             pagesDone: message.pagesDone,
             pagesTotal: message.pagesTotal,
             page: message.currentPageName,
+            ...(message.detail ? { detail: message.detail } : {}),
           });
           return;
         case 'main/scan-finished':
@@ -347,11 +349,13 @@ function Start({
               done={progress.pagesTotal > 1 ? progress.pagesDone : progress.nodes}
               total={progress.pagesTotal > 1 ? progress.pagesTotal : Math.max(progress.nodes, 1)}
               headline={withCount(progress.nodes, 'слой', 'слоя', 'слоёв')}
-              {...(progress.pagesTotal > 1
-                ? {
-                    caption: `${progress.page} · страница ${progress.pagesDone + 1} из ${progress.pagesTotal}`,
-                  }
-                : {})}
+              {...(progress.detail !== undefined
+                ? { caption: progress.detail }
+                : progress.pagesTotal > 1
+                  ? {
+                      caption: `${progress.page} · страница ${progress.pagesDone + 1} из ${progress.pagesTotal}`,
+                    }
+                  : {})}
             />
           </div>
         )}
