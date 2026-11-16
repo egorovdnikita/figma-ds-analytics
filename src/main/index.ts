@@ -17,6 +17,7 @@ import { parseTheme, type Theme } from '../shared/theme';
 import { loadConfig } from './storage/config';
 import { HISTORY_LIMIT, loadHistory, saveHistory } from './storage/snapshots';
 import { traverse, type ScanTarget } from './scanner/traversal';
+import { allAliases } from './scanner/aliases';
 import { VariableResolver } from './scanner/variables';
 
 const UI_SIZE = { width: 480, height: 640 } as const;
@@ -85,32 +86,6 @@ const SCOPE_LABEL: Readonly<Record<ScanScope, string>> = {
   page: 'страница',
   file: 'весь файл',
 };
-
-function isAlias(value: unknown): value is VariableAlias {
-  return (
-    typeof value === 'object' &&
-    value !== null &&
-    (value as { type?: unknown }).type === 'VARIABLE_ALIAS' &&
-    typeof (value as { id?: unknown }).id === 'string'
-  );
-}
-
-/** Все привязки переменных на ноде — по всем свойствам, не только по заливке. */
-function allAliases(node: SceneNode): readonly VariableAlias[] {
-  if (!('boundVariables' in node)) return [];
-  const bound: unknown = node.boundVariables;
-  if (bound === undefined || bound === null) return [];
-
-  const result: VariableAlias[] = [];
-  for (const value of Object.values(bound as Record<string, unknown>)) {
-    if (Array.isArray(value)) {
-      for (const item of value) if (isAlias(item)) result.push(item);
-    } else if (isAlias(value)) {
-      result.push(value);
-    }
-  }
-  return result;
-}
 
 /** Есть ли у ноды видимая заливка — кандидат на токенизацию. */
 function hasVisibleFill(node: SceneNode): boolean {
