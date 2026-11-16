@@ -210,6 +210,7 @@ export const REPORT = {
     nodesOnLibraryVariable,
     nodesOnLocalVariable,
     nodesWithoutVariable,
+    nodesOnUnavailableVariable: 0,
     topVariables,
   },
   trend: { points, previous: points[points.length - 2] },

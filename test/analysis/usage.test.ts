@@ -72,9 +72,9 @@ describe('деление нод по локальности токена', () =>
     index.add('V:local', place('shared'));
     index.add('V:lib', place('shared'));
 
-    const split = index.splitByLocality((id) => id === 'V:local');
+    const split = index.splitByLocality((id) => (id === 'V:local' ? 'local' : 'library'));
 
-    expect(split).toEqual({ onLocal: 1, onLibrary: 0 });
+    expect(split).toEqual({ onLocal: 1, onLibrary: 0, unavailable: 0 });
   });
 
   it('одна нода с двумя библиотечными токенами не задваивается', () => {
@@ -82,7 +82,11 @@ describe('деление нод по локальности токена', () =>
     index.add('V:a', place('one'));
     index.add('V:b', place('one'));
 
-    expect(index.splitByLocality(() => false)).toEqual({ onLocal: 0, onLibrary: 1 });
+    expect(index.splitByLocality(() => 'library')).toEqual({
+      onLocal: 0,
+      onLibrary: 1,
+      unavailable: 0,
+    });
   });
 
   it('считает точно и за пределами хранимых мест', () => {
@@ -91,13 +95,32 @@ describe('деление нод по локальности токена', () =>
     const index = new VariableUsageIndex();
     for (let i = 0; i < 500; i++) index.add('V:lib', place(`n${i}`));
 
-    expect(index.splitByLocality(() => false)).toEqual({ onLocal: 0, onLibrary: 500 });
+    expect(index.splitByLocality(() => 'library')).toEqual({
+      onLocal: 0,
+      onLibrary: 500,
+      unavailable: 0,
+    });
   });
 
   it('пустой индекс не ломает подсчёт', () => {
-    expect(new VariableUsageIndex().splitByLocality(() => true)).toEqual({
+    expect(new VariableUsageIndex().splitByLocality(() => 'local')).toEqual({
       onLocal: 0,
       onLibrary: 0,
+      unavailable: 0,
     });
   });
+});
+
+it('недоступные переменные не увеличивают библиотечное покрытие', () => {
+  const index = new VariableUsageIndex();
+  index.add('missing', place('unknown'));
+  index.add('missing', place('mixed'));
+  index.add('library', place('mixed'));
+  index.add('local', place('local'));
+  index.add('missing', place('local'));
+  expect(
+    index.splitByLocality((id) =>
+      id === 'missing' ? 'unavailable' : id === 'local' ? 'local' : 'library',
+    ),
+  ).toEqual({ onLocal: 1, onLibrary: 1, unavailable: 1 });
 });

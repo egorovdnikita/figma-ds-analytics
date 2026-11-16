@@ -63,21 +63,25 @@ export class VariableUsageIndex {
    * Нода считается один раз: если на ней есть хоть одна локальная привязка,
    * она локальная. Иначе двойной учёт раздул бы сумму выше числа нод.
    */
-  splitByLocality(isLocal: (variableId: string) => boolean): {
+  splitByLocality(state: (variableId: string) => 'local' | 'library' | 'unavailable'): {
     onLocal: number;
     onLibrary: number;
+    unavailable: number;
   } {
     let onLocal = 0;
     let onLibrary = 0;
+    let unavailable = 0;
 
     for (const variableIds of this.#byNode.values()) {
       // Нода с локальной и библиотечной привязками считается локальной:
       // иначе она попала бы в оба счётчика и сумма превысила бы число нод.
-      if (variableIds.some(isLocal)) onLocal++;
-      else onLibrary++;
+      const states = variableIds.map(state);
+      if (states.includes('local')) onLocal++;
+      else if (states.includes('library')) onLibrary++;
+      else unavailable++;
     }
 
-    return { onLocal, onLibrary };
+    return { onLocal, onLibrary, unavailable };
   }
 
   /** Использование токенов, от самых востребованных к редким. */

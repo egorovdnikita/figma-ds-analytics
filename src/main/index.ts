@@ -157,9 +157,11 @@ async function scan(scope: ScanScope): Promise<void> {
 
   // Фаза 4 — покрытие по нодам. Локальность известна только после гидрации,
   // поэтому считается здесь, а не во время обхода.
-  const { onLocal: onLocalVariable, onLibrary: onLibraryVariable } = usage.splitByLocality(
-    (id: string) => resolver.isLocal(id),
-  );
+  const {
+    onLocal: onLocalVariable,
+    onLibrary: onLibraryVariable,
+    unavailable,
+  } = usage.splitByLocality((id: string) => resolver.resolve(id).state);
 
   // Обратный индекс: какие токены держат на себе файл и что сломается,
   // если их тронуть.
@@ -177,6 +179,7 @@ async function scan(scope: ScanScope): Promise<void> {
       nodesOnLibraryVariable: onLibraryVariable,
       nodesOnLocalVariable: onLocalVariable,
       nodesWithoutVariable: withoutVariable,
+      nodesOnUnavailableVariable: unavailable,
       topVariables,
     },
     {

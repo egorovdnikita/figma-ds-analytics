@@ -40,6 +40,7 @@ function report(over: Partial<Adoption> = {}, trend?: ScanReport['trend']): Scan
       nodesOnLibraryVariable: 80,
       nodesOnLocalVariable: 20,
       nodesWithoutVariable: 100,
+      nodesOnUnavailableVariable: 0,
       topVariables: [],
       ...over,
     },

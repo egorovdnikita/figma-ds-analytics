@@ -49,6 +49,12 @@ export function toMarkdown(report: ScanReport, at: Date): string {
   }
 
   lines.push('');
+  if (adoption.nodesOnUnavailableVariable > 0) {
+    lines.push(
+      `> Не удалось проверить привязки: ${withCount(adoption.nodesOnUnavailableVariable, 'слой', 'слоя', 'слоёв')}. Они не включены в подтверждённое покрытие токенами.`,
+    );
+    lines.push('');
+  }
   lines.push('## Главное');
   lines.push('');
   lines.push('| Показатель | Значение |');

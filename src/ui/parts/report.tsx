@@ -72,6 +72,13 @@ export function SummaryScreen({
           <p className="mt-1">Проверка остановлена. Показатели относятся к просмотренным слоям.</p>
         </div>
       )}
+      {adoption.nodesOnUnavailableVariable > 0 && (
+        <Note>
+          Не удалось проверить привязки:{' '}
+          {withCount(adoption.nodesOnUnavailableVariable, 'слой', 'слоя', 'слоёв')}. Они не включены
+          в подтверждённое покрытие токенами.
+        </Note>
+      )}
       <section className="coverage-hero text-center">
         <div
           className="coverage-gauge relative mx-auto mt-3 w-[240px]"

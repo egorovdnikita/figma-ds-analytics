@@ -49,6 +49,8 @@ export interface AdoptionInput {
   readonly nodesOnLibraryVariable: number;
   readonly nodesOnLocalVariable: number;
   readonly nodesWithoutVariable: number;
+  /** Слои, для которых не удалось подтвердить ни одной переменной. */
+  readonly nodesOnUnavailableVariable: number;
   readonly topVariables: readonly VariableUsage[];
 }
 
@@ -77,6 +79,7 @@ export async function buildAdoption(
     nodesOnLibraryVariable: input.nodesOnLibraryVariable,
     nodesOnLocalVariable: input.nodesOnLocalVariable,
     nodesWithoutVariable: input.nodesWithoutVariable,
+    nodesOnUnavailableVariable: input.nodesOnUnavailableVariable,
     topVariables: input.topVariables,
   };
 }

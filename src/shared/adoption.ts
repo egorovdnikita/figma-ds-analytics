@@ -68,6 +68,8 @@ export interface Adoption {
   readonly nodesOnLocalVariable: number;
   /** Нод, которые могли бы иметь переменную (есть заливка), но не имеют. */
   readonly nodesWithoutVariable: number;
+  /** Слои, для которых не удалось подтвердить ни одной переменной. */
+  readonly nodesOnUnavailableVariable: number;
   /** Самые востребованные токены — обратный индекс для impact analysis. */
   readonly topVariables: readonly VariableUsage[];
 }
