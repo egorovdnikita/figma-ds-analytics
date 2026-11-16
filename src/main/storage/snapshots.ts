@@ -91,6 +91,7 @@ function writeHistory(gateway: SnapshotGateway, history: readonly Snapshot[]): n
     kept = nextLength > 0 ? kept.slice(-nextLength) : [];
   }
 
-  gateway.setPluginData(SNAPSHOTS_KEY, '[]');
+  // Ни один снимок не влез: сохраняем прежнюю историю документа.
+  if (history.length === 0) gateway.setPluginData(SNAPSHOTS_KEY, '[]');
   return 0;
 }

@@ -107,5 +107,12 @@ describe('недоступное хранилище', () => {
 it('один снимок больше лимита не зацикливает сохранение', () => {
   const g = gateway();
   expect(saveHistory(g, [snap({ target: 'selection:' + 'x'.repeat(100_000) })])).toBe(0);
-  expect(g.stored).toBe('[]');
+  expect(g.stored).toBe('');
+});
+
+it('слишком большой новый снимок не стирает прежнюю историю', () => {
+  const previous = snap();
+  const g = gateway(JSON.stringify([previous]));
+  expect(saveHistory(g, [snap({ target: 'x'.repeat(100_000) })])).toBe(0);
+  expect(loadHistory(g)).toEqual([previous]);
 });
