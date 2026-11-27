@@ -287,14 +287,14 @@ export function ListRow({
       </span>
     </>
   );
-  const className = 'flex min-h-[72px] items-center gap-3 py-3 text-left';
+  const className = 'flex min-h-18 items-center gap-3 py-3 text-left';
   return (
     <li>
       {onClick === undefined ? (
         <div className={`${className} w-full`}>{body}</div>
       ) : (
         <button
-          className={`${className} -mx-2 w-[calc(100%+16px)] rounded-lg px-2 hover:bg-hover`}
+          className={`${className} -mx-2 w-[calc(100%+var(--spacing-16))] rounded-lg px-2 hover:bg-hover`}
           onClick={onClick}
         >
           {body}
@@ -313,7 +313,7 @@ export function Empty({ title, hint }: { title: string; hint?: string }): JSX.El
       </span>
       <p className="text-body-m font-medium">{title}</p>
       {hint !== undefined && (
-        <p className="mx-auto mt-1.5 max-w-[240px] text-caption-l leading-relaxed text-ink-soft">
+        <p className="mx-auto mt-1.5 max-w-narrow-content text-caption-l leading-relaxed text-ink-soft">
           {hint}
         </p>
       )}
@@ -385,10 +385,10 @@ export function StackedBar({ segments }: { segments: readonly Segment[] }): JSX.
         return (
           <li key={segment.label}>
             {segment.onClick === undefined || segment.value === 0 ? (
-              <div className="flex min-h-[72px] flex-col justify-center text-body-l">{body}</div>
+              <div className="flex min-h-18 flex-col justify-center text-body-l">{body}</div>
             ) : (
               <button
-                className="-mx-2 flex min-h-[72px] w-[calc(100%+16px)] flex-col justify-center rounded-lg px-2 text-body-l hover:bg-hover"
+                className="-mx-2 flex min-h-18 w-[calc(100%+var(--spacing-16))] flex-col justify-center rounded-lg px-2 text-body-l hover:bg-hover"
                 onClick={segment.onClick}
               >
                 {body}
@@ -678,7 +678,7 @@ export function Places({
       {places.map((place) => (
         <li key={place.nodeId}>
           <button
-            className="-mx-2 flex min-h-16 w-[calc(100%+16px)] items-center gap-3 rounded-lg px-2 py-3 text-left hover:bg-hover"
+            className="-mx-2 flex min-h-16 w-[calc(100%+var(--spacing-16))] items-center gap-3 rounded-lg px-2 py-3 text-left hover:bg-hover"
             title="Показать слой в Figma"
             onClick={() => onReveal(place.nodeId, place.pageId)}
           >
@@ -748,12 +748,12 @@ export function AdviceRow({
     </>
   );
 
-  const className = 'flex min-h-[72px] items-center gap-3 py-3 text-left';
+  const className = 'flex min-h-18 items-center gap-3 py-3 text-left';
   return onClick === undefined ? (
     <div className={className}>{body}</div>
   ) : (
     <button
-      className={`${className} -mx-2 w-[calc(100%+16px)] rounded-lg px-2 hover:bg-hover`}
+      className={`${className} -mx-2 w-[calc(100%+var(--spacing-16))] rounded-lg px-2 hover:bg-hover`}
       onClick={onClick}
     >
       {body}
@@ -794,7 +794,7 @@ export function Sparkline({
   const lastY = height - ((last - min) / span) * height;
 
   return (
-    <svg viewBox={`0 0 ${width} ${height}`} className="h-7 w-[120px] overflow-visible">
+    <svg viewBox={`0 0 ${width} ${height}`} className="h-7 w-sparkline overflow-visible">
       <polyline
         points={points}
         fill="none"

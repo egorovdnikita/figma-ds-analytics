@@ -1,0 +1,31 @@
+{
+  "repository": "https://github.com/egorovdnikita/box-ui",
+  "commit": "9cff5edcef3878d56c6d4241eb16cea8635f0f09",
+  "inputs": {
+    "tokens/figma/README.md": "a6c88599d6950bd470933994b006d4cb924384781ab78360514a6c49866bfe90",
+    "tokens/figma/brand-color.txt": "1f9b27475428a8777d6c9a24180be04d4013afe015bb8a92af5815d241b8a9d4",
+    "tokens/figma/brand-icon.txt": "f4ad7f1963ac6a7f3096cb5dc6dc6f7ca28e36beaba84f7d97be20e88690dd93",
+    "tokens/figma/brand-rounding.txt": "6d171c958fb5ffcc271bab673e7b6dcc6797ceb49fd232379e44cc5edfa6e498",
+    "tokens/figma/brand-type.txt": "619b617088a08bba9056bcb343b442617fc6eb6e2c9f61ffbdf3f59e31b066bb",
+    "tokens/figma/docs.json": "a39667b175d4d243c0a8e68982f5fd178356e3833b5eb2c65464b35b3795d7a3",
+    "tokens/figma/meta.json": "c7efec38013e773be3cd95a68c8fe769a7622408da2e8fddee3997551e4e1f09",
+    "tokens/figma/prim-color.txt": "b89a01a6807064f4fab4ca8dd4f7d9a4051fea746dec660ae2f5da6e6af32f33",
+    "tokens/figma/prim-rounding.txt": "99f4fe37f920f7b25b00f989b01a0c6806bee778386d28ef71dca45da61f9ea1",
+    "tokens/figma/prim-size.txt": "5e95066a47958bc4c27ba186f5b1d248123c4c7f3b5210561e7e75d2a1c2b5fc",
+    "tokens/figma/prim-spacing.txt": "ca0cee5db32a171c2c6643b387a00d959b08b906cfdebd3cca429d6911f93b90",
+    "tokens/figma/prim-type.txt": "1fe7cf439e419ebc5b86a2466527650203b538ec382a7d31e5bfe9994a81d2ad",
+    "tokens/figma/sys-appearance.txt": "3744c7125d9668cb8ff16b4bdbe072df904eae6a2c9ee326d80062285e8a9d68",
+    "tokens/figma/sys-color.txt": "77da164112ae8976002906cd725e0ce9b22bd574ff914ffa32cc1ca839163bde",
+    "tokens/figma/sys-responsive.txt": "1c028bd6dcf36d67480d6a7278dc98c533a7f272d3233237a64166851d2a54d8",
+    "tokens/figma/sys-state.txt": "a5ff6896abc5d44d8da9b2bf283d16313821e4db04d5cc615517eb27f11c7adf",
+    "tokens/figma/sys-status.txt": "fd3dd19cc203b7e1246997dfccb8cc30d5d51ee576df86e2d837f50f8453178b",
+    "tokens/figma/sys-theme.txt": "a55d6a0872d34b8836b4dc185a357ff72b94ff42b44c2ed757557ab0dca7c94c",
+    "packages/tokens/scripts/build.mjs": "bb7527f4590ae7299a4a7ffd6884ad5d21848c934a0b9f61842c2a73e07b7d54",
+    "packages/tokens/scripts/parse-figma.mjs": "6be07f308e50f747d571783d4250f6631ba680ed7c1aa1cf58233a61f008fd82"
+  },
+  "files": {
+    "primitives.css": "853fa86ea797dd39ff46aa40db7f6ddfcf6b88fae60f0cda396be65c195626da",
+    "theme.css": "cd23f9864531cfba3a3203e32260cf4d0ec7166a5b6897a676d1eb9cd2dab1bd",
+    "controls.css": "ae1897c5ede7a2691cac328a9518e0b7bc5aa65910e30d1a9c18171c594197a9"
+  }
+}

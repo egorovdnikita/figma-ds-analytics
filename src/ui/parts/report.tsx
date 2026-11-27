@@ -82,7 +82,7 @@ export function SummaryScreen({
       )}
       <section className="coverage-hero text-center">
         <div
-          className="coverage-gauge relative mx-auto mt-3 w-[240px]"
+          className="coverage-gauge relative mx-auto mt-3 w-narrow-content"
           role="meter"
           aria-label="Доля копий из библиотеки"
           aria-valuemin={0}

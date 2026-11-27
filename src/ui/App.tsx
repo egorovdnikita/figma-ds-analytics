@@ -280,7 +280,7 @@ function Start({
             )}
           </h1>
           <p
-            className={`${running || error !== null ? 'hidden' : ''} start-description mt-3 max-w-[360px] text-body-l leading-relaxed text-ink-soft`}
+            className={`${running || error !== null ? 'hidden' : ''} start-description mt-3 max-w-description text-body-l leading-relaxed text-ink-soft`}
           >
             Компоненты из библиотеки, локальные копии и покрытие токенами — в одном отчёте.
           </p>

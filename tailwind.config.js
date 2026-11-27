@@ -11,10 +11,41 @@
  *
  * @type {import('tailwindcss').Config}
  */
+// Числовые имена Tailwind сохраняются; значения разрешаются через Box UI.
+const scale = [
+  2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 24, 28, 32, 36, 40, 44, 48, 52, 56, 60, 64, 68, 72, 76, 80,
+  84, 88, 92, 96,
+];
+const spacing = Object.fromEntries(scale.map((px) => [px / 4, `var(--spacing-${px})`]));
+const sizes = {
+  ...Object.fromEntries(scale.map((px) => [px / 4, `var(--size-${px})`])),
+  32: 'var(--audit-scope-height)',
+  sparkline: 'var(--audit-sparkline-width)',
+  'narrow-content': 'var(--audit-narrow-content-width)',
+  description: 'var(--audit-description-width)',
+};
+
 export default {
   content: ['./src/ui/**/*.{ts,tsx,html}'],
   theme: {
     extend: {
+      spacing,
+      lineHeight: {
+        relaxed: 'var(--audit-leading-relaxed)',
+        snug: 'var(--audit-leading-snug)',
+        none: 'var(--audit-leading-none)',
+      },
+      letterSpacing: { tight: 'var(--audit-tracking-tight)' },
+      opacity: { 50: 'var(--audit-disabled-opacity)' },
+      borderWidth: { DEFAULT: 'var(--audit-border-width)', 2: 'var(--audit-outline-width)' },
+      ringWidth: { 2: 'var(--audit-outline-width)' },
+      ringOffsetWidth: { 1: 'var(--audit-focus-offset)' },
+      width: sizes,
+      height: sizes,
+      minWidth: sizes,
+      minHeight: sizes,
+      maxWidth: sizes,
+      maxHeight: sizes,
       colors: {
         panel: 'var(--panel-fill)',
         'panel-card': 'var(--panel-card-fill)',
@@ -54,7 +85,7 @@ export default {
         md: 'var(--rounding-m)',
         lg: 'var(--rounding-l)',
         card: 'var(--rounding-xl)',
-        pill: 'var(--rounding-base-full)',
+        pill: 'var(--rounding-full)',
       },
       fontFamily: {
         sans: ['var(--font-family-body)'],
@@ -69,6 +100,7 @@ export default {
         h2: ['var(--type-h2-font-size)', 'var(--type-h2-line-height)'],
       },
       fontWeight: {
+        normal: 'var(--font-weight-regular)',
         medium: 'var(--type-font-weight-medium)',
         semibold: 'var(--type-font-weight-semibold)',
       },

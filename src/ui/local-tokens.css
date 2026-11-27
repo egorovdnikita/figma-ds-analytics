@@ -1,0 +1,24 @@
+/* Исключения без семантического аналога и конфликты сохранения вида.
+   Обоснование и значения Box UI: docs/BOX_UI_SYNC.md. */
+:root {
+  --audit-mascot-frame: 200px;
+  --audit-mascot-frame-compact: 160px;
+  --audit-scope-height: 128px;
+  --audit-narrow-content-width: 240px;
+  --audit-sparkline-width: 120px;
+  --audit-description-width: 360px;
+  --audit-border-width: 1px;
+  --audit-outline-width: 2px;
+  --audit-focus-offset: 1px;
+  --audit-disabled-opacity: 0.5;
+  --audit-leading-relaxed: 1.625;
+  --audit-leading-snug: 1.375;
+  --audit-leading-none: 1;
+  --audit-tracking-tight: -0.025em;
+  --audit-summary-tracking: -0.05em;
+  --audit-modal-dim-duration: 180ms;
+  --audit-modal-rise-duration: 280ms;
+  --audit-coverage-duration: 700ms;
+  --audit-reduced-motion-duration: 0.01ms;
+  --audit-gauge-font: 'Audit Display';
+}

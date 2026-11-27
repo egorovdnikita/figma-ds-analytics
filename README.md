@@ -69,3 +69,5 @@ TypeScript · React · Vite · Tailwind · Vitest
 ## Лицензия
 
 [MIT](LICENSE). Интерфейс использует токены и иконки дизайн-системы [Box UI](https://github.com/egorovdnikita/box-ui) (MIT). Иконки — набор [Solar](https://www.figma.com/community/file/1166831539721848736) © 480 Design, [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
+
+Синхронизация токенов и локальные исключения: [docs/BOX_UI_SYNC.md](docs/BOX_UI_SYNC.md).

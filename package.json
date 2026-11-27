@@ -10,7 +10,7 @@
   },
   "scripts": {
     "build": "npm run build:ui && npm run build:main && npm run size-check",
-    "build:ui": "vite build && node scripts/prune-css-vars.mjs",
+    "build:ui": "npm run check:tokens && vite build && node scripts/prune-css-vars.mjs",
     "build:main": "node scripts/build-main.mjs",
     "dev": "node scripts/build-main.mjs --watch",
     "typecheck": "tsc -p tsconfig.main.json && tsc -p tsconfig.ui.json && tsc -p tsconfig.test.json",
@@ -21,7 +21,9 @@
     "test:watch": "vitest",
     "size-check": "node scripts/size-check.mjs",
     "verify": "npm run typecheck && npm run lint && npm run format:check && npm run test && npm run build",
-    "sync:box-ui": "node scripts/sync-box-ui.mjs"
+    "sync:box-ui": "node scripts/sync-box-ui.mjs",
+    "check:box-ui": "node scripts/sync-box-ui.mjs --check",
+    "check:tokens": "node scripts/sync-box-ui.mjs --offline"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

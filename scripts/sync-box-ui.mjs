@@ -1,96 +1,86 @@
-/**
- * Синхронизация с дизайн-системой Box UI.
- *
- *   npm run sync:box-ui                         # клонирует свежий main
- *   BOX_UI_DIR=../box-ui npm run sync:box-ui    # из локальной копии
- *
- * Пакеты Box UI не опубликованы в npm, поэтому нужное вендорится в
- * src/ui/vendor/box-ui/ и коммитится — сборка плагина не должна зависеть от
- * сети и от чужого репозитория.
- *
- * Токены берутся целиком: тема переключается атрибутами и ссылается на всю
- * цепочку примитивов, выдернуть часть значит получить var() в пустоту.
- * Иконки — только из списков src/ui/icons.ts: стиль целиком весит 640 KB,
- * а бюджет всего UI — 500 KB. Каждая иконка берётся из своего стиля:
- * BOLD_ICONS — bold, LINEAR_ICONS — linear.
- */
+/** Сборка токенов Box UI в изолированной копии. Исходник доступен только для чтения. */
 import { execFileSync } from 'node:child_process';
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
-import { tmpdir } from 'node:os';
-import { join, resolve } from 'node:path';
+import { createHash } from 'node:crypto';
+import {
+  cpSync,
+  mkdirSync,
+  mkdtempSync,
+  readFileSync,
+  readdirSync,
+  rmSync,
+  writeFileSync,
+} from 'node:fs';
+import { homedir, tmpdir } from 'node:os';
+import { dirname, join, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-const REPO = 'https://github.com/egorovdnikita/box-ui.git';
-const ICON_STYLES = { BOLD_ICONS: 'bold', LINEAR_ICONS: 'linear' };
-const OUT = resolve('src/ui/vendor/box-ui');
+const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+const source = resolve(process.env.BOX_UI_DIR ?? join(homedir(), 'Projects/box-ui'));
+const out = join(root, 'src/ui/vendor/box-ui');
+const files = ['primitives.css', 'theme.css', 'controls.css'];
+const hash = (value) => createHash('sha256').update(value).digest('hex');
+const checking = process.argv.includes('--check');
+const offline = process.argv.includes('--offline');
+const manifestPath = join(out, 'tokens-source.json');
 
-let source = process.env.BOX_UI_DIR ? resolve(process.env.BOX_UI_DIR) : null;
-let cleanup = null;
-if (source === null) {
-  const dir = mkdtempSync(join(tmpdir(), 'box-ui-'));
-  execFileSync('git', ['clone', '--quiet', '--depth', '1', REPO, dir], { stdio: 'inherit' });
-  source = dir;
-  cleanup = dir;
-}
-
-try {
-  const commit = execFileSync('git', ['-C', source, 'rev-parse', 'HEAD'], {
-    encoding: 'utf8',
-  }).trim();
-
-  // Токены собираются из дампов Figma скриптом самой Box UI — тем же, что
-  // кормит её Storybook. Своей интерпретации дампов здесь нет.
-  execFileSync('node', [join(source, 'packages/tokens/scripts/build.mjs')], {
-    cwd: source,
-    stdio: 'ignore',
-  });
-  const cssDir = join(source, 'packages/tokens/dist/css');
-
-  mkdirSync(OUT, { recursive: true });
-  for (const file of ['primitives.css', 'theme.css', 'controls.css']) {
-    writeFileSync(join(OUT, file), readFileSync(join(cssDir, file)));
-  }
-
-  const list = readFileSync('src/ui/icons.ts', 'utf8');
-  const icons = {};
-  const counts = [];
-  for (const [constant, style] of Object.entries(ICON_STYLES)) {
-    const block = new RegExp(`export const ${constant} = \\[([\\s\\S]*?)\\] as const`).exec(list);
-    if (block === null) throw new Error(`В src/ui/icons.ts нет списка ${constant}`);
-    const wanted = [...block[1].matchAll(/'([a-z0-9-]+)'/g)].map((match) => match[1]);
-    const all = JSON.parse(
-      readFileSync(join(source, `packages/icons/src/data/${style}.json`), 'utf8'),
-    );
-    const missing = wanted.filter((name) => !(name in all));
-    if (missing.length > 0) {
-      throw new Error(`В Box UI (${style}) нет иконок: ${missing.join(', ')}`);
+if (offline) {
+  const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'));
+  for (const file of files) {
+    if (hash(readFileSync(join(out, file))) !== manifest.files[file]) {
+      throw new Error(`Дрейф вендорного файла ${file}: запустите npm run sync:box-ui`);
     }
-    for (const name of wanted) icons[name] = all[name];
-    counts.push(`${wanted.length} \`${style}\``);
   }
-  const wanted = Object.keys(icons);
-  // Зашитый цвет проигнорировал бы токен текста вокруг — Box UI запрещает
-  // такое в своих тестах, и здесь это проверяется повторно.
-  for (const [name, body] of Object.entries(icons)) {
-    if (/fill="#|stroke="#/i.test(body)) throw new Error(`Иконка ${name} с зашитым цветом`);
+  console.log('Box UI: контрольные суммы токенов совпадают');
+} else {
+  const temp = mkdtempSync(join(tmpdir(), 'figma-ds-box-ui-'));
+  try {
+    // Копируем входы генератора, а не dist: он может быть устаревшим.
+    for (const path of ['tokens/figma', 'packages/tokens/scripts']) {
+      cpSync(join(source, path), join(temp, path), { recursive: true });
+    }
+    const inputs = {};
+    for (const path of ['tokens/figma', 'packages/tokens/scripts']) {
+      for (const file of readdirSync(join(temp, path)).sort()) {
+        inputs[`${path}/${file}`] = hash(readFileSync(join(temp, path, file)));
+      }
+    }
+    const commit = execFileSync('git', ['-C', source, 'rev-parse', 'HEAD'], {
+      encoding: 'utf8',
+    }).trim();
+    execFileSync(process.execPath, [join(temp, 'packages/tokens/scripts/build.mjs')], {
+      cwd: temp,
+      stdio: 'pipe',
+    });
+    const generated = Object.fromEntries(
+      files.map((file) => [file, readFileSync(join(temp, 'packages/tokens/dist/css', file))]),
+    );
+    const manifest = {
+      repository: 'https://github.com/egorovdnikita/box-ui',
+      commit,
+      inputs,
+      files: Object.fromEntries(files.map((file) => [file, hash(generated[file])])),
+    };
+    if (checking) {
+      const pinned = JSON.parse(readFileSync(manifestPath, 'utf8'));
+      if (JSON.stringify(pinned.inputs) !== JSON.stringify(inputs))
+        throw new Error('Изменились исходники Box UI: требуется проверка и синхронизация');
+      for (const file of files) {
+        if (!readFileSync(join(out, file)).equals(generated[file]))
+          throw new Error(`Расхождение с Box UI: ${file}`);
+      }
+      console.log(`Box UI ${commit.slice(0, 7)}: исходники и все 3 CSS совпадают`);
+    } else {
+      const sourceDoc = readFileSync(join(out, 'SOURCE.md'), 'utf8').replace(
+        /(- Токены — коммит: )`[^`]+`/,
+        (_, prefix) => `${prefix}\`${commit}\``,
+      );
+      mkdirSync(out, { recursive: true });
+      for (const file of files) writeFileSync(join(out, file), generated[file]);
+      writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`);
+      writeFileSync(join(out, 'SOURCE.md'), sourceDoc);
+      console.log(`Box UI ${commit.slice(0, 7)}: синхронизированы только токены; иконки сохранены`);
+    }
+  } finally {
+    rmSync(temp, { recursive: true, force: true });
   }
-  writeFileSync(join(OUT, 'icons.json'), `${JSON.stringify(icons, null, 2)}\n`);
-
-  writeFileSync(
-    join(OUT, 'SOURCE.md'),
-    `# Box UI — вендорная копия
-
-Не редактировать руками: файлы перезаписывает \`npm run sync:box-ui\`.
-
-- Источник: ${REPO.replace(/\.git$/, '')}
-- Коммит: \`${commit}\`
-- Токены: \`primitives.css\`, \`theme.css\`, \`controls.css\` — сборка \`packages/tokens\`, без изменений
-- Иконки: ${wanted.length} шт. (${counts.join(', ')}), списки — \`src/ui/icons.ts\`
-
-Иконки — набор Solar © 480 Design, [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
-`,
-  );
-
-  console.log(`Box UI ${commit.slice(0, 7)}: токены + ${wanted.length} иконок → ${OUT}`);
-} finally {
-  if (cleanup !== null && existsSync(cleanup)) rmSync(cleanup, { recursive: true, force: true });
 }
